@@ -230,12 +230,13 @@ jobs:
               Get-ChildItem -Path $msedgeDir -Recurse | ForEach-Object { Write-Host "  $($_.FullName)" -ForegroundColor Cyan }
               
               # Check if Chrome-bin exists (new structure)
-              $chromeBinPath = Get-ChildItem -Path $msedgeDir -Directory -Name "Chrome-bin" -Recurse | Select-Object -First 1
-              if ($chromeBinPath) {
-                Write-Host "Found Chrome-bin folder: $($chromeBinPath.FullName)" -ForegroundColor Green
+              $chromeBinFolders = Get-ChildItem -Path $msedgeDir -Directory -Recurse | Where-Object { $_.Name -eq "Chrome-bin" }
+              if ($chromeBinFolders.Count -gt 0) {
+                $chromeBinFullPath = $chromeBinFolders[0].FullName
+                Write-Host "Found Chrome-bin folder: $chromeBinFullPath" -ForegroundColor Green
                 Write-Host "Chrome-bin contents:" -ForegroundColor Cyan
-                Get-ChildItem -Path $chromeBinPath.FullName -Recurse | ForEach-Object { Write-Host "    $($_.FullName)" -ForegroundColor Cyan }
-                Copy-Item "$($chromeBinPath.FullName)\*" $edgePath -Recurse -Force
+                Get-ChildItem -Path $chromeBinFullPath | ForEach-Object { Write-Host "    $($_.Name)" -ForegroundColor Cyan }
+                Copy-Item "$chromeBinFullPath\*" $edgePath -Recurse -Force
                 Write-Host "Copied Chrome-bin contents successfully" -ForegroundColor Green
               } else {
                 Write-Host "Chrome-bin folder not found, using fallback method..." -ForegroundColor Yellow
