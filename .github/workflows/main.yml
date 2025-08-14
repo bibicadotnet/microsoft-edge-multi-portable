@@ -185,13 +185,42 @@ jobs:
               
               Write-Host "Found Chrome-bin directory, copying files..." -ForegroundColor Yellow
               
-              # Copy all contents from Chrome-bin to Edge folder
+              # Copy all contents from Chrome-bin to Edge folder with better error handling
               $chromeBinPath = $chromeBinDir.FullName
-              Copy-Item "$chromeBinPath\*" $edgePath -Recurse -Force
+              
+              try {
+                # Copy files one by one to handle problematic files
+                Get-ChildItem -Path $chromeBinPath -Recurse | ForEach-Object {
+                  if ($_.PSIsContainer) {
+                    # Create directory
+                    $relativePath = $_.FullName.Substring($chromeBinPath.Length + 1)
+                    $targetDir = Join-Path $edgePath $relativePath
+                    if (-not (Test-Path $targetDir)) {
+                      New-Item -ItemType Directory -Path $targetDir -Force | Out-Null
+                    }
+                  } else {
+                    # Copy file, skip problematic ones
+                    if ($_.Name -notmatch "^(desktop\.ini|thumbs\.db|\$)") {
+                      $relativePath = $_.FullName.Substring($chromeBinPath.Length + 1)
+                      $targetFile = Join-Path $edgePath $relativePath
+                      $targetDir = Split-Path $targetFile
+                      if (-not (Test-Path $targetDir)) {
+                        New-Item -ItemType Directory -Path $targetDir -Force | Out-Null
+                      }
+                      Copy-Item $_.FullName $targetFile -Force -ErrorAction SilentlyContinue
+                    }
+                  }
+                }
+              } catch {
+                Write-Host "Error copying some files: $($_.Exception.Message)" -ForegroundColor Yellow
+                # Try fallback method
+                robocopy "$chromeBinPath" "$edgePath" /E /R:0 /W:0 /NFL /NDL /NJH /NJS /NC /NS | Out-Null
+              }
               
               # Verify msedge.exe exists
               if (-not (Test-Path "$edgePath\msedge.exe")) {
-                Write-Host "msedge.exe not found after extraction for $arch, skipping..." -ForegroundColor Red
+                Write-Host "msedge.exe not found after extraction for $arch, contents:" -ForegroundColor Red
+                Get-ChildItem -Path $edgePath -Recurse -ErrorAction SilentlyContinue | ForEach-Object { Write-Host "  $($_.FullName)" }
                 continue
               }
               
