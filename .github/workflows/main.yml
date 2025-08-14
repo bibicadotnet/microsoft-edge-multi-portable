@@ -1,96 +1,263 @@
-name: Edge Multi Portable Auto Builder
+name: Edge Multi-Portable Auto Builder
 
 on:
   schedule:
-    - cron: '0 * * * *'
-  workflow_dispatch:
+    - cron: '0 * * * *'  # Chạy mỗi giờ
+  workflow_dispatch:  # Cho phép chạy thủ công
 
 permissions:
   contents: write
+  packages: write
 
 jobs:
-  build:
+  check-and-build:
     runs-on: windows-latest
+    
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Install jq
-        run: choco install jq -y
-
-      - name: Fetch data.json
-        shell: bash
-        run: |
-          curl -sL https://raw.githubusercontent.com/bibicadotnet/edge_installer_multi/main/data.json -o data.json
-
-      - name: Get Chrome++ version
-        id: chromeplus
-        shell: bash
-        run: |
-          ver=$(curl -s https://api.github.com/repos/Bush2021/chrome_plus/releases/latest | jq -r '.tag_name')
-          echo "version=$ver" >> $GITHUB_OUTPUT
-
-      - name: Build multi portable
-        shell: pwsh
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          $channels = @("stable", "beta", "dev", "canary")
-          $archs = @("x86", "x64", "ARM64")
-          $data = Get-Content data.json | ConvertFrom-Json
-          $chromePlusVersion = "${{ steps.chromeplus.outputs.version }}"
-
-          foreach ($channel in $channels) {
-            $verKey = "msedge-$channel-win-x64"
-            $version = $data.$verKey.version
-            if (-not $version -or $version -eq "null") {
-              continue
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Get all Edge releases
+      id: edge-releases
+      shell: powershell
+      run: |
+        try {
+          $releases = Invoke-RestMethod "https://api.github.com/repos/bibicadotnet/edge_installer_multi/releases"
+          echo "RELEASES_COUNT=$($releases.Count)" >> $env:GITHUB_OUTPUT
+          # Convert releases to JSON and pass to next steps
+          $releasesJson = $releases | ConvertTo-Json -Depth 10
+          echo "RELEASES_JSON=$releasesJson" >> $env:GITHUB_OUTPUT
+          Write-Host "Found $($releases.Count) Edge releases"
+        } catch {
+          Write-Error "Failed to get Edge releases: $($_.Exception.Message)"
+          exit 1
+        }
+        
+    - name: Get latest Chrome++ version
+      id: chromeplus-version
+      shell: powershell
+      run: |
+        try {
+          $chromePlusRelease = Invoke-RestMethod "https://api.github.com/repos/Bush2021/chrome_plus/releases/latest"
+          $chromePlusVersion = $chromePlusRelease.tag_name
+          echo "CHROMEPLUS_VERSION=$chromePlusVersion" >> $env:GITHUB_OUTPUT
+          Write-Host "Chrome++ version: $chromePlusVersion"
+        } catch {
+          Write-Error "Failed to get Chrome++ version: $($_.Exception.Message)"
+          exit 1
+        }
+        
+    - name: Process each release
+      id: process-releases
+      shell: powershell
+      run: |
+        $releasesJson = '${{ steps.edge-releases.outputs.RELEASES_JSON }}' | ConvertFrom-Json
+        $chromePlusVersion = "${{ steps.chromeplus-version.outputs.CHROMEPLUS_VERSION }}"
+        
+        $results = @()
+        
+        foreach ($release in $releasesJson) {
+          # Parse channel and version from tag name (format: stable-139.0.3405.86)
+          $tagParts = $release.tag_name -split '-'
+          if ($tagParts.Count -lt 2) { continue }
+          
+          $channel = $tagParts[0]
+          $version = $tagParts[1..($tagParts.Count-1)] -join '-'
+          
+          # Check if portable release already exists
+          $portableTag = "${channel}-portable-${version}"
+          $releaseExists = $false
+          
+          try {
+            $headers = @{
+              'Authorization' = 'token ${{ secrets.GITHUB_TOKEN }}'
+              'Accept' = 'application/vnd.github.v3+json'
             }
-
-            $tag = "$channel-portable-$version"
-
-            try {
-              gh release view $tag --repo ${{ github.repository }} --json tagName > $null
+            $null = Invoke-RestMethod -Uri "https://api.github.com/repos/${{ github.repository }}/releases/tags/$portableTag" -Headers $headers -ErrorAction Stop
+            $releaseExists = $true
+            Write-Host "Portable release $portableTag already exists - skipping"
+          } catch {
+            if ($_.Exception.Response.StatusCode -ne 404) {
+              Write-Error "Error checking release: $($_.Exception.Message)"
               continue
-            } catch {}
-
-            $files = @()
-
-            foreach ($arch in $archs) {
-              $key = "msedge-$channel-win-$arch"
-              $url = $data.$key.'下载链接'
-              if (-not $url -or $url -eq "null") {
-                continue
-              }
-
-              $tempDir = "$env:TEMP\edge_build_${channel}_${arch}"
-              Remove-Item $tempDir -Recurse -Force -ErrorAction SilentlyContinue
-              New-Item -ItemType Directory -Path $tempDir | Out-Null
-
-              $zipName = "edge-$channel-$arch-$version.zip"
-              Invoke-WebRequest -Uri $url -OutFile "$tempDir\$zipName"
-
-              Invoke-WebRequest -Uri "https://github.com/Bush2021/chrome_plus/releases/latest/download/setdll.7z" -OutFile "$tempDir\setdll.7z"
-              Invoke-WebRequest -Uri "https://www.7-zip.org/a/7zr.exe" -OutFile "$tempDir\7zr.exe"
-              Invoke-WebRequest -Uri "https://raw.githubusercontent.com/bibicadotnet/microsoft-edge-portable/main/chrome%2B%2B.ini" -OutFile "$tempDir\chrome++.ini"
-
-              & "$tempDir\7zr.exe" x "$tempDir\$zipName" "-o$tempDir\edge" -y | Out-Null
-              & "$tempDir\7zr.exe" x "$tempDir\setdll.7z" "-o$tempDir\chromeplus" -y | Out-Null
-
-              Copy-Item "$tempDir\chrome++.ini" "$tempDir\edge\chrome++.ini" -Force
-              Copy-Item "$tempDir\chromeplus\setdll-x64.exe" "$tempDir\edge\setdll-x64.exe" -Force
-              Copy-Item "$tempDir\chromeplus\version-x64.dll" "$tempDir\edge\version.dll" -Force
-
-              Push-Location "$tempDir\edge"
-              .\setdll-x64.exe /d:version.dll msedge.exe | Out-Null
-              Pop-Location
-
-              $portableZip = "edge-$channel-portable-$arch-$version.zip"
-              Compress-Archive -Path "$tempDir\edge\*" -DestinationPath $portableZip -Force
-              $files += $portableZip
-            }
-
-            if ($files.Count -gt 0) {
-              gh release create $tag $files --title "$tag" --notes "Auto portable build for $channel $version with Chrome++ $chromePlusVersion"
             }
           }
+          
+          if (-not $releaseExists) {
+            # Find assets for each architecture
+            $assets = @{
+              x86 = $release.assets | Where-Object { $_.name -match "edge-${channel}-x86-${version}\.zip" } | Select-Object -First 1
+              x64 = $release.assets | Where-Object { $_.name -match "edge-${channel}-x64-${version}\.zip" } | Select-Object -First 1
+              ARM64 = $release.assets | Where-Object { $_.name -match "edge-${channel}-ARM64-${version}\.zip" } | Select-Object -First 1
+            }
+            
+            $result = @{
+              channel = $channel
+              version = $version
+              tag = $portableTag
+              assets = $assets
+              should_build = $true
+            }
+            
+            $results += $result
+            Write-Host "Will build portable for $channel version $version"
+          }
+        }
+        
+        # Convert results to JSON and output
+        $resultsJson = $results | ConvertTo-Json -Depth 5 -Compress
+        echo "PROCESSED_RELEASES=$resultsJson" >> $env:GITHUB_OUTPUT
+        
+    - name: Build Edge Portable
+      if: steps.process-releases.outputs.PROCESSED_RELEASES != '[]'
+      shell: powershell
+      run: |
+        $processedReleases = '${{ steps.process-releases.outputs.PROCESSED_RELEASES }}' | ConvertFrom-Json
+        $chromePlusVersion = "${{ steps.chromeplus-version.outputs.CHROMEPLUS_VERSION }}"
+        
+        # Download Chrome++ once
+        $chromePlusRelease = Invoke-RestMethod "https://api.github.com/repos/Bush2021/chrome_plus/releases/latest"
+        $chromePlusDownloadUrl = $chromePlusRelease.assets | Where-Object { $_.name -eq "setdll.7z" } | Select-Object -First 1 -ExpandProperty browser_download_url
+        
+        $tempDir = "$env:TEMP\EdgePortableBuild"
+        if (Test-Path $tempDir) { Remove-Item $tempDir -Recurse -Force }
+        New-Item -ItemType Directory -Path $tempDir -Force | Out-Null
+        
+        # Download Chrome++
+        Write-Host "Downloading Chrome++..." -ForegroundColor Yellow
+        (New-Object System.Net.WebClient).DownloadFile($chromePlusDownloadUrl, "$tempDir\setdll.7z")
+        (New-Object System.Net.WebClient).DownloadFile("https://www.7-zip.org/a/7zr.exe", "$tempDir\7zr.exe")
+        (New-Object System.Net.WebClient).DownloadFile("https://raw.githubusercontent.com/bibicadotnet/microsoft-edge-portable/refs/heads/main/chrome%2B%2B.ini", "$tempDir\chrome++.ini")
+        
+        # Extract Chrome++
+        Write-Host "Extracting Chrome++..." -ForegroundColor Yellow
+        $sevenZPath = "$tempDir\7zr.exe"
+        $chromePlusExtractDir = "$tempDir\chromeplus"
+        & $sevenZPath x "$tempDir\setdll.7z" "-o$chromePlusExtractDir" -y | Out-Null
+        
+        foreach ($release in $processedReleases) {
+          if (-not $release.should_build) { continue }
+          
+          $channel = $release.channel
+          $version = $release.version
+          $tag = $release.tag
+          
+          Write-Host "Building portable for $channel version $version" -ForegroundColor Green
+          
+          $archResults = @()
+          
+          foreach ($arch in $release.assets.Keys) {
+            $asset = $release.assets.$arch
+            if (-not $asset) {
+              Write-Host "No asset found for $channel $arch $version - skipping"
+              continue
+            }
+            
+            $rootPath = "$env:GITHUB_WORKSPACE\$tag-$arch"
+            $portablePath = "$rootPath\Edge_Portable"
+            $edgePath = "$portablePath\Edge"
+            
+            # Prepare directories
+            if (Test-Path $rootPath) { Remove-Item $rootPath -Recurse -Force }
+            New-Item -ItemType Directory -Path $rootPath -Force | Out-Null
+            New-Item -ItemType Directory -Path $portablePath -Force | Out-Null
+            New-Item -ItemType Directory -Path $edgePath -Force | Out-Null
+            
+            # Download Edge zip
+            $edgeZipPath = "$tempDir\edge-$channel-$arch-$version.zip"
+            Write-Host "Downloading Edge $channel $arch $version..." -ForegroundColor Yellow
+            (New-Object System.Net.WebClient).DownloadFile($asset.browser_download_url, $edgeZipPath)
+            
+            # Extract Edge zip
+            Write-Host "Extracting Edge..." -ForegroundColor Yellow
+            $edgeExtractDir = "$tempDir\edge-$channel-$arch-$version"
+            if (Test-Path $edgeExtractDir) { Remove-Item $edgeExtractDir -Recurse -Force }
+            New-Item -ItemType Directory -Path $edgeExtractDir -Force | Out-Null
+            
+            Expand-Archive -Path $edgeZipPath -DestinationPath $edgeExtractDir -Force
+            
+            # Find msedge.exe and version folder
+            $msedgeExe = Get-ChildItem -Path $edgeExtractDir -Filter "msedge.exe" -Recurse | Select-Object -First 1
+            $versionFolder = Get-ChildItem -Path $edgeExtractDir -Directory -Recurse | Where-Object { $_.Name -match "^\d+\.\d+\.\d+\.\d+$" } | Select-Object -First 1
+            
+            if (-not $msedgeExe -or -not $versionFolder) {
+              Write-Host "Could not find required files in Edge package for $channel $arch $version - skipping"
+              continue
+            }
+            
+            # Copy Edge files
+            Copy-Item $versionFolder.FullName "$edgePath\$($versionFolder.Name)" -Recurse -Force
+            Copy-Item $msedgeExe.FullName "$edgePath\msedge.exe" -Force
+            
+            # Copy Chrome++ files
+            Copy-Item "$tempDir\chrome++.ini" "$edgePath\chrome++.ini" -Force
+            
+            $dllName = "version-$arch.dll"
+            if ($arch -eq "ARM64") { $dllName = "version-arm64.dll" }
+            $setdllName = "setdll-$arch.exe"
+            if ($arch -eq "ARM64") { $setdllName = "setdll-arm64.exe" }
+            
+            if (Test-Path "$chromePlusExtractDir\$dllName") {
+              Copy-Item "$chromePlusExtractDir\$dllName" "$edgePath\version.dll" -Force
+            } else {
+              Write-Host "Chrome++ DLL for $arch not found - skipping"
+              continue
+            }
+            
+            if (Test-Path "$chromePlusExtractDir\$setdllName") {
+              Copy-Item "$chromePlusExtractDir\$setdllName" "$edgePath\setdll.exe" -Force
+            } else {
+              Write-Host "Chrome++ setdll for $arch not found - skipping"
+              continue
+            }
+            
+            # Apply Chrome++
+            Write-Host "Applying Chrome++ for $arch..." -ForegroundColor Yellow
+            Push-Location $edgePath
+            & ".\setdll.exe" /d:version.dll msedge.exe | Out-Null
+            Pop-Location
+            
+            # Cleanup
+            Remove-Item "$edgePath\setdll.exe", "$edgePath\msedge.exe~" -Force -ErrorAction SilentlyContinue
+            
+            # Create ZIP
+            $zipPath = "$env:GITHUB_WORKSPACE\edge-$channel-portable-$arch-$version.zip"
+            Compress-Archive -Path "$rootPath\*" -DestinationPath $zipPath -CompressionLevel Optimal
+            
+            $archResults += @{
+              arch = $arch
+              zipPath = $zipPath
+            }
+            
+            Write-Host "Created portable for $channel $arch $version" -ForegroundColor Green
+          }
+          
+          # Create release if we have at least one architecture
+          if ($archResults.Count -gt 0) {
+            $releaseTitle = "$channel-portable-$version"
+            $releaseBody = "**Microsoft Edge Portable with Chrome++**`n`n**Channel:** $channel`n**Edge Version:** $version`n**Chrome++ Version:** $chromePlusVersion`n`n## What's Included`n- Microsoft Edge $channel Portable`n- Chrome++ enhancements`n- Pre-configured settings`n`n## Installation`n1. Download the ZIP file for your architecture`n2. Extract to your desired location`n3. Run Edge_Portable\Edge\msedge.exe`n`n---`n*This release was automatically generated by GitHub Actions*"
+            
+            $assetPaths = $archResults | ForEach-Object { $_.zipPath }
+            $assetArgs = $assetPaths -join ' '
+            
+            Write-Host "Creating release $tag with assets: $assetArgs" -ForegroundColor Yellow
+            gh release create $tag --title $releaseTitle --notes $releaseBody --repo ${{ github.repository }} $assetArgs
+            
+            Write-Host "Release $tag created successfully!" -ForegroundColor Green
+          }
+        }
+        
+        # Cleanup
+        Remove-Item $tempDir -Recurse -Force -ErrorAction SilentlyContinue
+        
+    - name: Summary
+      shell: powershell
+      run: |
+        $processedReleases = '${{ steps.process-releases.outputs.PROCESSED_RELEASES }}' | ConvertFrom-Json
+        $builtCount = ($processedReleases | Where-Object { $_.should_build }).Count
+        
+        if ($builtCount -eq 0) {
+          Write-Host "No new releases to build - all portable versions are up to date" -ForegroundColor Yellow
+        } else {
+          Write-Host "Successfully built $builtCount portable releases" -ForegroundColor Green
+        }
