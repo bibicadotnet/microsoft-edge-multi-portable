@@ -174,18 +174,11 @@ jobs:
               
               # Install Edge
               Write-Host "Installing Edge..." -ForegroundColor Yellow
-              # Check if Chrome-bin exists (new structure)
-              $chromeBinFolders = Get-ChildItem -Path $msedgeDir -Directory -Recurse | Where-Object { $_.Name -eq "Chrome-bin" }
-              if ($chromeBinFolders.Count -gt 0) {
-                $chromeBinFullPath = $chromeBinFolders[0].FullName
-                Copy-Item "$chromeBinFullPath\*" $edgePath -Recurse -Force
-              } else {
-                # Fallback to original method
-                $versionFolder = Get-ChildItem -Path $msedgeDir -Directory -Recurse | Where-Object { $_.Name -match "^\d+\.\d+\.\d+\.\d+$" } | Select-Object -First 1
-                if ($versionFolder) {
-                  Copy-Item $versionFolder.FullName "$edgePath\$($versionFolder.Name)" -Recurse -Force
-                }
+              $versionFolder = Get-ChildItem -Path $msedgeDir -Directory -Recurse | Where-Object { $_.Name -match "^\d+\.\d+\.\d+\.\d+$" } | Select-Object -First 1
+              if ($versionFolder) {
+                Copy-Item $versionFolder.FullName "$edgePath\$($versionFolder.Name)" -Recurse -Force
                 
+                # QUAN TRỌNG: Copy msedge.exe ra ngoài
                 $sourceFile = Get-ChildItem -Path $msedgeDir -Name "msedge.exe" -Recurse | Select-Object -First 1
                 if ($sourceFile) {
                   Copy-Item "$msedgeDir\$sourceFile" "$edgePath\msedge.exe" -Force
