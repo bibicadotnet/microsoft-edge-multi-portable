@@ -1,4 +1,4 @@
-## Microsoft Edge (Stable, Beta, Dev, or Canary) Portable with Chrome++ Auto Installer
+## Microsoft Edge (Stable, Beta, Dev, or Canary) Portable with Chrome++
 
 No installation or setup required. Keeps all history, cookies, extensions, and settings even when moved to another device.
 
