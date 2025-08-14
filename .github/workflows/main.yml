@@ -141,17 +141,43 @@ jobs:
               Write-Host "Downloading $expectedAssetName..." -ForegroundColor Yellow
               (New-Object System.Net.WebClient).DownloadFile($asset.browser_download_url, $edgeZipPath)
               
-              # Extract Edge
+              # Extract Edge ZIP using 7z (not standard ZIP)
               $edgeExtractDir = "$tempDir\edge_$arch"
+              if (Test-Path $edgeExtractDir) { Remove-Item $edgeExtractDir -Recurse -Force }
+              New-Item -ItemType Directory -Path $edgeExtractDir -Force | Out-Null
+              
+              Write-Host "Extracting $expectedAssetName using 7z..." -ForegroundColor Yellow
               & "$tempDir\7zr.exe" x $edgeZipPath "-o$edgeExtractDir" -y | Out-Null
               
-              # Find and copy Edge files
-              $msedgeExe = Get-ChildItem -Path $edgeExtractDir -Name "msedge.exe" -Recurse | Select-Object -First 1
-              if ($msedgeExe) {
-                $msedgeDir = Split-Path (Get-ChildItem -Path $edgeExtractDir -Name "msedge.exe" -Recurse).FullName
-                Copy-Item "$msedgeDir\*" $edgePath -Recurse -Force
-              } else {
-                Write-Host "msedge.exe not found for $arch, skipping..." -ForegroundColor Red
+              # Look for MSEDGE.7z
+              $msedge7z = Get-ChildItem -Path $edgeExtractDir -Name "MSEDGE.7z" -Recurse | Select-Object -First 1
+              if (-not $msedge7z) {
+                Write-Host "MSEDGE.7z not found in $expectedAssetName for $arch, skipping..." -ForegroundColor Red
+                continue
+              }
+              
+              Write-Host "Found MSEDGE.7z, extracting..." -ForegroundColor Yellow
+              
+              # Extract MSEDGE.7z - should contain Chrome-bin
+              $msedgeDir = "$tempDir\msedge_$arch"
+              & "$tempDir\7zr.exe" x "$($msedge7z.FullName)" "-o$msedgeDir" -y | Out-Null
+              
+              # Look for Chrome-bin directory
+              $chromeBinDir = Get-ChildItem -Path $msedgeDir -Name "Chrome-bin" -Directory -Recurse | Select-Object -First 1
+              if (-not $chromeBinDir) {
+                Write-Host "Chrome-bin directory not found for $arch, skipping..." -ForegroundColor Red
+                continue
+              }
+              
+              Write-Host "Found Chrome-bin directory, copying files..." -ForegroundColor Yellow
+              
+              # Copy all contents from Chrome-bin to Edge folder
+              $chromeBinPath = $chromeBinDir.FullName
+              Copy-Item "$chromeBinPath\*" $edgePath -Recurse -Force
+              
+              # Verify msedge.exe exists
+              if (-not (Test-Path "$edgePath\msedge.exe")) {
+                Write-Host "msedge.exe not found after extraction for $arch, skipping..." -ForegroundColor Red
                 continue
               }
               
@@ -214,8 +240,13 @@ jobs:
               $releaseTitle = "$channel-portable-$version"
               
               # Create release with all archives
-              $archiveArgs = $archiveFiles -join " "
-              gh release create $portableReleaseTag --title $releaseTitle --notes $releaseBody --repo ${{ github.repository }} @archiveFiles
+              $releaseArgs = @()
+              foreach ($archive in $archiveFiles) {
+                $releaseArgs += $archive
+              }
+              
+              $env:GITHUB_TOKEN = "${{ secrets.GITHUB_TOKEN }}"
+              & gh release create $portableReleaseTag --title $releaseTitle --notes $releaseBody --repo "${{ github.repository }}" $releaseArgs
               
               $builtReleases += $portableReleaseTag
               Write-Host "Successfully created release: $portableReleaseTag" -ForegroundColor Green
