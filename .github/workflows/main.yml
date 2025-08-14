@@ -22,14 +22,17 @@ jobs:
       shell: powershell
       run: |
         try {
+          Write-Host "Fetching Edge releases from edge_installer_multi..." -ForegroundColor Yellow
           $edgeReleases = Invoke-RestMethod "https://api.github.com/repos/bibicadotnet/edge_installer_multi/releases"
           $releaseData = @()
           
           foreach ($release in $edgeReleases) {
+            Write-Host "Processing release: $($release.tag_name)" -ForegroundColor Cyan
             # Parse release tag (e.g., "stable-139.0.3405.86")
             if ($release.tag_name -match '^(stable|beta|dev|canary)-(.+)$') {
               $channel = $matches[1]
               $version = $matches[2]
+              Write-Host "  Channel: $channel, Version: $version" -ForegroundColor Cyan
               
               $channelData = @{
                 tag = $release.tag_name
@@ -44,11 +47,14 @@ jobs:
                 $assetName = "edge-$channel-$arch-$version.zip"
                 $asset = $release.assets | Where-Object { $_.name -eq $assetName }
                 if ($asset) {
+                  Write-Host "    Found asset: $assetName" -ForegroundColor Green
                   $channelData.assets += @{
                     arch = $arch
                     name = $assetName
                     url = $asset.browser_download_url
                   }
+                } else {
+                  Write-Host "    Missing asset: $assetName" -ForegroundColor Red
                 }
               }
               
@@ -61,7 +67,7 @@ jobs:
           $jsonData = $releaseData | ConvertTo-Json -Depth 10 -Compress
           $jsonData | Out-File -FilePath "edge_releases.json" -Encoding UTF8
           
-          Write-Host "Found $($releaseData.Count) Edge releases"
+          Write-Host "Found $($releaseData.Count) Edge releases with assets" -ForegroundColor Green
           echo "RELEASES_COUNT=$($releaseData.Count)" >> $env:GITHUB_OUTPUT
         } catch {
           Write-Error "Failed to get Edge releases: $($_.Exception.Message)"
@@ -73,10 +79,11 @@ jobs:
       shell: powershell
       run: |
         try {
+          Write-Host "Fetching Chrome++ latest release..." -ForegroundColor Yellow
           $chromePlusRelease = Invoke-RestMethod "https://api.github.com/repos/Bush2021/chrome_plus/releases/latest"
           $chromePlusVersion = $chromePlusRelease.tag_name
           echo "CHROMEPLUS_VERSION=$chromePlusVersion" >> $env:GITHUB_OUTPUT
-          Write-Host "Chrome++ version: $chromePlusVersion"
+          Write-Host "Chrome++ version: $chromePlusVersion" -ForegroundColor Green
         } catch {
           Write-Error "Failed to get Chrome++ version: $($_.Exception.Message)"
           exit 1
@@ -85,11 +92,14 @@ jobs:
     - name: Process all releases
       shell: powershell
       run: |
+        Write-Host "Starting to process all releases..." -ForegroundColor Yellow
         $releaseData = Get-Content "edge_releases.json" | ConvertFrom-Json
+        Write-Host "Loaded $($releaseData.Count) releases from JSON" -ForegroundColor Cyan
         
         foreach ($edgeRelease in $releaseData) {
           $channel = $edgeRelease.channel
           $version = $edgeRelease.version
+          Write-Host "Processing release: $channel $version" -ForegroundColor Magenta
           
           foreach ($asset in $edgeRelease.assets) {
             $arch = $asset.arch
@@ -98,9 +108,12 @@ jobs:
             $releaseTag = "edge-$channel-portable-$arch`_$version`_${{ steps.chromeplus-version.outputs.CHROMEPLUS_VERSION }}"
             
             Write-Host "=== Processing $channel $version $arch ===" -ForegroundColor Cyan
+            Write-Host "Release tag: $releaseTag" -ForegroundColor Cyan
+            Write-Host "Asset URL: $($asset.url)" -ForegroundColor Cyan
             
             # Check if release exists
             try {
+              Write-Host "Checking if release exists..." -ForegroundColor Yellow
               $headers = @{
                 'Authorization' = 'token ${{ secrets.GITHUB_TOKEN }}'
                 'Accept' = 'application/vnd.github.v3+json'
@@ -112,7 +125,7 @@ jobs:
               if ($_.Exception.Response.StatusCode -eq 404) {
                 Write-Host "Release $releaseTag does not exist, will create new one" -ForegroundColor Green
               } else {
-                Write-Error "Error checking release: $($_.Exception.Message)"
+                Write-Host "Error checking release: $($_.Exception.Message)" -ForegroundColor Red
                 continue
               }
             }
@@ -121,6 +134,7 @@ jobs:
             Write-Host "Building Microsoft Edge $channel $arch Portable with Chrome++" -ForegroundColor Green
             
             # Stop any Edge processes
+            Write-Host "Stopping Edge processes..." -ForegroundColor Yellow
             Stop-Process -Name msedge,MicrosoftEdgeUpdate,edgeupdate,edgeupdatem,MicrosoftEdgeSetup -Force -ErrorAction SilentlyContinue
             
             $rootPath = "$env:GITHUB_WORKSPACE\$releaseTag"
@@ -128,54 +142,121 @@ jobs:
             $edgePath = "$portablePath\Edge"
             $tempDir = "$env:TEMP\EdgeInstaller_$channel`_$version`_$arch"
             
+            Write-Host "Paths configured:" -ForegroundColor Cyan
+            Write-Host "  Root: $rootPath" -ForegroundColor Cyan
+            Write-Host "  Portable: $portablePath" -ForegroundColor Cyan
+            Write-Host "  Edge: $edgePath" -ForegroundColor Cyan
+            Write-Host "  Temp: $tempDir" -ForegroundColor Cyan
+            
             # Prepare directories
-            if (Test-Path $tempDir) { Remove-Item $tempDir -Recurse -Force }
+            Write-Host "Preparing directories..." -ForegroundColor Yellow
+            if (Test-Path $tempDir) { 
+              Write-Host "Removing existing temp dir: $tempDir" -ForegroundColor Yellow
+              Remove-Item $tempDir -Recurse -Force 
+            }
             New-Item -ItemType Directory -Path $tempDir -Force | Out-Null
-            if (Test-Path $rootPath) { Remove-Item $rootPath -Recurse -Force }
+            Write-Host "Created temp directory: $tempDir" -ForegroundColor Green
+            
+            if (Test-Path $rootPath) { 
+              Write-Host "Removing existing root path: $rootPath" -ForegroundColor Yellow
+              Remove-Item $rootPath -Recurse -Force 
+            }
             New-Item -ItemType Directory -Path $rootPath -Force | Out-Null
             New-Item -ItemType Directory -Path $portablePath -Force | Out-Null
             New-Item -ItemType Directory -Path $edgePath -Force | Out-Null
+            Write-Host "Created build directories" -ForegroundColor Green
             
             try {
               # Download files
               Write-Host "Downloading Edge $arch..." -ForegroundColor Yellow
+              Write-Host "  From: $($asset.url)" -ForegroundColor Cyan
+              Write-Host "  To: $tempDir\$($asset.name)" -ForegroundColor Cyan
               (New-Object System.Net.WebClient).DownloadFile($asset.url, "$tempDir\$($asset.name)")
+              Write-Host "Downloaded Edge installer successfully" -ForegroundColor Green
+              
+              Write-Host "Downloading 7zr.exe..." -ForegroundColor Yellow
               (New-Object System.Net.WebClient).DownloadFile("https://www.7-zip.org/a/7zr.exe", "$tempDir\7zr.exe")
+              Write-Host "Downloaded 7zr.exe successfully" -ForegroundColor Green
               
               Write-Host "Downloading Chrome++..." -ForegroundColor Yellow
               $chromePlusDownloadUrl = "https://github.com/Bush2021/chrome_plus/releases/download/${{ steps.chromeplus-version.outputs.CHROMEPLUS_VERSION }}/setdll.7z"
+              Write-Host "  From: $chromePlusDownloadUrl" -ForegroundColor Cyan
+              Write-Host "  To: $tempDir\setdll.7z" -ForegroundColor Cyan
               (New-Object System.Net.WebClient).DownloadFile($chromePlusDownloadUrl, "$tempDir\setdll.7z")
+              Write-Host "Downloaded Chrome++ successfully" -ForegroundColor Green
+              
+              Write-Host "Downloading chrome++.ini..." -ForegroundColor Yellow
               (New-Object System.Net.WebClient).DownloadFile("https://raw.githubusercontent.com/bibicadotnet/microsoft-edge-portable/refs/heads/main/chrome%2B%2B.ini", "$edgePath\chrome++.ini")
+              Write-Host "Downloaded chrome++.ini successfully" -ForegroundColor Green
               
               # Extract Edge
               Write-Host "Extracting Edge..." -ForegroundColor Yellow
               $sevenZPath = "$tempDir\7zr.exe"
               $extractDir = "$tempDir\extract"
-              & $sevenZPath x "$tempDir\$($asset.name)" "-o$extractDir" -y | Out-Null
+              Write-Host "  7z path: $sevenZPath" -ForegroundColor Cyan
+              Write-Host "  Extract to: $extractDir" -ForegroundColor Cyan
+              Write-Host "  Extracting: $tempDir\$($asset.name)" -ForegroundColor Cyan
               
+              & $sevenZPath x "$tempDir\$($asset.name)" "-o$extractDir" -y | Out-Null
+              Write-Host "Extracted Edge installer" -ForegroundColor Green
+              
+              Write-Host "Looking for MSEDGE.7z..." -ForegroundColor Yellow
               $msedge7z = Get-ChildItem -Path $extractDir -Name "MSEDGE.7z" -Recurse | Select-Object -First 1
-              $msedgeDir = "$tempDir\msedge"
-              & $sevenZPath x "$extractDir\$msedge7z" "-o$msedgeDir" -y | Out-Null
+              if ($msedge7z) {
+                Write-Host "Found MSEDGE.7z: $($msedge7z.FullName)" -ForegroundColor Green
+                $msedgeDir = "$tempDir\msedge"
+                Write-Host "Extracting MSEDGE.7z to: $msedgeDir" -ForegroundColor Cyan
+                & $sevenZPath x "$extractDir\$msedge7z" "-o$msedgeDir" -y | Out-Null
+                Write-Host "Extracted MSEDGE.7z successfully" -ForegroundColor Green
+              } else {
+                Write-Host "MSEDGE.7z not found! Listing contents of $extractDir :" -ForegroundColor Red
+                Get-ChildItem -Path $extractDir -Recurse | ForEach-Object { Write-Host "  $($_.FullName)" -ForegroundColor Red }
+                throw "MSEDGE.7z not found in extracted files"
+              }
               
               # Extract Chrome Plus
               Write-Host "Extracting Chrome++..." -ForegroundColor Yellow
               $chromePlusExtractDir = "$tempDir\chromeplus"
+              Write-Host "  Extract to: $chromePlusExtractDir" -ForegroundColor Cyan
               & $sevenZPath x "$tempDir\setdll.7z" "-o$chromePlusExtractDir" -y | Out-Null
+              Write-Host "Extracted Chrome++ successfully" -ForegroundColor Green
+              
+              Write-Host "Chrome++ contents:" -ForegroundColor Cyan
+              Get-ChildItem -Path $chromePlusExtractDir | ForEach-Object { Write-Host "  $($_.Name)" -ForegroundColor Cyan }
               
               # Install Edge
               Write-Host "Installing Edge..." -ForegroundColor Yellow
-              # Try to find Chrome-bin folder first
-              $chromeBinFolder = Get-ChildItem -Path $msedgeDir -Directory -Name "Chrome-bin" -Recurse | Select-Object -First 1
-              if ($chromeBinFolder) {
-                $chromeBinPath = Get-ChildItem -Path $msedgeDir -Directory -Name "Chrome-bin" -Recurse | Select-Object -First 1 | ForEach-Object { $_.FullName }
-                Copy-Item "$chromeBinPath\*" $edgePath -Recurse -Force
+              Write-Host "MSEDGE contents:" -ForegroundColor Cyan
+              Get-ChildItem -Path $msedgeDir -Recurse | ForEach-Object { Write-Host "  $($_.FullName)" -ForegroundColor Cyan }
+              
+              # Check if Chrome-bin exists (new structure)
+              $chromeBinPath = Get-ChildItem -Path $msedgeDir -Directory -Name "Chrome-bin" -Recurse | Select-Object -First 1
+              if ($chromeBinPath) {
+                Write-Host "Found Chrome-bin folder: $($chromeBinPath.FullName)" -ForegroundColor Green
+                Write-Host "Chrome-bin contents:" -ForegroundColor Cyan
+                Get-ChildItem -Path $chromeBinPath.FullName -Recurse | ForEach-Object { Write-Host "    $($_.FullName)" -ForegroundColor Cyan }
+                Copy-Item "$($chromeBinPath.FullName)\*" $edgePath -Recurse -Force
+                Write-Host "Copied Chrome-bin contents successfully" -ForegroundColor Green
               } else {
+                Write-Host "Chrome-bin folder not found, using fallback method..." -ForegroundColor Yellow
                 # Fallback to original method
                 $versionFolder = Get-ChildItem -Path $msedgeDir -Directory -Recurse | Where-Object { $_.Name -match "^\d+\.\d+\.\d+\.\d+$" } | Select-Object -First 1
-                Copy-Item $versionFolder.FullName "$edgePath\$($versionFolder.Name)" -Recurse -Force
+                if ($versionFolder) {
+                  Write-Host "Found version folder: $($versionFolder.Name) at $($versionFolder.FullName)" -ForegroundColor Green
+                  Copy-Item $versionFolder.FullName "$edgePath\$($versionFolder.Name)" -Recurse -Force
+                  Write-Host "Copied version folder successfully" -ForegroundColor Green
+                } else {
+                  Write-Host "No version folder found!" -ForegroundColor Red
+                }
                 
                 $sourceFile = Get-ChildItem -Path $msedgeDir -Name "msedge.exe" -Recurse | Select-Object -First 1
-                Copy-Item "$msedgeDir\$sourceFile" "$edgePath\msedge.exe" -Force
+                if ($sourceFile) {
+                  Write-Host "Found msedge.exe at: $($sourceFile.FullName)" -ForegroundColor Green
+                  Copy-Item "$msedgeDir\$sourceFile" "$edgePath\msedge.exe" -Force
+                  Write-Host "Copied msedge.exe successfully" -ForegroundColor Green
+                } else {
+                  Write-Host "msedge.exe not found!" -ForegroundColor Red
+                }
               }
               
               # Install Chrome Plus based on architecture
@@ -184,25 +265,53 @@ jobs:
               $setdllExe = "setdll-$archLower.exe"
               $versionDll = "version-$archLower.dll"
               
-              Copy-Item "$chromePlusExtractDir\$setdllExe" "$edgePath\$setdllExe" -Force
-              Copy-Item "$chromePlusExtractDir\$versionDll" "$edgePath\version.dll" -Force
+              Write-Host "Looking for Chrome++ files:" -ForegroundColor Cyan
+              Write-Host "  setdll exe: $setdllExe" -ForegroundColor Cyan
+              Write-Host "  version dll: $versionDll" -ForegroundColor Cyan
+              
+              if (Test-Path "$chromePlusExtractDir\$setdllExe") {
+                Write-Host "Found $setdllExe" -ForegroundColor Green
+                Copy-Item "$chromePlusExtractDir\$setdllExe" "$edgePath\$setdllExe" -Force
+                Write-Host "Copied $setdllExe successfully" -ForegroundColor Green
+              } else {
+                Write-Host "$setdllExe not found!" -ForegroundColor Red
+                throw "Chrome++ executable $setdllExe not found"
+              }
+              
+              if (Test-Path "$chromePlusExtractDir\$versionDll") {
+                Write-Host "Found $versionDll" -ForegroundColor Green
+                Copy-Item "$chromePlusExtractDir\$versionDll" "$edgePath\version.dll" -Force
+                Write-Host "Copied $versionDll as version.dll successfully" -ForegroundColor Green
+              } else {
+                Write-Host "$versionDll not found!" -ForegroundColor Red
+                throw "Chrome++ DLL $versionDll not found"
+              }
               
               # Apply Chrome Plus
               Write-Host "Applying Chrome++..." -ForegroundColor Yellow
+              Write-Host "Current Edge folder contents:" -ForegroundColor Cyan
+              Get-ChildItem -Path $edgePath | ForEach-Object { Write-Host "  $($_.Name)" -ForegroundColor Cyan }
+              
               Push-Location $edgePath
+              Write-Host "Running: .\$setdllExe /d:version.dll msedge.exe" -ForegroundColor Cyan
               & ".\$setdllExe" /d:version.dll msedge.exe | Out-Null
               Pop-Location
+              Write-Host "Applied Chrome++ successfully" -ForegroundColor Green
               
               # Cleanup temp files and installer remnants
+              Write-Host "Cleaning up temporary files..." -ForegroundColor Yellow
               Remove-Item $tempDir -Recurse -Force
               Remove-Item "$edgePath\$setdllExe", "$edgePath\msedge.exe~" -Force -ErrorAction SilentlyContinue
+              Write-Host "Cleanup completed" -ForegroundColor Green
               
               Write-Host "Build completed!" -ForegroundColor Green
               
               # Create ZIP archive
+              Write-Host "Creating ZIP archive..." -ForegroundColor Yellow
               $zipPath = "$env:GITHUB_WORKSPACE\$releaseTag.zip"
+              Write-Host "Archive path: $zipPath" -ForegroundColor Cyan
               Compress-Archive -Path "$rootPath\*" -DestinationPath $zipPath -CompressionLevel Optimal
-              Write-Host "Created archive: $zipPath"
+              Write-Host "Created archive: $zipPath" -ForegroundColor Green
               
               # Create Release and Upload Asset
               Write-Host "Creating release: $releaseTag" -ForegroundColor Yellow
@@ -212,16 +321,20 @@ jobs:
               $releaseBody = "**Microsoft Edge $channel $arch Portable with Chrome++ Auto Build**`n`n**Edge Version:** $version`n**Chrome++ Version:** ${{ steps.chromeplus-version.outputs.CHROMEPLUS_VERSION }}`n**Channel:** $channel`n**Architecture:** $arch`n`n## What's Included`n- Microsoft Edge $channel $arch Portable`n- Chrome++ enhancements`n- Pre-configured settings`n`n## Installation`n1. Download the ZIP file`n2. Extract to your desired location`n3. Run Edge_Portable\Edge\msedge.exe`n`n## Features`n- Fully portable - no installation required`n- Enhanced with Chrome++ features`n- Auto-configured for optimal experience`n`n---`n*This release was automatically generated by GitHub Actions*"
               
               gh release create $releaseTag --title $releaseTitle --notes $releaseBody --repo ${{ github.repository }} $zipPath
-              
               Write-Host "Release created successfully!" -ForegroundColor Green
               
               # Cleanup
               Remove-Item $zipPath -Force -ErrorAction SilentlyContinue
               Remove-Item $rootPath -Recurse -Force -ErrorAction SilentlyContinue
+              Write-Host "Final cleanup completed" -ForegroundColor Green
               
             } catch {
               Write-Host "Failed to build $channel $version $arch : $($_.Exception.Message)" -ForegroundColor Red
+              Write-Host "Error details: $($_.Exception)" -ForegroundColor Red
+              Write-Host "Stack trace: $($_.ScriptStackTrace)" -ForegroundColor Red
+              
               # Cleanup on error
+              Write-Host "Cleaning up after error..." -ForegroundColor Yellow
               Remove-Item $tempDir -Recurse -Force -ErrorAction SilentlyContinue
               Remove-Item $rootPath -Recurse -Force -ErrorAction SilentlyContinue
             }
