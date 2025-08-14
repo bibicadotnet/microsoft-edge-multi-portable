@@ -142,8 +142,7 @@ jobs:
               (New-Object System.Net.WebClient).DownloadFile($asset.browser_download_url, $edgeZipPath)
               
               # Extract Edge ZIP - should contain MSEDGE.7z
-              $edgeExtractDir = "$tempDir\edge_$arch"
-              & "$tempDir\7zr.exe" x $edgeZipPath "-o$edgeExtractDir" -y | Out-Null
+              Expand-Archive -Path $edgeZipPath -DestinationPath $edgeExtractDir -Force
               
               # Look for MSEDGE.7z
               $msedge7z = Get-ChildItem -Path $edgeExtractDir -Name "MSEDGE.7z" -Recurse | Select-Object -First 1
