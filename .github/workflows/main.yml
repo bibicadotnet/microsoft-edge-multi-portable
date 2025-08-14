@@ -89,6 +89,8 @@ jobs:
         
     - name: Process all releases
       shell: powershell
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         Write-Host "Starting to process all releases..." -ForegroundColor Yellow
         $releaseData = Get-Content "edge_releases.json" | ConvertFrom-Json
