@@ -156,6 +156,21 @@ jobs:
               $chromePlusDownloadUrl = "https://github.com/Bush2021/chrome_plus/releases/download/${{ steps.chromeplus-version.outputs.CHROMEPLUS_VERSION }}/setdll.7z"
               (New-Object System.Net.WebClient).DownloadFile($chromePlusDownloadUrl, "$tempDir\setdll.7z")
               (New-Object System.Net.WebClient).DownloadFile("https://raw.githubusercontent.com/bibicadotnet/microsoft-edge-portable/refs/heads/main/chrome%2B%2B.ini", "$edgePath\chrome++.ini")
+
+              # Download and customize update.bat for this channel
+              Write-Host "Downloading and customizing update.bat for $channel channel..." -ForegroundColor Yellow
+              $updateBatUrl = "https://raw.githubusercontent.com/${{ github.repository }}/refs/heads/main/update.bat"
+              $tempUpdateBat = "$tempDir\update_template.bat"
+              (New-Object System.Net.WebClient).DownloadFile($updateBatUrl, $tempUpdateBat)
+              
+              # Customize the template for this channel
+              $channelTitle = $channel.Substring(0,1).ToUpper() + $channel.Substring(1)
+              $updateBatContent = Get-Content $tempUpdateBat -Raw
+              $updateBatContent = $updateBatContent.Replace('{CHANNEL}', $channel)
+              $updateBatContent = $updateBatContent.Replace('{CHANNEL_TITLE}', $channelTitle)
+              $updateBatContent = $updateBatContent.Replace('{REPOSITORY}', '${{ github.repository }}')
+              $updateBatContent | Out-File -FilePath "$edgePath\update.bat" -Encoding ASCII
+              Write-Host "Created customized update.bat for $channel" -ForegroundColor Green
               
               # Extract Edge
               Write-Host "Extracting Edge..." -ForegroundColor Yellow
