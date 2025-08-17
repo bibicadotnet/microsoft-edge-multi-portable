@@ -86,15 +86,11 @@ jobs:
         $afterVersions = $readmeContent.Substring($readmeContent.IndexOf($endMarker))
         
         # Tạo phần Script features
-        $scriptFeatures = @"
-**Script features:**
-* Downloads the latest Edge Stable, Beta, Dev, or Canary x64 from [edge_installer_multi](https://github.com/bibicadotnet/edge_installer_multi/releases)
-* Integrates [Chrome++](https://github.com/Bush2021/chrome_plus) for extra features
-* Manual update script preserves your settings and configurations
-
-$($versionLines -join "`n")
-
-"@
+        $scriptFeatures = "**Script features:**`n" +
+                         "* Downloads the latest Edge Stable, Beta, Dev, or Canary x64 from [edge_installer_multi](https://github.com/bibicadotnet/edge_installer_multi/releases)`n" +
+                         "* Integrates [Chrome++](https://github.com/Bush2021/chrome_plus) for extra features`n" +
+                         "* Manual update script preserves your settings and configurations`n`n" +
+                         ($versionLines -join "`n") + "`n`n"
         
         # Ghép nội dung mới
         $newReadmeContent = $beforeVersions + $scriptFeatures + $afterVersions
