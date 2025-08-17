@@ -110,22 +110,24 @@ $($versionLines -join "`n")
 
     - name: Check for changes
       id: verify-changed-files
+      shell: powershell
       run: |
-        if (git diff --exit-code README.md) {
+        $hasChanges = git diff --exit-code README.md
+        if ($LASTEXITCODE -eq 0) {
           echo "changed=false" >> $env:GITHUB_OUTPUT
           Write-Host "No changes detected in README.md"
         } else {
-          echo "changed=true" >> $env:GITHUB_OUTPUT  
+          echo "changed=true" >> $env:GITHUB_OUTPUT
           Write-Host "Changes detected in README.md"
         }
-      shell: powershell
 
     - name: Commit and push changes
       if: steps.verify-changed-files.outputs.changed == 'true'
+      shell: powershell
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
         git add README.md
-        git commit -m "Update Edge versions - $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss UTC')"
+        $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss UTC"
+        git commit -m "Update Edge versions - $timestamp"
         git push
-      shell: powershell
