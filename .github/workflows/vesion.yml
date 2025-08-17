@@ -1,0 +1,131 @@
+name: Update Edge Versions
+
+on:
+  schedule:
+    # Chạy mỗi giờ
+    - cron: '0 * * * *'
+  workflow_dispatch: # Cho phép chạy thủ công
+
+jobs:
+  update-versions:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Check Edge versions and update README
+      shell: powershell
+      run: |
+        # Fetch all Edge release data once
+        Write-Host "Fetching Edge release data..."
+        $allReleases = Invoke-RestMethod "https://edgeupdates.microsoft.com/api/products"
+        
+        # Lấy phiên bản cho từng channel
+        $channelVersions = @{
+            "Stable" = ($allReleases | Where-Object { $_.Product -eq "Stable" }).Releases |
+                       Where-Object { $_.Platform -eq "Windows" -and $_.Architecture -eq "x64" } |
+                       Sort-Object PublishedTime -Descending |
+                       Select-Object -First 1 -ExpandProperty ProductVersion
+            "Beta" = ($allReleases | Where-Object { $_.Product -eq "Beta" }).Releases |
+                     Where-Object { $_.Platform -eq "Windows" -and $_.Architecture -eq "x64" } |
+                     Sort-Object PublishedTime -Descending |
+                     Select-Object -First 1 -ExpandProperty ProductVersion
+            "Dev" = ($allReleases | Where-Object { $_.Product -eq "Dev" }).Releases |
+                    Where-Object { $_.Platform -eq "Windows" -and $_.Architecture -eq "x64" } |
+                    Sort-Object PublishedTime -Descending |
+                    Select-Object -First 1 -ExpandProperty ProductVersion
+            "Canary" = ($allReleases | Where-Object { $_.Product -eq "Canary" }).Releases |
+                       Where-Object { $_.Platform -eq "Windows" -and $_.Architecture -eq "x64" } |
+                       Sort-Object PublishedTime -Descending |
+                       Select-Object -First 1 -ExpandProperty ProductVersion
+        }
+        
+        Write-Host "Latest versions:"
+        $channelVersions | Format-Table -AutoSize
+        
+        # Lấy danh sách releases từ GitHub
+        Write-Host "Fetching GitHub releases..."
+        $githubReleases = Invoke-RestMethod -Uri "https://api.github.com/repos/bibicadotnet/microsoft-edge-multi-portable/releases" -Headers @{
+            "User-Agent" = "GitHub-Actions"
+        }
+        
+        # Tạo nội dung mới cho README
+        $versionLines = @()
+        
+        foreach ($channel in @("Stable", "Beta", "Dev", "Canary")) {
+            $version = $channelVersions[$channel]
+            $channelDisplayName = if ($channel -eq "Dev") { "Developer" } else { $channel }
+            
+            if ($version) {
+                # Tìm release tương ứng
+                $releasePattern = "edge-$($channel.ToLower())-portable-x64_$($version)_"
+                $matchingRelease = $githubReleases | Where-Object { $_.tag_name -like "$releasePattern*" }
+                
+                if ($matchingRelease) {
+                    # Có portable release
+                    $versionLines += "Microsoft Edge $channelDisplayName Portable [$version](https://github.com/bibicadotnet/microsoft-edge-multi-portable/releases/tag/$($matchingRelease.tag_name))"
+                } else {
+                    # Chưa có portable release
+                    $versionLines += "Microsoft Edge $channelDisplayName $version (latest portable not available yet)"
+                }
+            }
+        }
+        
+        # Đọc README hiện tại
+        $readmeContent = Get-Content "README.md" -Raw -Encoding UTF8
+        
+        # Tạo pattern để tìm và thay thế phần version
+        $startMarker = "**Script features:**"
+        $endMarker = "**Download the pre-built"
+        
+        # Tách nội dung
+        $beforeVersions = $readmeContent.Substring(0, $readmeContent.IndexOf($startMarker))
+        $afterVersions = $readmeContent.Substring($readmeContent.IndexOf($endMarker))
+        
+        # Tạo phần Script features
+        $scriptFeatures = @"
+**Script features:**
+* Downloads the latest Edge Stable, Beta, Dev, or Canary x64 from [edge_installer_multi](https://github.com/bibicadotnet/edge_installer_multi/releases)
+* Integrates [Chrome++](https://github.com/Bush2021/chrome_plus) for extra features
+* Manual update script preserves your settings and configurations
+
+$($versionLines -join "`n")
+
+"@
+        
+        # Ghép nội dung mới
+        $newReadmeContent = $beforeVersions + $scriptFeatures + $afterVersions
+        
+        # Ghi vào file
+        $newReadmeContent | Set-Content "README.md" -Encoding UTF8 -NoNewline
+        
+        Write-Host "README.md updated with latest versions"
+        
+        # Hiển thị thay đổi
+        Write-Host "`nVersion information updated:"
+        $versionLines | ForEach-Object { Write-Host "  $_" }
+
+    - name: Check for changes
+      id: verify-changed-files
+      run: |
+        if (git diff --exit-code README.md) {
+          echo "changed=false" >> $env:GITHUB_OUTPUT
+          Write-Host "No changes detected in README.md"
+        } else {
+          echo "changed=true" >> $env:GITHUB_OUTPUT  
+          Write-Host "Changes detected in README.md"
+        }
+      shell: powershell
+
+    - name: Commit and push changes
+      if: steps.verify-changed-files.outputs.changed == 'true'
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add README.md
+        git commit -m "Update Edge versions - $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss UTC')"
+        git push
+      shell: powershell
