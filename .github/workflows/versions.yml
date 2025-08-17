@@ -92,8 +92,8 @@ jobs:
         
         $readmeContent = Get-Content "README.md" -Raw -Encoding UTF8
         
-        # Tìm và thay thế từ "### Script features:" đến "**Download the pre-built"
-        $startMarker = "### Script features:"
+        # Tìm và thay thế chỉ phần Microsoft Edge Portable Latest
+        $startMarker = "### Microsoft Edge Portable Latest"
         $endMarker = "**Download the pre-built"
         
         $startIndex = $readmeContent.IndexOf($startMarker)
@@ -109,18 +109,13 @@ jobs:
         $beforeVersions = $readmeContent.Substring(0, $startIndex)
         $afterVersions = $readmeContent.Substring($endIndex)
         
-        # Tạo phần mới
-        $newSection = "### Script features:`r`n" +
-                     " `r`n" +
-                     "* Downloads the latest Edge Stable, Beta, Dev, or Canary x64 from [edge_installer_multi](https://github.com/bibicadotnet/edge_installer_multi/releases)`r`n" +
-                     "* Integrates [Chrome++](https://github.com/Bush2021/chrome_plus) for extra features`r`n" +
-                     "* Manual update script preserves your settings and configurations`r`n" +
-                     "### Microsoft Edge Portable Latest`r`n" +
-                     ($versionLines -join "`r`n") + "`r`n" +
-                     "`r`n"
+        # Tạo chỉ phần Microsoft Edge Portable Latest
+        $versionSection = "### Microsoft Edge Portable Latest`r`n" +
+                         ($versionLines -join "`r`n") + "`r`n" +
+                         "`r`n"
         
         # Ghép nội dung mới
-        $newReadmeContent = $beforeVersions + $newSection + $afterVersions
+        $newReadmeContent = $beforeVersions + $versionSection + $afterVersions
         
         # Ghi vào file
         Set-Content "README.md" -Value $newReadmeContent -Encoding UTF8 -NoNewline
