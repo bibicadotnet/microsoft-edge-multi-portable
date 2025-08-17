@@ -45,7 +45,9 @@ echo   $extractedDir = Get-ChildItem $tempDir -Recurse -Directory ^| Where-Objec
 echo   $currentDir = "%~dp0"
 echo.
 echo   Write-Host "Updating files..."
-echo   Get-ChildItem $currentDir ^| Where-Object { $_.Name -ne "update.bat" -and $_.Name -ne "chrome++.ini" } ^| Remove-Item -Recurse -Force
+echo   if ^(Test-Path "msedge.exe"^) { Remove-Item "msedge.exe" -Force }
+echo   if ^(Test-Path "version.dll"^) { Remove-Item "version.dll" -Force }
+echo   if ^(Test-Path $currentVersion^) { Remove-Item $currentVersion -Recurse -Force }
 echo.
 echo   Get-ChildItem $extractedDir.FullName -Recurse ^| Where-Object { $_.Name -ne "update.bat" -and $_.Name -ne "chrome++.ini" } ^| ForEach-Object {
 echo     $relativePath = $_.FullName.Substring^($extractedDir.FullName.Length + 1^)
