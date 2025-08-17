@@ -12,6 +12,7 @@ No installation or setup required. Keeps all history, cookies, extensions, and s
 - Microsoft Edge Beta Portable [140.0.3485.11](https://github.com/bibicadotnet/microsoft-edge-multi-portable/releases/tag/edge-beta-portable-x64_140.0.3485.11_1.13.0)
 - Microsoft Edge Developer Portable [140.0.3485.6](https://github.com/bibicadotnet/microsoft-edge-multi-portable/releases/tag/edge-dev-portable-x64_140.0.3485.6_1.13.0)
 - Microsoft Edge Canary Portable [141.0.3500.0](https://github.com/bibicadotnet/microsoft-edge-multi-portable/releases/tag/edge-canary-portable-x64_141.0.3500.0_1.13.0)
+
 **Download the pre-built [release](https://github.com/bibicadotnet/microsoft-edge-multi-portable/releases)**, extract, and start using immediately.
 
 ### ⚠ Virus warning?
