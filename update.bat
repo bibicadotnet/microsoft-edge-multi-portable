@@ -1,0 +1,72 @@
+@echo off
+setlocal
+echo Microsoft Edge {CHANNEL} Portable Auto Updater
+echo ==========================================
+echo.
+(
+echo # Microsoft Edge {CHANNEL} Updater
+echo $ErrorActionPreference = "Stop"
+echo $edgePath = Join-Path "%~dp0" "msedge.exe"
+echo $apiUrl = "https://api.github.com/repos/{REPOSITORY}/releases"
+echo $tempDir = Join-Path $env:TEMP "Edge{CHANNEL_TITLE}Update"
+echo.
+echo try {
+echo   $currentVersion = if ^(Test-Path $edgePath^) { ^(Get-Item $edgePath^).VersionInfo.ProductVersion } else { "Not installed" }
+echo   $allReleases = Invoke-RestMethod -Uri $apiUrl
+echo   $channelReleases = $allReleases ^| Where-Object { $_.tag_name -like "edge-{CHANNEL}-portable-x64_*" } ^| Sort-Object created_at -Descending
+echo   $latestRelease = $channelReleases^[0^]
+echo   $latestVersion = ^($latestRelease.tag_name -split "_"^)^[1^]
+echo   $downloadUrl = $latestRelease.assets^[0^].browser_download_url
+echo.
+echo   Write-Host "Current version: $currentVersion" -ForegroundColor Yellow
+echo   Write-Host "Latest version: $latestVersion" -ForegroundColor Yellow
+echo   Write-Host
+echo.
+echo   $confirm = Read-Host "Do you want to update? (y/N)"
+echo   if ^($confirm -ne 'y' -and $confirm -ne 'Y'^) { exit }
+echo.
+echo   if ^(Test-Path $edgePath^) {
+echo     Write-Host "Stopping processes..."
+echo     Stop-Process -Name msedge,MicrosoftEdgeUpdate,edgeupdate,edgeupdatem,MicrosoftEdgeSetup -Force -ErrorAction SilentlyContinue
+echo     Start-Sleep 2
+echo   }
+echo.
+echo   if ^(Test-Path $tempDir^) { Remove-Item $tempDir -Recurse -Force }
+echo   New-Item -ItemType Directory -Path $tempDir -Force ^| Out-Null
+echo   $zipFile = Join-Path $tempDir "update.zip"
+echo.
+echo   Write-Host "Downloading..."
+echo   ^(New-Object System.Net.WebClient^).DownloadFile^($downloadUrl, $zipFile^)
+echo.
+echo   Write-Host "Extracting..."
+echo   Expand-Archive -Path $zipFile -DestinationPath $tempDir -Force
+echo.
+echo   $extractedDir = Get-ChildItem $tempDir -Recurse -Directory ^| Where-Object { $_.Name -eq "Edge" } ^| Select-Object -First 1
+echo   $currentDir = "%~dp0"
+echo.
+echo   Write-Host "Updating files..."
+echo   Get-ChildItem $currentDir ^| Where-Object { $_.Name -ne "update.bat" -and $_.Name -ne "chrome++.ini" } ^| Remove-Item -Recurse -Force
+echo.
+echo   Get-ChildItem $extractedDir.FullName -Recurse ^| Where-Object { $_.Name -ne "update.bat" -and $_.Name -ne "chrome++.ini" } ^| ForEach-Object {
+echo     $relativePath = $_.FullName.Substring^($extractedDir.FullName.Length + 1^)
+echo     $destPath = Join-Path $currentDir $relativePath
+echo     if ^($_.PSIsContainer^) {
+echo       New-Item -ItemType Directory -Path $destPath -Force ^| Out-Null
+echo     } else {
+echo       $destFolder = Split-Path $destPath -Parent
+echo       if ^(-not ^(Test-Path $destFolder^)^) { New-Item -ItemType Directory -Path $destFolder -Force ^| Out-Null }
+echo       Copy-Item $_.FullName -Destination $destPath -Force
+echo     }
+echo   }
+echo.
+echo   Remove-Item $tempDir -Recurse -Force
+echo   Write-Host "Update completed! Version: $latestVersion" -ForegroundColor Green
+echo.
+echo } catch {
+echo   Write-Host "Error: $_" -ForegroundColor Red
+echo }
+echo.
+echo Read-Host "Press Enter to exit"
+) > "%TEMP%\edge_{CHANNEL}_update.ps1"
+powershell -NoProfile -ExecutionPolicy Bypass -File "%TEMP%\edge_{CHANNEL}_update.ps1"
+del "%TEMP%\edge_{CHANNEL}_update.ps1" 2>nul
