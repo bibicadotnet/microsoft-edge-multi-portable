@@ -1,8 +1,9 @@
-﻿## Microsoft Edge (Stable, Beta, Dev, or Canary) Portable
+﻿# Microsoft Edge (Stable, Beta, Dev, or Canary) Portable
 
 No installation or setup required. Keeps all history, cookies, extensions, and settings even when moved to another device.
 
-**Script features:**
+### Script features:
+ 
 * Downloads the latest Edge Stable, Beta, Dev, or Canary x64 from [edge_installer_multi](https://github.com/bibicadotnet/edge_installer_multi/releases)
 * Integrates [Chrome++](https://github.com/Bush2021/chrome_plus) for extra features
 * Manual update script preserves your settings and configurations
