@@ -21,7 +21,12 @@ jobs:
       run: |
         # Fetch all Edge release data once
         Write-Host "Fetching Edge release data..."
-        $allReleases = Invoke-RestMethod "https://edgeupdates.microsoft.com/api/products"
+        try {
+            $allReleases = Invoke-RestMethod "https://edgeupdates.microsoft.com/api/products"
+        } catch {
+            Write-Host "Error fetching Edge data: $_"
+            exit 1
+        }
         
         # Lấy phiên bản cho từng channel
         $channelVersions = @{
@@ -44,12 +49,17 @@ jobs:
         }
         
         Write-Host "Latest versions:"
-        $channelVersions | Format-Table -AutoSize
+        $channelVersions.GetEnumerator() | ForEach-Object { Write-Host "  $($_.Key): $($_.Value)" }
         
         # Lấy danh sách releases từ GitHub
         Write-Host "Fetching GitHub releases..."
-        $githubReleases = Invoke-RestMethod -Uri "https://api.github.com/repos/bibicadotnet/microsoft-edge-multi-portable/releases" -Headers @{
-            "User-Agent" = "GitHub-Actions"
+        try {
+            $githubReleases = Invoke-RestMethod -Uri "https://api.github.com/repos/bibicadotnet/microsoft-edge-multi-portable/releases" -Headers @{
+                "User-Agent" = "GitHub-Actions"
+            }
+        } catch {
+            Write-Host "Error fetching GitHub releases: $_"
+            exit 1
         }
         
         # Tạo nội dung mới cho README
@@ -75,15 +85,28 @@ jobs:
         }
         
         # Đọc README hiện tại
+        if (-not (Test-Path "README.md")) {
+            Write-Host "README.md not found!"
+            exit 1
+        }
+        
         $readmeContent = Get-Content "README.md" -Raw -Encoding UTF8
         
         # Tạo pattern để tìm và thay thế phần version
         $startMarker = "**Script features:**"
         $endMarker = "**Download the pre-built"
         
+        $startIndex = $readmeContent.IndexOf($startMarker)
+        $endIndex = $readmeContent.IndexOf($endMarker)
+        
+        if ($startIndex -eq -1 -or $endIndex -eq -1) {
+            Write-Host "Cannot find markers in README.md"
+            exit 1
+        }
+        
         # Tách nội dung
-        $beforeVersions = $readmeContent.Substring(0, $readmeContent.IndexOf($startMarker))
-        $afterVersions = $readmeContent.Substring($readmeContent.IndexOf($endMarker))
+        $beforeVersions = $readmeContent.Substring(0, $startIndex)
+        $afterVersions = $readmeContent.Substring($endIndex)
         
         # Tạo phần Script features
         $scriptFeatures = "**Script features:**`n" +
@@ -96,7 +119,7 @@ jobs:
         $newReadmeContent = $beforeVersions + $scriptFeatures + $afterVersions
         
         # Ghi vào file
-        $newReadmeContent | Set-Content "README.md" -Encoding UTF8 -NoNewline
+        Set-Content "README.md" -Value $newReadmeContent -Encoding UTF8 -NoNewline
         
         Write-Host "README.md updated with latest versions"
         
@@ -104,26 +127,23 @@ jobs:
         Write-Host "`nVersion information updated:"
         $versionLines | ForEach-Object { Write-Host "  $_" }
 
-    - name: Check for changes
-      id: verify-changed-files
+    - name: Check for changes and commit
       shell: powershell
       run: |
-        $hasChanges = git diff --exit-code README.md
-        if ($LASTEXITCODE -eq 0) {
-          echo "changed=false" >> $env:GITHUB_OUTPUT
-          Write-Host "No changes detected in README.md"
-        } else {
-          echo "changed=true" >> $env:GITHUB_OUTPUT
-          Write-Host "Changes detected in README.md"
-        }
-
-    - name: Commit and push changes
-      if: steps.verify-changed-files.outputs.changed == 'true'
-      shell: powershell
-      run: |
+        # Configure git
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
+        
+        # Check if there are changes
         git add README.md
-        $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss UTC"
-        git commit -m "Update Edge versions - $timestamp"
-        git push
+        
+        $changes = git diff --cached --name-only
+        if ([string]::IsNullOrEmpty($changes)) {
+            Write-Host "No changes to commit"
+        } else {
+            Write-Host "Changes detected, committing..."
+            $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss UTC"
+            git commit -m "Update Edge versions - $timestamp"
+            git push
+            Write-Host "Changes committed and pushed"
+        }
