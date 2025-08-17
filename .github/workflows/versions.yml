@@ -76,10 +76,10 @@ jobs:
                 
                 if ($matchingRelease) {
                     # Có portable release
-                    $versionLines += "Microsoft Edge $channelDisplayName Portable [$version](https://github.com/bibicadotnet/microsoft-edge-multi-portable/releases/tag/$($matchingRelease.tag_name))"
+                    $versionLines += "- Microsoft Edge $channelDisplayName Portable [$version](https://github.com/bibicadotnet/microsoft-edge-multi-portable/releases/tag/$($matchingRelease.tag_name))"
                 } else {
                     # Chưa có portable release
-                    $versionLines += "Microsoft Edge $channelDisplayName $version (latest portable not available yet)"
+                    $versionLines += "- Microsoft Edge $channelDisplayName $version (latest portable not available yet)"
                 }
             }
         }
@@ -92,8 +92,8 @@ jobs:
         
         $readmeContent = Get-Content "README.md" -Raw -Encoding UTF8
         
-        # Tạo pattern để tìm và thay thế phần version
-        $startMarker = "**Script features:**"
+        # Tìm và thay thế từ "### Script features:" đến "**Download the pre-built"
+        $startMarker = "### Script features:"
         $endMarker = "**Download the pre-built"
         
         $startIndex = $readmeContent.IndexOf($startMarker)
@@ -101,6 +101,7 @@ jobs:
         
         if ($startIndex -eq -1 -or $endIndex -eq -1) {
             Write-Host "Cannot find markers in README.md"
+            Write-Host "Looking for: '$startMarker' and '$endMarker'"
             exit 1
         }
         
@@ -108,15 +109,17 @@ jobs:
         $beforeVersions = $readmeContent.Substring(0, $startIndex)
         $afterVersions = $readmeContent.Substring($endIndex)
         
-        # Tạo phần Script features
-        $scriptFeatures = "**Script features:**`n" +
-                         "* Downloads the latest Edge Stable, Beta, Dev, or Canary x64 from [edge_installer_multi](https://github.com/bibicadotnet/edge_installer_multi/releases)`n" +
-                         "* Integrates [Chrome++](https://github.com/Bush2021/chrome_plus) for extra features`n" +
-                         "* Manual update script preserves your settings and configurations`n`n" +
-                         ($versionLines -join "`n") + "`n`n"
+        # Tạo phần mới
+        $newSection = "### Script features:`r`n" +
+                     " `r`n" +
+                     "* Downloads the latest Edge Stable, Beta, Dev, or Canary x64 from [edge_installer_multi](https://github.com/bibicadotnet/edge_installer_multi/releases)`r`n" +
+                     "* Integrates [Chrome++](https://github.com/Bush2021/chrome_plus) for extra features`r`n" +
+                     "* Manual update script preserves your settings and configurations`r`n" +
+                     "### Microsoft Edge Portable Latest`r`n" +
+                     ($versionLines -join "`r`n") + "`r`n"
         
         # Ghép nội dung mới
-        $newReadmeContent = $beforeVersions + $scriptFeatures + $afterVersions
+        $newReadmeContent = $beforeVersions + $newSection + $afterVersions
         
         # Ghi vào file
         Set-Content "README.md" -Value $newReadmeContent -Encoding UTF8 -NoNewline
