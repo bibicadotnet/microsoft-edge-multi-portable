@@ -13,8 +13,8 @@ echo.
 echo try {
 echo   $currentVersion = if ^(Test-Path $edgePath^) { ^(Get-Item $edgePath^).VersionInfo.ProductVersion } else { "Not installed" }
 echo   $allReleases = Invoke-RestMethod -Uri $apiUrl
-echo   $channelReleases = $allReleases ^| Where-Object { $_.tag_name -like "edge-{CHANNEL}-portable-x64_*" } ^| Sort-Object created_at -Descending
-echo   $latestRelease = $channelReleases^[0^]
+echo   $channelReleases = $allReleases ^| Where-Object { $_.tag_name -like "edge-{CHANNEL}-portable-x64_*" }
+echo   $latestRelease = $channelReleases ^| Sort-Object { if ^($_.tag_name -match "([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)"^) { [System.Version]$matches[1] } else { [System.Version]"0.0.0.0" } } -Descending ^| Select-Object -First 1
 echo   $latestVersion = ^($latestRelease.tag_name -split "_"^)^[1^]
 echo   $downloadUrl = $latestRelease.assets^[0^].browser_download_url
 echo.
