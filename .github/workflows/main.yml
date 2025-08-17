@@ -166,7 +166,7 @@ jobs:
               # Customize the template for this channel
               $channelTitle = $channel.Substring(0,1).ToUpper() + $channel.Substring(1).ToLower()
               $updateBatContent = Get-Content $tempUpdateBat -Raw
-              $updateBatContent = $updateBatContent.Replace('{CHANNEL}', $channel)
+              $updateBatContent = $updateBatContent.Replace('{CHANNEL}', $channelTitle)
               $updateBatContent = $updateBatContent.Replace('{CHANNEL_TITLE}', $channelTitle)
               $updateBatContent = $updateBatContent.Replace('{REPOSITORY}', '${{ github.repository }}')
               $updateBatContent | Out-File -FilePath "$edgePath\update.bat" -Encoding ASCII
