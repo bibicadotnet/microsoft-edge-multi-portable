@@ -1,6 +1,6 @@
 @echo off
 setlocal
-echo Microsoft Edge {CHANNEL} Portable Auto Updater
+echo Microsoft Edge {CHANNEL} Portable Updater
 echo ==========================================
 echo.
 (
