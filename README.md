@@ -6,6 +6,7 @@ No installation or setup required. Keeps all history, cookies, extensions, and s
 
 * Downloads the latest Edge Stable, Beta, Dev, or Canary x64 from [edge_installer_multi](https://github.com/bibicadotnet/edge_installer_multi/releases)
 * Integrates [Chrome++](https://github.com/Bush2021/chrome_plus) for extra features
+* Manual update script preserves your settings and configurations
 
 **Download the pre-built [release](https://github.com/bibicadotnet/microsoft-edge-multi-portable/releases)**, extract, and start using immediately.
 
