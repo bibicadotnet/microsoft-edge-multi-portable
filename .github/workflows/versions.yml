@@ -116,7 +116,8 @@ jobs:
                      "* Integrates [Chrome++](https://github.com/Bush2021/chrome_plus) for extra features`r`n" +
                      "* Manual update script preserves your settings and configurations`r`n" +
                      "### Microsoft Edge Portable Latest`r`n" +
-                     ($versionLines -join "`r`n") + "`r`n"
+                     ($versionLines -join "`r`n") + "`r`n" +
+                     "`r`n"
         
         # Ghép nội dung mới
         $newReadmeContent = $beforeVersions + $newSection + $afterVersions
