@@ -62,7 +62,12 @@ echo     }
 echo   }
 echo.
 echo   Remove-Item $tempDir -Recurse -Force
-echo   Write-Host "Update completed! Version: $latestVersion" -ForegroundColor Green
+echo   $newCurrentVersion = if ^(Test-Path $edgePath^) { ^(Get-Item $edgePath^).VersionInfo.ProductVersion } else { "Not installed" }
+echo   if ^($newCurrentVersion -eq $latestVersion^) {
+echo     Write-Host "Update completed successfully! Version: $newCurrentVersion" -ForegroundColor Green
+echo   } else {
+echo     Write-Host "Update may not be successful. Expected: $latestVersion, Actual: $newCurrentVersion" -ForegroundColor Yellow
+echo   }
 echo.
 echo } catch {
 echo   Write-Host "Error: $_" -ForegroundColor Red
