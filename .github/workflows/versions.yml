@@ -2,8 +2,8 @@ name: Update Edge Versions
 
 on:
   schedule:
-    # Chạy mỗi giờ
-    - cron: '*/10 * * * *'  # Chạy mỗi 10 phút
+    # Chạy mỗi 10 phút
+    - cron: '*/10 * * * *'
   workflow_dispatch: # Cho phép chạy thủ công
 
 jobs:
