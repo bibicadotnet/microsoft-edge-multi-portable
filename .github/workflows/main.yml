@@ -226,19 +226,10 @@ jobs:
               
               Write-Host "Build completed!" -ForegroundColor Green
               
-              # Create ZIP archive using full 7-Zip for better compression
+              # Create ZIP archive
               $zipPath = "$env:GITHUB_WORKSPACE\$releaseTag.zip"
-              
-              # Use built-in 7-Zip on GitHub Actions runner
-              $sevenZPath = "C:\Program Files\7-Zip\7z.exe"
-              if (-not (Test-Path $sevenZPath)) {
-                  # Fallback: Install 7-Zip if not available
-                  choco install 7zip -y
-              }
-              
-              # Use 7-Zip to create ZIP with high compression
-              & $sevenZPath a -tzip -mx=9 $zipPath "$rootPath\*"
-              Write-Host "Created optimized ZIP archive: $zipPath"
+              Compress-Archive -Path "$rootPath\*" -DestinationPath $zipPath -CompressionLevel Optimal
+              Write-Host "Created archive: $zipPath"
               
               # Create Release and Upload Asset
               $releaseTitle = "$channel-portable-$arch`_$version`_${{ steps.chromeplus-version.outputs.CHROMEPLUS_VERSION }}"
