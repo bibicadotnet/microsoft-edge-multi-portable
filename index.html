@@ -199,8 +199,6 @@
             font-weight: bold;
         }
 
-
-
         @media (max-width: 600px) {
             body {
                 padding: 10px;
@@ -304,10 +302,12 @@
 
         async function getOfficialVersions() {
             try {
-                const response = await fetch('https://edgeupdates.microsoft.com/api/products');
+                // Sử dụng CORS proxy
+                const response = await fetch('https://api.allorigins.win/get?url=' + encodeURIComponent('https://edgeupdates.microsoft.com/api/products'));
                 if (!response.ok) throw new Error('API response not ok');
                 
-                const products = await response.json();
+                const data = await response.json();
+                const products = JSON.parse(data.contents);
                 const versions = {};
                 
                 const channelMap = {
@@ -333,10 +333,19 @@
                     }
                 }
                 
+                console.log('Official versions:', versions);
                 return versions;
             } catch (error) {
                 console.warn('Failed to fetch official versions:', error);
-                return {};
+                // Fallback với version mẫu để test
+                const fallbackVersions = {
+                    'stable': '131.0.2903.112',
+                    'beta': '132.0.2957.55', 
+                    'dev': '141.0.3500.0',
+                    'canary': '141.0.3508.0'
+                };
+                console.log('Using fallback versions:', fallbackVersions);
+                return fallbackVersions;
             }
         }
         
@@ -366,10 +375,19 @@
                 for (const channel of channels) {
                     const officialVersion = officialVersions[channel.key];
                     
-                    // Find portable release
-                    const portableRelease = releases.find(release => 
-                        release.tag_name.includes(`edge-${channel.key}-portable`)
-                    );
+				// Find portable release
+				const portableReleases = releases
+					.filter(release => release.tag_name.includes(`${channel.key}-portable-x64`))
+					.map(release => {
+						const versionMatch = release.tag_name.match(/x64_([0-9.]+)_/);
+						return {
+							...release,
+							parsedVersion: versionMatch ? versionMatch[1] : '0.0.0'
+						};
+					})
+					.sort((a, b) => compareVersions(b.parsedVersion, a.parsedVersion));
+
+				const portableRelease = portableReleases[0];
                     
                     let portableVersion = null;
                     let downloadUrl = null;
@@ -388,20 +406,31 @@
                         
                         if (portableVersion && officialVersion) {
                             const comparison = compareVersions(portableVersion, officialVersion);
+                            console.log(`Channel: ${channel.key}, Portable: ${portableVersion}, Official: ${officialVersion}, Comparison: ${comparison}`);
+                            
                             if (comparison === 0) {
                                 status = 'current';
                                 statusText = 'Latest version available';
                             } else if (comparison < 0) {
                                 status = 'outdated';
-                                statusText = `Official: ${officialVersion} (newer available)`;
+                                statusText = `Portable: ${portableVersion} | Official: ${officialVersion} (newer available)`;
                             } else {
                                 status = 'current';
                                 statusText = 'Latest version available';
                             }
+                        } else if (portableVersion) {
+                            // Có portable version nhưng không lấy được official version
+                            status = 'current';
+                            statusText = 'Available for download';
                         } else {
+                            // Có release nhưng không parse được version
                             status = 'current';
                             statusText = 'Available for download';
                         }
+                    } else if (officialVersion) {
+                        // Có official version nhưng chưa có portable release
+                        status = 'unavailable';
+                        statusText = `Official: ${officialVersion} - Portable not yet available`;
                     }
                     
                     html += `
