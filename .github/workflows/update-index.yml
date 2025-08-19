@@ -33,26 +33,22 @@ jobs:
         Write-Host "Found $($githubReleases.Count) releases"
         
         # Tạo HTML content cho từng channel
-        $channels = @(
-            @{ Name = "Stable"; Pattern = "edge-stable-portable"; Display = "Microsoft Edge Stable" },
-            @{ Name = "Beta"; Pattern = "edge-beta-portable"; Display = "Microsoft Edge Beta" },
-            @{ Name = "Dev"; Pattern = "edge-dev-portable"; Display = "Microsoft Edge Developer" },
-            @{ Name = "Canary"; Pattern = "edge-canary-portable"; Display = "Microsoft Edge Canary" }
-        )
-        
-        $versionHtml = ""
+        $channels = @("Stable", "Beta", "Dev", "Canary")
+        $versionItems = @()
         
         foreach ($channel in $channels) {
+            $channelDisplayName = if ($channel -eq "Dev") { "Microsoft Edge Developer" } else { "Microsoft Edge $channel" }
+            $pattern = "edge-$($channel.ToLower())-portable"
+            
             # Tìm release mới nhất cho channel này
             $channelReleases = $githubReleases | Where-Object { 
-                $_.tag_name -like "*$($channel.Pattern)*" 
+                $_.tag_name -like "*$pattern*" 
             } | Sort-Object published_at -Descending
             
             if ($channelReleases.Count -gt 0) {
                 $latestRelease = $channelReleases[0]
                 
                 # Extract version từ tag name
-                # Tag format: edge-stable-portable-x64_139.0.3405.86_2024-12-19T10-00-03Z
                 $versionMatch = $latestRelease.tag_name -match "x64_([0-9.]+)_"
                 $version = if ($versionMatch) { $matches[1] } else { "Unknown" }
                 
@@ -61,36 +57,34 @@ jobs:
                 
                 if ($zipAsset) {
                     $downloadUrl = $zipAsset.browser_download_url
-                    $versionHtml += @"
-                    <li class="version-item">
-                        <div>
-                            <div class="version-name">$($channel.Display)</div>
-                            <a href="$downloadUrl" class="download-link" target="_blank">Download ZIP</a>
-                        </div>
-                        <div class="version-number">$version</div>
-                    </li>
-"@
+                    $versionItems += "                    <li class=`"version-item`">"
+                    $versionItems += "                        <div>"
+                    $versionItems += "                            <div class=`"version-name`">$channelDisplayName</div>"
+                    $versionItems += "                            <a href=`"$downloadUrl`" class=`"download-link`" target=`"_blank`">Download ZIP</a>"
+                    $versionItems += "                        </div>"
+                    $versionItems += "                        <div class=`"version-number`">$version</div>"
+                    $versionItems += "                    </li>"
                 } else {
-                    $versionHtml += @"
-                    <li class="version-item">
-                        <div>
-                            <div class="version-name">$($channel.Display)</div>
-                            <span class="unavailable">No ZIP found</span>
-                        </div>
-                        <div class="version-number">$version</div>
-                    </li>
-"@
+                    $versionItems += "                    <li class=`"version-item`">"
+                    $versionItems += "                        <div>"
+                    $versionItems += "                            <div class=`"version-name`">$channelDisplayName</div>"
+                    $versionItems += "                            <span class=`"unavailable`">No ZIP found</span>"
+                    $versionItems += "                        </div>"
+                    $versionItems += "                        <div class=`"version-number`">$version</div>"
+                    $versionItems += "                    </li>"
                 }
+                
+                Write-Host "$channel : $version"
             } else {
-                $versionHtml += @"
-                    <li class="version-item">
-                        <div>
-                            <div class="version-name">$($channel.Display)</div>
-                            <span class="unavailable">Not available yet</span>
-                        </div>
-                        <div class="version-number">-</div>
-                    </li>
-"@
+                $versionItems += "                    <li class=`"version-item`">"
+                $versionItems += "                        <div>"
+                $versionItems += "                            <div class=`"version-name`">$channelDisplayName</div>"
+                $versionItems += "                            <span class=`"unavailable`">Not available yet</span>"
+                $versionItems += "                        </div>"
+                $versionItems += "                        <div class=`"version-number`">-</div>"
+                $versionItems += "                    </li>"
+                
+                Write-Host "$channel : Not available"
             }
         }
         
@@ -111,15 +105,19 @@ jobs:
         
         if ($startIndex -eq -1 -or $endIndex -eq -1) {
             Write-Host "Cannot find version markers in index.html"
+            Write-Host "Looking for: '$startMarker' and '$endMarker'"
             exit 1
         }
         
-        # Tính toán vị trí
-        $beforeContent = $indexContent.Substring(0, $startIndex + $startMarker.Length)
-        $afterContent = $indexContent.Substring($endIndex)
+        # Tách nội dung
+        $beforeVersions = $indexContent.Substring(0, $startIndex + $startMarker.Length)
+        $afterVersions = $indexContent.Substring($endIndex)
         
-        # Tạo nội dung mới
-        $newIndexContent = $beforeContent + "`r`n" + $versionHtml + "`r`n                    " + $afterContent
+        # Tạo phần versions mới
+        $versionSection = "`r`n" + ($versionItems -join "`r`n") + "`r`n                    "
+        
+        # Ghép nội dung mới
+        $newIndexContent = $beforeVersions + $versionSection + $afterVersions
         
         # Cập nhật thời gian
         $timeStartMarker = "<!-- AUTO_UPDATE_TIME_START -->"
@@ -132,28 +130,17 @@ jobs:
             $currentTime = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss UTC")
             $beforeTime = $newIndexContent.Substring(0, $timeStartIndex + $timeStartMarker.Length)
             $afterTime = $newIndexContent.Substring($timeEndIndex)
-            $newIndexContent = $beforeTime + "`r`n            Last updated: $currentTime`r`n            " + $afterTime
+            $timeSection = "`r`n            Last updated: $currentTime`r`n            "
+            $newIndexContent = $beforeTime + $timeSection + $afterTime
         }
         
-        # Ghi file
+        # Ghi vào file
         Set-Content "index.html" -Value $newIndexContent -Encoding UTF8 -NoNewline
         
         Write-Host "index.html updated successfully"
-        Write-Host "Version information:"
-        $channels | ForEach-Object {
-            $channelName = $_.Name
-            $channelReleases = $githubReleases | Where-Object { 
-                $_.tag_name -like "*$($_.Pattern)*" 
-            } | Sort-Object published_at -Descending
-            
-            if ($channelReleases.Count -gt 0) {
-                $versionMatch = $channelReleases[0].tag_name -match "x64_([0-9.]+)_"
-                $version = if ($versionMatch) { $matches[1] } else { "Unknown" }
-                Write-Host "  $channelName : $version"
-            } else {
-                Write-Host "  $channelName : Not available"
-            }
-        }
+        
+        # Hiển thị thay đổi
+        Write-Host "`nVersion information updated for index.html"
 
     - name: Check for changes and commit
       shell: powershell
@@ -171,7 +158,7 @@ jobs:
         } else {
             Write-Host "Changes detected, committing..."
             $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss UTC"
-            git commit -m "Update index page with latest versions - $timestamp"
+            git commit -m "Update index page - $timestamp"
             git push
             Write-Host "Changes committed and pushed"
         }
