@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -12,192 +12,220 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             line-height: 1.6;
-            color: #2c3e50;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+            color: #333;
+            background: #f5f5f5;
             padding: 20px;
         }
 
         .container {
-            max-width: 900px;
+            max-width: 800px;
             margin: 0 auto;
             background: white;
-            border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            border: 1px solid #ddd;
             overflow: hidden;
         }
 
         .header {
-            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            background: #333;
             color: white;
-            padding: 40px;
+            padding: 30px;
             text-align: center;
         }
 
         .header h1 {
-            font-size: 2.5rem;
+            font-size: 2rem;
             margin-bottom: 10px;
         }
 
         .header p {
             font-size: 1.1rem;
             opacity: 0.9;
-            margin-bottom: 20px;
-        }
-
-        .github-link {
-            display: inline-block;
-            padding: 12px 24px;
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            text-decoration: none;
-            border-radius: 25px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            transition: all 0.3s ease;
-        }
-
-        .github-link:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: translateY(-2px);
+            margin-bottom: 0;
         }
 
         .content {
-            padding: 40px;
+            padding: 30px;
         }
 
         .section {
-            margin-bottom: 40px;
+            margin-bottom: 30px;
         }
 
         .section h2 {
-            color: #2c3e50;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #ecf0f1;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
+        }
+
+        .section h2.versions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section h2.versions::before {
+            content: "📦";
+            font-size: 1.1rem;
         }
 
         .version-list {
             list-style: none;
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 20px;
-            margin: 20px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
         }
 
         .version-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px;
-            border-bottom: 1px solid #e9ecef;
         }
 
         .version-item:last-child {
             border-bottom: none;
         }
 
-        .version-link {
-            color: #007bff;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
+        .version-info h3 {
+            font-size: 1rem;
+            margin-bottom: 3px;
+            color: #333;
         }
 
-        .version-link:hover {
-            color: #0056b3;
-            text-decoration: underline;
+        .version-status {
+            font-size: 0.85rem;
+            color: #666;
         }
 
         .version-number {
             font-family: 'Consolas', 'Monaco', monospace;
             background: white;
             padding: 6px 12px;
-            border-radius: 6px;
-            border: 1px solid #dee2e6;
             font-size: 0.9rem;
             color: #495057;
         }
 
-        .feature-list {
+        .version-number.unavailable {
+            background: transparent;
+            color: #999;
+            cursor: default;
+        }
+
+        .version-number.unavailable:hover {
+            background: transparent;
+            color: #999;
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+
+        .status-current { background: #28a745; }
+        .status-outdated { background: #ffc107; }
+        .status-unavailable { background: #dc3545; }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .error {
+            background: #f5f5f5;
+            color: #333;
+            padding: 15px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        .notice {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .notice h3 {
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+
+        .notice p, .notice ul {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+
+        .notice ul {
+            padding-left: 20px;
+        }
+
+        .features {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 20px;
+        }
+
+        .features ul {
             list-style: none;
-            margin: 20px 0;
+            padding-left: 0;
         }
 
-        .feature-list li {
-            padding: 10px 0;
+        .features li {
+            padding: 3px 0;
             position: relative;
-            padding-left: 30px;
+            padding-left: 20px;
         }
 
-        .feature-list li:before {
-            content: "✓";
+        .features li:before {
+            content: "•";
             position: absolute;
             left: 0;
-            color: #28a745;
+            color: #333;
             font-weight: bold;
-            font-size: 1.1rem;
         }
 
-        .file-list {
-            list-style: none;
-            margin: 20px 0;
-        }
 
-        .file-list li {
-            padding: 8px 0;
-            font-family: 'Consolas', 'Monaco', monospace;
-            background: #f8f9fa;
-            padding: 10px 15px;
-            border-radius: 6px;
-            margin: 5px 0;
-            border-left: 4px solid #007bff;
-        }
 
-        .warning {
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-            border-radius: 10px;
-            padding: 20px;
-            margin: 20px 0;
-            color: #856404;
-        }
-
-        .warning h3 {
-            color: #856404;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-        }
-
-        .warning-icon {
-            margin-right: 10px;
-            font-size: 1.2em;
-        }
-
-        .last-updated {
-            text-align: center;
-            padding: 20px;
-            background: #f8f9fa;
-            color: #6c757d;
-            border-top: 1px solid #e9ecef;
-        }
-
-        @media (max-width: 768px) {
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
             .header h1 {
-                font-size: 2rem;
+                font-size: 1.5rem;
             }
             
             .content {
                 padding: 20px;
             }
-            
+
+            .github-footer {
+                padding: 10px 20px;
+            }
+
             .version-item {
                 flex-direction: column;
                 align-items: flex-start;
-                gap: 10px;
+                gap: 8px;
             }
         }
     </style>
@@ -206,95 +234,208 @@
     <div class="container">
         <header class="header">
             <h1>Microsoft Edge Multi Portable</h1>
-            <p>Portable versions of Microsoft Edge browser for all channels</p>
-            <a href="https://github.com/bibicadotnet/microsoft-edge-multi-portable" class="github-link">
-                View on GitHub
-            </a>
+            <p>Download the pre-built release, extract, and start using immediately.</p>
         </header>
 
         <div class="content">
             <div class="section">
-                <h2>📦 Microsoft Edge Portable</h2>
-                <p><strong>No installation required.</strong> Keeps all history, cookies, extensions, and settings even when moved to another device.</p>
-                  <br>
-                <h3>Latest Versions</h3>
-              
-                <ul class="version-list">
-                    <!-- AUTO_UPDATE_START -->
-                    <li class="version-item">
-                        <a href="https://github.com/bibicadotnet/microsoft-edge-multi-portable/releases/download/edge-stable-portable-x64_139.0.3405.102_1.13.0/edge-stable-portable-x64_139.0.3405.102_1.13.0.zip" class="version-link" target="_blank">
-                            Microsoft Edge Stable Portable
-                        </a>
-                        <span class="version-number">139.0.3405.102</span>
-                    </li>
-                    <li class="version-item">
-                        <a href="https://github.com/bibicadotnet/microsoft-edge-multi-portable/releases/download/edge-beta-portable-x64_140.0.3485.14_1.13.0/edge-beta-portable-x64_140.0.3485.14_1.13.0.zip" class="version-link" target="_blank">
-                            Microsoft Edge Beta Portable
-                        </a>
-                        <span class="version-number">140.0.3485.14</span>
-                    </li>
-                    <li class="version-item">
-                        <a href="https://github.com/bibicadotnet/microsoft-edge-multi-portable/releases/download/edge-dev-portable-x64_141.0.3500.1_1.13.0/edge-dev-portable-x64_141.0.3500.1_1.13.0.zip" class="version-link" target="_blank">
-                            Microsoft Edge Developer Portable
-                        </a>
-                        <span class="version-number">141.0.3500.1</span>
-                    </li>
-                    <li class="version-item">
-                        <a href="https://github.com/bibicadotnet/microsoft-edge-multi-portable/releases/download/edge-canary-portable-x64_141.0.3500.0_1.13.0/edge-canary-portable-x64_141.0.3500.0_1.13.0.zip" class="version-link" target="_blank">
-                            Microsoft Edge Canary Portable
-                        </a>
-                        <span class="version-number">141.0.3500.0</span>
-                    </li>
-                    <!-- AUTO_UPDATE_END -->
-                </ul>
-                
-                <p><strong>Download the pre-built release, extract, and start using immediately.</strong></p>
+                <h2 class="versions">Available Portable Versions</h2>
+                <div id="versions-content">
+                    <div class="loading">Loading latest versions...</div>
+                </div>
             </div>
 
             <div class="section">
-                <h2>🚀 Script Features</h2>
-                <ul class="feature-list">
-                    <li>Downloads the latest Edge Stable, Beta, Dev, or Canary x64 from edge_installer_multi</li>
-                    <li>Integrates Chrome++ for extra features</li>
-                    <li>Manual update script preserves your settings and configurations</li>
-                </ul>
+                <h2>⭐ Features</h2>
+                <div class="features">
+                    <ul>
+                        <li>All channels: Stable, Beta, Developer, Canary</li>
+                        <li>Windows x64 architecture only</li>
+                        <li>No installation required - extract and run</li>
+                        <li>Pre-configured for portable usage</li>
+                        <li>Keeps all data in local folder</li>
+                    </ul>
+                </div>
             </div>
 
             <div class="section">
                 <h2>📁 Files and Their Purposes</h2>
-                <ul class="file-list">
-                    <li><strong>chrome++.ini</strong>: configuration file for Chrome++</li>
-                    <li><strong>debloater.reg</strong>: removes unnecessary features from Microsoft Edge</li>
-                    <li><strong>default-apps-multi-profile.bat</strong>: sets the browser as the default application</li>
-                    <li><strong>update.bat</strong>: updates to the latest version</li>
-                </ul>
-            </div>
-
-            <div class="section">
-                <h2>💻 How to Use</h2>
-                <ol style="padding-left: 20px; margin: 15px 0;">
-                    <li>Download the desired Edge channel version</li>
-                    <li>Extract the archive to your preferred location</li>
-                    <li>Run the executable file</li>
-                    <li>Enjoy your portable Microsoft Edge!</li>
-                </ol>
+                <div class="notice">
+                    <ul>
+                        <li><strong>chrome++.ini</strong>: configuration file for Chrome++</li>
+                        <li><strong>debloater.reg</strong>: removes unnecessary features from Microsoft Edge</li>
+                        <li><strong>default-apps-multi-profile.bat</strong>: sets the browser as the default application</li>
+                        <li><strong>update.bat</strong>: updates to the latest version</li>
+                    </ul>
+                </div>
             </div>
 
             <div class="section">
                 <h2>⚠️ Important Notice</h2>
-                <div class="warning">
-                    <h3><span class="warning-icon">⚠</span> Microsoft Defender Antivirus Warning</h3>
+                <div class="notice">
+                    <h3>Microsoft Defender Antivirus Warning</h3>
                     <p>Due to the way Microsoft Edge is bypassed to run as a portable app, Microsoft Defender Antivirus may falsely flag it as a trojan.</p>
                     <p><strong>Solution:</strong> Allow/whitelist the file and wait for Microsoft Defender's definitions to update and remove the false positive.</p>
                 </div>
             </div>
-        </div>
 
-        <div class="last-updated">
-            <!-- AUTO_UPDATE_TIME_START -->
-            Last updated: 2025-08-19 19:53:57 UTC
-            <!-- AUTO_UPDATE_TIME_END -->
+            <p style="text-align: center; margin-top: 20px; font-size: 0.9rem;">
+                <a href="https://github.com/bibicadotnet/microsoft-edge-multi-portable" target="_blank" style="color: #666; text-decoration: none;">View on GitHub</a>
+            </p>
         </div>
     </div>
+
+    <script>
+        const GITHUB_API_BASE = 'https://api.github.com/repos/bibicadotnet/microsoft-edge-multi-portable';
+        
+        function compareVersions(v1, v2) {
+            const parts1 = v1.split('.').map(Number);
+            const parts2 = v2.split('.').map(Number);
+            
+            for (let i = 0; i < Math.max(parts1.length, parts2.length); i++) {
+                const part1 = parts1[i] || 0;
+                const part2 = parts2[i] || 0;
+                
+                if (part1 > part2) return 1;
+                if (part1 < part2) return -1;
+            }
+            return 0;
+        }
+
+        async function getOfficialVersions() {
+            try {
+                const response = await fetch('https://edgeupdates.microsoft.com/api/products');
+                if (!response.ok) throw new Error('API response not ok');
+                
+                const products = await response.json();
+                const versions = {};
+                
+                const channelMap = {
+                    'Stable': 'stable',
+                    'Beta': 'beta', 
+                    'Dev': 'dev',
+                    'Canary': 'canary'
+                };
+                
+                for (const product of products) {
+                    const channelKey = channelMap[product.Product];
+                    if (channelKey && product.Releases) {
+                        const windowsReleases = product.Releases.filter(r => 
+                            r.Platform === 'Windows' && r.Architecture === 'x64'
+                        );
+                        
+                        if (windowsReleases.length > 0) {
+                            const latest = windowsReleases.sort((a, b) => 
+                                new Date(b.PublishedTime) - new Date(a.PublishedTime)
+                            )[0];
+                            versions[channelKey] = latest.ProductVersion;
+                        }
+                    }
+                }
+                
+                return versions;
+            } catch (error) {
+                console.warn('Failed to fetch official versions:', error);
+                return {};
+            }
+        }
+        
+        async function loadVersions() {
+            const versionsContent = document.getElementById('versions-content');
+            versionsContent.innerHTML = '<div class="loading">Loading latest versions...</div>';
+            
+            try {
+                // Fetch GitHub releases
+                const githubResponse = await fetch(`${GITHUB_API_BASE}/releases`);
+                if (!githubResponse.ok) throw new Error('Failed to fetch releases');
+                
+                const releases = await githubResponse.json();
+                
+                // Try to get official versions (optional)
+                const officialVersions = await getOfficialVersions();
+                
+                const channels = [
+                    { key: 'stable', name: 'Microsoft Edge Stable' },
+                    { key: 'beta', name: 'Microsoft Edge Beta' },
+                    { key: 'dev', name: 'Microsoft Edge Developer' },
+                    { key: 'canary', name: 'Microsoft Edge Canary' }
+                ];
+                
+                let html = '<ul class="version-list">';
+                
+                for (const channel of channels) {
+                    const officialVersion = officialVersions[channel.key];
+                    
+                    // Find portable release
+                    const portableRelease = releases.find(release => 
+                        release.tag_name.includes(`edge-${channel.key}-portable`)
+                    );
+                    
+                    let portableVersion = null;
+                    let downloadUrl = null;
+                    let status = 'unavailable';
+                    let statusText = 'Not available yet';
+                    
+                    if (portableRelease) {
+                        const versionMatch = portableRelease.tag_name.match(/x64_([0-9.]+)_/);
+                        portableVersion = versionMatch ? versionMatch[1] : null;
+                        
+                        // Find direct download link
+                        const asset = portableRelease.assets && portableRelease.assets.find(asset => 
+                            asset.name.endsWith('.zip')
+                        );
+                        downloadUrl = asset ? asset.browser_download_url : portableRelease.html_url;
+                        
+                        if (portableVersion && officialVersion) {
+                            const comparison = compareVersions(portableVersion, officialVersion);
+                            if (comparison === 0) {
+                                status = 'current';
+                                statusText = 'Latest version available';
+                            } else if (comparison < 0) {
+                                status = 'outdated';
+                                statusText = `Official: ${officialVersion} (newer available)`;
+                            } else {
+                                status = 'current';
+                                statusText = 'Latest version available';
+                            }
+                        } else {
+                            status = 'current';
+                            statusText = 'Available for download';
+                        }
+                    }
+                    
+                    html += `
+                        <li class="version-item">
+                            <div class="version-info">
+                                <h3>${channel.name}</h3>
+                                <div class="version-status">
+                                    <span class="status-dot status-${status}"></span>
+                                    ${statusText}
+                                </div>
+                            </div>
+                            ${portableVersion && downloadUrl ? 
+                                `<a href="${downloadUrl}" class="version-number" target="_blank">${portableVersion}</a>` :
+                                `<span class="version-number unavailable">Not Available</span>`
+                            }
+                        </li>
+                    `;
+                }
+                
+                html += '</ul>';
+                versionsContent.innerHTML = html;
+                
+            } catch (error) {
+                versionsContent.innerHTML = `
+                    <div class="error">
+                        Unable to load versions. Please visit the GitHub repository directly.
+                    </div>
+                `;
+                console.error('Error loading versions:', error);
+            }
+        }
+        
+        // Load versions when page loads
+        document.addEventListener('DOMContentLoaded', loadVersions);
+    </script>
 </body>
 </html>
