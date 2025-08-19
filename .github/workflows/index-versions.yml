@@ -1,0 +1,286 @@
+name: Update Portable Versions
+
+on:
+  schedule:
+    # Chạy mỗi 5 phút
+    - cron: '*/5 * * * *'
+  workflow_dispatch: # Cho phép chạy thủ công
+
+jobs:
+  update-versions:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        fetch-depth: 0
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+    
+    - name: Install dependencies
+      run: |
+        npm init -y
+        npm install node-fetch
+    
+    - name: Update versions and modify index.html
+      run: |
+        cat << 'EOF' > update_versions.js
+        const fs = require('fs');
+        const fetch = require('node-fetch');
+
+        const GITHUB_API_BASE = 'https://api.github.com/repos/bibicadotnet/microsoft-edge-multi-portable';
+
+        function compareVersions(v1, v2) {
+            const parts1 = v1.split('.').map(Number);
+            const parts2 = v2.split('.').map(Number);
+            
+            for (let i = 0; i < Math.max(parts1.length, parts2.length); i++) {
+                const part1 = parts1[i] || 0;
+                const part2 = parts2[i] || 0;
+                
+                if (part1 > part2) return 1;
+                if (part1 < part2) return -1;
+            }
+            return 0;
+        }
+
+        async function getOfficialVersions() {
+            try {
+                const response = await fetch('https://edgeupdates.microsoft.com/api/products');
+                if (!response.ok) throw new Error('API response not ok');
+                
+                const products = await response.json();
+                const versions = {};
+                
+                const channelMap = {
+                    'Stable': 'stable',
+                    'Beta': 'beta', 
+                    'Dev': 'dev',
+                    'Canary': 'canary'
+                };
+                
+                for (const product of products) {
+                    const channelKey = channelMap[product.Product];
+                    if (channelKey && product.Releases) {
+                        const windowsReleases = product.Releases.filter(r => 
+                            r.Platform === 'Windows' && r.Architecture === 'x64'
+                        );
+                        
+                        if (windowsReleases.length > 0) {
+                            const latest = windowsReleases.sort((a, b) => 
+                                new Date(b.PublishedTime) - new Date(a.PublishedTime)
+                            )[0];
+                            versions[channelKey] = latest.ProductVersion;
+                        }
+                    }
+                }
+                
+                console.log('Official versions:', versions);
+                return versions;
+            } catch (error) {
+                console.warn('Failed to fetch official versions:', error);
+                const fallbackVersions = {
+                    'stable': '131.0.2903.112',
+                    'beta': '132.0.2957.55', 
+                    'dev': '141.0.3500.0',
+                    'canary': '141.0.3508.0'
+                };
+                console.log('Using fallback versions:', fallbackVersions);
+                return fallbackVersions;
+            }
+        }
+
+        async function generateVersionsHTML() {
+            try {
+                // Fetch GitHub releases
+                const githubResponse = await fetch(`${GITHUB_API_BASE}/releases`);
+                if (!githubResponse.ok) throw new Error('Failed to fetch releases');
+                
+                const releases = await githubResponse.json();
+                
+                // Get official versions
+                const officialVersions = await getOfficialVersions();
+                
+                const channels = [
+                    { key: 'stable', name: 'Microsoft Edge Stable' },
+                    { key: 'beta', name: 'Microsoft Edge Beta' },
+                    { key: 'dev', name: 'Microsoft Edge Developer' },
+                    { key: 'canary', name: 'Microsoft Edge Canary' }
+                ];
+                
+                let html = '<ul class="version-list">';
+                
+                for (const channel of channels) {
+                    const officialVersion = officialVersions[channel.key];
+                    
+                    // Find portable release
+                    const portableReleases = releases
+                        .filter(release => release.tag_name.includes(`${channel.key}-portable-x64`))
+                        .map(release => {
+                            const versionMatch = release.tag_name.match(/x64_([0-9.]+)_/);
+                            return {
+                                ...release,
+                                parsedVersion: versionMatch ? versionMatch[1] : '0.0.0'
+                            };
+                        })
+                        .sort((a, b) => compareVersions(b.parsedVersion, a.parsedVersion));
+
+                    const portableRelease = portableReleases[0];
+                    
+                    let portableVersion = null;
+                    let downloadUrl = null;
+                    let status = 'unavailable';
+                    let statusText = 'Not available yet';
+                    
+                    if (portableRelease) {
+                        const versionMatch = portableRelease.tag_name.match(/x64_([0-9.]+)_/);
+                        portableVersion = versionMatch ? versionMatch[1] : null;
+                        
+                        // Find direct download link
+                        const asset = portableRelease.assets && portableRelease.assets.find(asset => 
+                            asset.name.endsWith('.zip')
+                        );
+                        downloadUrl = asset ? asset.browser_download_url : portableRelease.html_url;
+                        
+                        if (portableVersion && officialVersion) {
+                            const comparison = compareVersions(portableVersion, officialVersion);
+                            console.log(`Channel: ${channel.key}, Portable: ${portableVersion}, Official: ${officialVersion}, Comparison: ${comparison}`);
+                            
+                            if (comparison === 0) {
+                                status = 'current';
+                                statusText = 'Latest version available';
+                            } else if (comparison < 0) {
+                                status = 'outdated';
+                                statusText = `Portable: ${portableVersion} | Official: ${officialVersion} (newer available)`;
+                            } else {
+                                status = 'current';
+                                statusText = 'Latest version available';
+                            }
+                        } else if (portableVersion) {
+                            status = 'current';
+                            statusText = 'Available for download';
+                        } else {
+                            status = 'current';
+                            statusText = 'Available for download';
+                        }
+                    } else if (officialVersion) {
+                        status = 'unavailable';
+                        statusText = `Official: ${officialVersion} - Portable not yet available`;
+                    }
+                    
+                    html += `
+                        <li class="version-item">
+                            <div class="version-info">
+                                <h3>${channel.name}</h3>
+                                <div class="version-status">
+                                    <span class="status-dot status-${status}"></span>
+                                    ${statusText}
+                                </div>
+                            </div>
+                            ${portableVersion && downloadUrl ? 
+                                `<a href="${downloadUrl}" class="version-number" target="_blank">${portableVersion}</a>` :
+                                `<span class="version-number unavailable">Not Available</span>`
+                            }
+                        </li>
+                    `;
+                }
+                
+                html += '</ul>';
+                return html;
+                
+            } catch (error) {
+                console.error('Error generating versions HTML:', error);
+                return `<div class="error">Unable to load versions. Please visit the GitHub repository directly.</div>`;
+            }
+        }
+
+        async function updateIndexHTML() {
+            try {
+                const versionsHTML = await generateVersionsHTML();
+                
+                // Read current index.html
+                let indexContent = fs.readFileSync('index.html', 'utf8');
+                
+                // Replace the versions content div
+                const startMarker = '<div id="versions-content">';
+                const endMarker = '</div>';
+                
+                const startIndex = indexContent.indexOf(startMarker);
+                const endIndex = indexContent.indexOf(endMarker, startIndex) + endMarker.length;
+                
+                if (startIndex !== -1 && endIndex !== -1) {
+                    const newVersionsDiv = `<div id="versions-content">
+                    ${versionsHTML}
+                </div>`;
+                    
+                    const newContent = indexContent.substring(0, startIndex) + 
+                                     newVersionsDiv + 
+                                     indexContent.substring(endIndex);
+                    
+                    // Add timestamp comment
+                    const timestamp = new Date().toISOString();
+                    const updatedContent = newContent.replace(
+                        '<!-- Last updated:',
+                        `<!-- Last updated: ${timestamp} -->\n<!-- Last updated:`
+                    ).replace(
+                        '<div class="container">',
+                        `<!-- Last updated: ${timestamp} -->\n<div class="container">`
+                    );
+                    
+                    fs.writeFileSync('index.html', updatedContent);
+                    console.log('Successfully updated index.html');
+                    
+                    // Write summary for GitHub Actions
+                    const summaryPath = process.env.GITHUB_STEP_SUMMARY;
+                    if (summaryPath) {
+                        fs.writeFileSync(summaryPath, `# Version Update Summary\n\nUpdated at: ${timestamp}\n\n${versionsHTML}`);
+                    }
+                } else {
+                    console.error('Could not find versions-content div in index.html');
+                    process.exit(1);
+                }
+                
+            } catch (error) {
+                console.error('Error updating index.html:', error);
+                process.exit(1);
+            }
+        }
+
+        updateIndexHTML();
+        EOF
+        
+        node update_versions.js
+    
+    - name: Check for changes
+      id: check_changes
+      run: |
+        if git diff --quiet; then
+          echo "has_changes=false" >> $GITHUB_OUTPUT
+          echo "No changes detected"
+        else
+          echo "has_changes=true" >> $GITHUB_OUTPUT
+          echo "Changes detected"
+          git diff --name-only
+        fi
+    
+    - name: Commit and push changes
+      if: steps.check_changes.outputs.has_changes == 'true'
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add index.html
+        git commit -m "Auto-update portable versions - $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+        git push
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: No changes summary
+      if: steps.check_changes.outputs.has_changes == 'false'
+      run: |
+        echo "# No Changes" >> $GITHUB_STEP_SUMMARY
+        echo "No version updates were needed at $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
