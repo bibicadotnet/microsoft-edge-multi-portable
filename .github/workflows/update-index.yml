@@ -19,6 +19,38 @@ jobs:
     - name: Update index.html with latest versions
       shell: powershell
       run: |
+        # Fetch all Edge release data once
+        Write-Host "Fetching Edge release data..."
+        try {
+            $allReleases = Invoke-RestMethod "https://edgeupdates.microsoft.com/api/products"
+        } catch {
+            Write-Host "Error fetching Edge data: $_"
+            exit 1
+        }
+        
+        # Lấy phiên bản mới nhất cho từng channel từ Microsoft
+        $latestEdgeVersions = @{
+            "Stable" = ($allReleases | Where-Object { $_.Product -eq "Stable" }).Releases |
+                       Where-Object { $_.Platform -eq "Windows" -and $_.Architecture -eq "x64" } |
+                       Sort-Object PublishedTime -Descending |
+                       Select-Object -First 1 -ExpandProperty ProductVersion
+            "Beta" = ($allReleases | Where-Object { $_.Product -eq "Beta" }).Releases |
+                     Where-Object { $_.Platform -eq "Windows" -and $_.Architecture -eq "x64" } |
+                     Sort-Object PublishedTime -Descending |
+                     Select-Object -First 1 -ExpandProperty ProductVersion
+            "Dev" = ($allReleases | Where-Object { $_.Product -eq "Dev" }).Releases |
+                    Where-Object { $_.Platform -eq "Windows" -and $_.Architecture -eq "x64" } |
+                    Sort-Object PublishedTime -Descending |
+                    Select-Object -First 1 -ExpandProperty ProductVersion
+            "Canary" = ($allReleases | Where-Object { $_.Product -eq "Canary" }).Releases |
+                       Where-Object { $_.Platform -eq "Windows" -and $_.Architecture -eq "x64" } |
+                       Sort-Object PublishedTime -Descending |
+                       Select-Object -First 1 -ExpandProperty ProductVersion
+        }
+        
+        Write-Host "Latest Edge versions from Microsoft:"
+        $latestEdgeVersions.GetEnumerator() | ForEach-Object { Write-Host "  $($_.Key): $($_.Value)" }
+        
         # Lấy danh sách releases từ GitHub
         Write-Host "Fetching GitHub releases..."
         try {
@@ -30,7 +62,7 @@ jobs:
             exit 1
         }
         
-        Write-Host "Found $($githubReleases.Count) releases"
+        Write-Host "Found $($githubReleases.Count) releases on GitHub"
         
         # Tạo HTML content cho từng channel
         $channels = @("Stable", "Beta", "Dev", "Canary")
@@ -38,53 +70,94 @@ jobs:
         
         foreach ($channel in $channels) {
             $channelDisplayName = if ($channel -eq "Dev") { "Microsoft Edge Developer" } else { "Microsoft Edge $channel" }
-            $pattern = "edge-$($channel.ToLower())-portable"
+            $latestVersion = $latestEdgeVersions[$channel]
             
-            # Tìm release mới nhất cho channel này
-            $channelReleases = $githubReleases | Where-Object { 
-                $_.tag_name -like "*$pattern*" 
-            } | Sort-Object published_at -Descending
-            
-            if ($channelReleases.Count -gt 0) {
-                $latestRelease = $channelReleases[0]
+            if ($latestVersion) {
+                # Tìm release tương ứng trên GitHub với phiên bản mới nhất
+                $releasePattern = "edge-$($channel.ToLower())-portable-x64_$($latestVersion)_"
+                $matchingRelease = $githubReleases | Where-Object { $_.tag_name -like "$releasePattern*" }
                 
-                # Extract version từ tag name
-                $versionMatch = $latestRelease.tag_name -match "x64_([0-9.]+)_"
-                $version = if ($versionMatch) { $matches[1] } else { "Unknown" }
-                
-                # Tìm file zip trong assets
-                $zipAsset = $latestRelease.assets | Where-Object { $_.name -like "*.zip" }
-                
-                if ($zipAsset) {
-                    $downloadUrl = $zipAsset.browser_download_url
-                    $versionItems += "                    <li class=`"version-item`">"
-                    $versionItems += "                        <div>"
-                    $versionItems += "                            <div class=`"version-name`">$channelDisplayName</div>"
-                    $versionItems += "                            <a href=`"$downloadUrl`" class=`"download-link`" target=`"_blank`">Download ZIP</a>"
-                    $versionItems += "                        </div>"
-                    $versionItems += "                        <div class=`"version-number`">$version</div>"
-                    $versionItems += "                    </li>"
+                if ($matchingRelease) {
+                    # Có portable release cho phiên bản mới nhất
+                    $zipAsset = $matchingRelease.assets | Where-Object { $_.name -like "*.zip" }
+                    
+                    if ($zipAsset) {
+                        $downloadUrl = $zipAsset.browser_download_url
+                        $versionItems += "                    <li class=`"version-item`">"
+                        $versionItems += "                        <div>"
+                        $versionItems += "                            <div class=`"version-name`">$channelDisplayName</div>"
+                        $versionItems += "                            <a href=`"$downloadUrl`" class=`"download-link`" target=`"_blank`">Download ZIP</a>"
+                        $versionItems += "                        </div>"
+                        $versionItems += "                        <div class=`"version-number`">$latestVersion</div>"
+                        $versionItems += "                    </li>"
+                        Write-Host "$channel : $latestVersion (available)"
+                    } else {
+                        $versionItems += "                    <li class=`"version-item`">"
+                        $versionItems += "                        <div>"
+                        $versionItems += "                            <div class=`"version-name`">$channelDisplayName</div>"
+                        $versionItems += "                            <span class=`"unavailable`">No ZIP found</span>"
+                        $versionItems += "                        </div>"
+                        $versionItems += "                        <div class=`"version-number`">$latestVersion</div>"
+                        $versionItems += "                    </li>"
+                        Write-Host "$channel : $latestVersion (no ZIP)"
+                    }
                 } else {
-                    $versionItems += "                    <li class=`"version-item`">"
-                    $versionItems += "                        <div>"
-                    $versionItems += "                            <div class=`"version-name`">$channelDisplayName</div>"
-                    $versionItems += "                            <span class=`"unavailable`">No ZIP found</span>"
-                    $versionItems += "                        </div>"
-                    $versionItems += "                        <div class=`"version-number`">$version</div>"
-                    $versionItems += "                    </li>"
+                    # Chưa có portable release cho phiên bản mới nhất
+                    # Tìm release gần nhất cho channel này
+                    $channelPattern = "edge-$($channel.ToLower())-portable"
+                    $latestChannelRelease = $githubReleases | Where-Object { 
+                        $_.tag_name -like "*$channelPattern*" 
+                    } | Sort-Object published_at -Descending | Select-Object -First 1
+                    
+                    if ($latestChannelRelease) {
+                        # Extract version từ tag name
+                        $versionMatch = $latestChannelRelease.tag_name -match "x64_([0-9.]+)_"
+                        $availableVersion = if ($versionMatch) { $matches[1] } else { "Unknown" }
+                        
+                        $zipAsset = $latestChannelRelease.assets | Where-Object { $_.name -like "*.zip" }
+                        
+                        if ($zipAsset) {
+                            $downloadUrl = $zipAsset.browser_download_url
+                            $versionItems += "                    <li class=`"version-item`">"
+                            $versionItems += "                        <div>"
+                            $versionItems += "                            <div class=`"version-name`">$channelDisplayName</div>"
+                            $versionItems += "                            <a href=`"$downloadUrl`" class=`"download-link outdated`" target=`"_blank`">Download ZIP (outdated)</a>"
+                            $versionItems += "                        </div>"
+                            $versionItems += "                        <div class=`"version-number`">$availableVersion <span class=`"latest-version`">(latest: $latestVersion)</span></div>"
+                            $versionItems += "                    </li>"
+                            Write-Host "$channel : $availableVersion (outdated, latest: $latestVersion)"
+                        } else {
+                            $versionItems += "                    <li class=`"version-item`">"
+                            $versionItems += "                        <div>"
+                            $versionItems += "                            <div class=`"version-name`">$channelDisplayName</div>"
+                            $versionItems += "                            <span class=`"unavailable`">No ZIP found</span>"
+                            $versionItems += "                        </div>"
+                            $versionItems += "                        <div class=`"version-number`">$availableVersion <span class=`"latest-version`">(latest: $latestVersion)</span></div>"
+                            $versionItems += "                    </li>"
+                            Write-Host "$channel : $availableVersion (no ZIP, latest: $latestVersion)"
+                        }
+                    } else {
+                        # Không có release nào cho channel này
+                        $versionItems += "                    <li class=`"version-item`">"
+                        $versionItems += "                        <div>"
+                        $versionItems += "                            <div class=`"version-name`">$channelDisplayName</div>"
+                        $versionItems += "                            <span class=`"unavailable`">Not available yet</span>"
+                        $versionItems += "                        </div>"
+                        $versionItems += "                        <div class=`"version-number`">- <span class=`"latest-version`">(latest: $latestVersion)</span></div>"
+                        $versionItems += "                    </li>"
+                        Write-Host "$channel : Not available (latest: $latestVersion)"
+                    }
                 }
-                
-                Write-Host "$channel : $version"
             } else {
+                # Không thể lấy phiên bản mới nhất từ Microsoft
                 $versionItems += "                    <li class=`"version-item`">"
                 $versionItems += "                        <div>"
                 $versionItems += "                            <div class=`"version-name`">$channelDisplayName</div>"
-                $versionItems += "                            <span class=`"unavailable`">Not available yet</span>"
+                $versionItems += "                            <span class=`"unavailable`">Version check failed</span>"
                 $versionItems += "                        </div>"
                 $versionItems += "                        <div class=`"version-number`">-</div>"
                 $versionItems += "                    </li>"
-                
-                Write-Host "$channel : Not available"
+                Write-Host "$channel : Version check failed"
             }
         }
         
@@ -138,9 +211,6 @@ jobs:
         Set-Content "index.html" -Value $newIndexContent -Encoding UTF8 -NoNewline
         
         Write-Host "index.html updated successfully"
-        
-        # Hiển thị thay đổi
-        Write-Host "`nVersion information updated for index.html"
 
     - name: Check for changes and commit
       shell: powershell
