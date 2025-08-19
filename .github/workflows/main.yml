@@ -158,10 +158,10 @@ jobs:
 
               # Copy config files from project
               Write-Host "Copying config files..." -ForegroundColor Yellow
-              Copy-Item "$env:GITHUB_WORKSPACE\chrome++.ini" "$applicationPath\chrome++.ini" -Force
-              Copy-Item "$env:GITHUB_WORKSPACE\update.bat" "$applicationPath\update.bat" -Force
-              Copy-Item "$env:GITHUB_WORKSPACE\debloater.reg" "$applicationPath\debloater.reg" -Force
-              Copy-Item "$env:GITHUB_WORKSPACE\default-apps-multi-profile.bat" "$applicationPath\default-apps-multi-profile.bat" -Force
+              Copy-Item "$env:GITHUB_WORKSPACE\chrome++.ini" "$edgePath\chrome++.ini" -Force
+              Copy-Item "$env:GITHUB_WORKSPACE\update.bat" "$edgePath\update.bat" -Force
+              Copy-Item "$env:GITHUB_WORKSPACE\debloater.reg" "$edgePath\debloater.reg" -Force
+              Copy-Item "$env:GITHUB_WORKSPACE\default-apps-multi-profile.bat" "$edgePath\default-apps-multi-profile.bat" -Force
 
               # Download and customize update.bat for this channel
               Write-Host "Downloading and customizing update.bat for $channel channel..." -ForegroundColor Yellow
