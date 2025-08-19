@@ -202,7 +202,7 @@ jobs:
         Write-Host "Changes detected. Updating index.html..."
         
         # Ghi vào file
-        Set-Content "index.html" -Value $newContent -Encoding UTF8 -NoNewline
+        $newContent | Out-File -FilePath "index.html" -Encoding utf8 -NoNewline
         
         Write-Host "index.html updated successfully"
 
