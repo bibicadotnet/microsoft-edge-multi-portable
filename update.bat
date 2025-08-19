@@ -49,7 +49,7 @@ echo   if ^(Test-Path "msedge.exe"^) { Remove-Item "msedge.exe" -Force }
 echo   if ^(Test-Path "version.dll"^) { Remove-Item "version.dll" -Force }
 echo   if ^(Test-Path $currentVersion^) { Remove-Item $currentVersion -Recurse -Force }
 echo.
-echo   Get-ChildItem $extractedDir.FullName -Recurse ^| Where-Object { $_.Name -ne "update.bat" -and $_.Name -ne "chrome++.ini" } ^| ForEach-Object {
+echo   Get-ChildItem $extractedDir.FullName -Recurse ^| Where-Object { $_.Name -notin "update.bat","chrome++.ini","debloater.reg","default-apps-multi-profile.bat" } ^| ForEach-Object {
 echo     $relativePath = $_.FullName.Substring^($extractedDir.FullName.Length + 1^)
 echo     $destPath = Join-Path $currentDir $relativePath
 echo     if ^($_.PSIsContainer^) {
