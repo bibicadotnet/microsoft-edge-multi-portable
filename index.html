@@ -301,41 +301,39 @@
         }
 
         async function getOfficialVersions() {
-            try {
-                // Sử dụng CORS proxy
-                const response = await fetch('https://api.allorigins.win/get?url=' + encodeURIComponent('https://edgeupdates.microsoft.com/api/products'));
-                if (!response.ok) throw new Error('API response not ok');
-                
-                const data = await response.json();
-                const products = JSON.parse(data.contents);
-                const versions = {};
-                
-                const channelMap = {
-                    'Stable': 'stable',
-                    'Beta': 'beta', 
-                    'Dev': 'dev',
-                    'Canary': 'canary'
-                };
-                
-                for (const product of products) {
-                    const channelKey = channelMap[product.Product];
-                    if (channelKey && product.Releases) {
-                        const windowsReleases = product.Releases.filter(r => 
-                            r.Platform === 'Windows' && r.Architecture === 'x64'
-                        );
-                        
-                        if (windowsReleases.length > 0) {
-                            const latest = windowsReleases.sort((a, b) => 
-                                new Date(b.PublishedTime) - new Date(a.PublishedTime)
-                            )[0];
-                            versions[channelKey] = latest.ProductVersion;
-                        }
-                    }
-                }
-                
-                console.log('Official versions:', versions);
-                return versions;
-            } catch (error) {
+			try {
+				const response = await fetch('/api/edge-versions');
+				if (!response.ok) throw new Error('API response not ok');
+				
+				const products = await response.json();
+				const versions = {};
+				
+				const channelMap = {
+					'Stable': 'stable',
+					'Beta': 'beta', 
+					'Dev': 'dev',
+					'Canary': 'canary'
+				};
+				
+				for (const product of products) {
+					const channelKey = channelMap[product.Product];
+					if (channelKey && product.Releases) {
+						const windowsReleases = product.Releases.filter(r => 
+							r.Platform === 'Windows' && r.Architecture === 'x64'
+						);
+						
+						if (windowsReleases.length > 0) {
+							const latest = windowsReleases.sort((a, b) => 
+								new Date(b.PublishedTime) - new Date(a.PublishedTime)
+							)[0];
+							versions[channelKey] = latest.ProductVersion;
+						}
+					}
+				}
+				
+				console.log('Official versions:', versions);
+				return versions;
+			} catch (error) {
                 console.warn('Failed to fetch official versions:', error);
                 // Fallback với version mẫu để test
                 const fallbackVersions = {
@@ -463,6 +461,7 @@
             }
         }
         
+        // Load versions when page loads
         document.addEventListener('DOMContentLoaded', loadVersions);
     </script>
 </body>
