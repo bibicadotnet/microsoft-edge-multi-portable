@@ -9,7 +9,7 @@ No installation or setup required. Keeps all history, cookies, extensions, and s
 * Manual update script preserves your settings and configurations
 ### Microsoft Edge Portable Latest
 - Microsoft Edge Stable Portable [139.0.3405.102](https://github.com/bibicadotnet/microsoft-edge-multi-portable/releases/tag/edge-stable-portable-x64_139.0.3405.102_1.13.0)
-- Microsoft Edge Beta 140.0.3485.14 (latest portable not available yet)
+- Microsoft Edge Beta Portable [140.0.3485.14](https://github.com/bibicadotnet/microsoft-edge-multi-portable/releases/tag/edge-beta-portable-x64_140.0.3485.14_1.13.0)
 - Microsoft Edge Developer Portable [140.0.3485.6](https://github.com/bibicadotnet/microsoft-edge-multi-portable/releases/tag/edge-dev-portable-x64_140.0.3485.6_1.13.0)
 - Microsoft Edge Canary Portable [141.0.3500.0](https://github.com/bibicadotnet/microsoft-edge-multi-portable/releases/tag/edge-canary-portable-x64_141.0.3500.0_1.13.0)
 
