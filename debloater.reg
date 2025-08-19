@@ -1,0 +1,428 @@
+Windows Registry Editor Version 5.00
+
+; Phục hồi về mặc định
+[-HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Edge]
+[-HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\EdgeUpdate]
+
+; Cấu hình cài đặt
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Edge]
+
+;Tắt màn hình chào mừng khi khởi chạy Edge lần đầu
+"HideFirstRunExperience"=dword:00000001
+
+;Vô hiệu hóa tính năng tìm kiếm trong thanh bên.
+"SearchInSidebarEnabled"=dword:00000002
+
+;Tắt tính năng Hubs Sidebar
+"HubsSidebarEnabled"=dword:00000000
+
+;Tắt tính năng đọc to (Read Aloud)
+"ReadAloudEnabled"=dword:00000000
+
+;Tắt gửi dữ liệu chẩn đoán
+"DiagnosticData"=dword:00000000
+
+;Tắt gửi URL để phân tích lỗi (UrlDiagnosticDataEnabled)
+"UrlDiagnosticDataEnabled"=dword:00000000
+
+;Tắt ghim nút Browser Essentials trên thanh công cụ
+"PinBrowserEssentialsToolbarButton"=dword:00000000
+
+;Tắt tính năng Collections
+"EdgeCollectionsEnabled"=dword:00000000
+
+;Tắt báo cáo cá nhân hóa
+"PersonalizationReportingEnabled"=dword:00000000
+
+;Tắt tính năng chia đôi màn hình
+"SplitScreenEnabled"=dword:00000000
+
+;Tắt tính năng chụp web
+"WebCaptureEnabled"=dword:00000000
+
+;Tắt tính năng chuyển đổi có hướng dẫn
+"GuidedSwitchEnabled"=dword:00000000
+
+;Tắt hiển thị Microsoft Rewards
+"ShowMicrosoftRewards"=dword:00000000
+
+;Tắt tính năng nhập tự động và phần nhập của trải nghiệm lần chạy đầu tiên bị bỏ qua
+"AutoImportAtFirstRun"=dword:00000004
+
+;Tắt tính năng Workspaces
+"EdgeWorkspacesEnabled"=dword:00000000
+
+;Tắt tính năng thanh toán Edge Wallet
+"EdgeWalletCheckoutEnabled"=dword:00000000
+
+;Tắt tính năng Etree trong Edge Wallet
+"EdgeWalletEtreeEnabled"=dword:00000000
+
+;Tắt SSO website AAD
+"AADWebSiteSSOUsingThisProfileEnabled"=dword:00000000
+
+;Tắt nhãn hình ảnh trợ năng
+"AccessibilityImageLabelsEnabled"=dword:00000000
+
+;Tắt nhà cung cấp tìm kiếm Bing trong thanh địa chỉ
+;"AddressBarMicrosoftSearchInBingProviderEnabled"=dword:00000000
+
+;Tắt menu trò chơi
+"AllowGamesMenu"=dword:00000000
+
+;Tắt soạn thảo nội tuyến
+"ComposeInlineEnabled"=dword:00000000
+
+;Tắt tự động đăng nhập tài khoản tại chỗ
+"ConfigureOnPremisesAccountAutoSignIn"=dword:00000000
+
+;Tắt cấu hình chuyển văn bản thành giọng nói trực tuyến
+"ConfigureOnlineTextToSpeech"=dword:00000000
+
+;Tắt cấu hình chia sẻ
+"ConfigureShare"=dword:00000000
+
+;Tắt chiến dịch cài đặt trình duyệt mặc định
+"DefaultBrowserSettingsCampaignEnabled"=dword:00000000
+
+;Tắt telemetry SERP bên thứ 3
+"Edge3PSerpTelemetryEnabled"=dword:00000000
+
+;Tắt tính năng Edge Drop
+"EdgeEDropEnabled"=dword:00000000
+
+;Tắt tính năng quyên góp qua Wallet
+"WalletDonationEnabled"=dword:00000000
+
+;Tắt nhập dữ liệu mỗi khi khởi chạy
+"ImportOnEachLaunch"=dword:00000000
+
+;Tắt hỗ trợ trong ứng dụng
+"InAppSupportEnabled"=dword:00000000
+
+;Tắt chia sẻ dữ liệu trình duyệt cục bộ
+"LocalBrowserDataShareEnabled"=dword:00000000
+
+;Tắt phụ đề trực tiếp
+"LiveCaptionsAllowed"=dword:00000000
+
+;Tắt SSO website MSA
+"MSAWebSiteSSOUsingThisProfileAllowed"=dword:00000000
+
+;Tắt quảng cáo Microsoft Edge Insider
+"MicrosoftEdgeInsiderPromotionEnabled"=dword:00000000
+
+;Tắt từ đồng nghĩa Microsoft Editor
+"MicrosoftEditorSynonymsEnabled"=dword:00000000
+
+;Tắt kiểm tra chính tả Microsoft Editor
+"MicrosoftEditorProofingEnabled"=dword:00000000
+
+;Tắt Related Website Sets
+"RelatedWebsiteSetsEnabled"=dword:00000000
+
+;Tắt truy vấn phương thức thanh toán
+"PaymentMethodQueryEnabled"=dword:00000000
+
+;Tắt Pinning Wizard
+"PinningWizardAllowed"=dword:00000000
+
+;Tắt tab quảng cáo
+"PromotionalTabsEnabled"=dword:00000000
+
+;Tắt hiển thị menu nhỏ tìm kiếm nhanh
+;"QuickSearchShowMiniMenu"=dword:00000000
+
+;Tắt xem nhanh file Office
+"QuickViewOfficeFilesEnabled"=dword:00000000
+
+;Tắt gỡ lỗi từ xa
+"RemoteDebuggingAllowed"=dword:00000000
+
+;Tắt sử dụng dịch vụ web để giải quyết lỗi điều hướng
+"ResolveNavigationErrorsUseWebService"=dword:00000000
+
+;Tắt hỗ trợ hồ sơ di động
+"RoamingProfileSupportEnabled"=dword:00000000
+
+;Tắt tìm kiếm bằng hình ảnh
+"SearchForImageEnabled"=dword:00000000
+
+;Tắt bộ lọc tìm kiếm
+"SearchFiltersEnabled"=dword:00000000
+
+;Bật gợi ý tìm kiếm
+"SearchSuggestEnabled"=dword:00000001
+
+;Tắt thanh tìm kiếm
+"SearchbarAllowed"=dword:00000000
+
+;Tắt thanh tìm kiếm khi khởi động
+"SearchbarIsEnabledOnStartup"=dword:00000000
+
+;Tắt liên kết chia sẻ
+"SharedLinksEnabled"=dword:00000000
+
+;Tắt nút đăng ký Acrobat
+"ShowAcrobatSubscriptionButton"=dword:00000000
+
+;Tắt lối tắt Office trong thanh yêu thích
+"ShowOfficeShortcutInFavoritesBar"=dword:00000000
+
+;Tắt đề xuất
+"ShowRecommendationsEnabled"=dword:00000000
+
+;Tắt nhận dạng giọng nói
+"SpeechRecognitionEnabled"=dword:00000000
+
+;Tắt Hubs Sidebar độc lập
+"StandaloneHubsSidebarEnabled"=dword:00000000
+
+;Tắt dịch vụ tab
+"TabServicesEnabled"=dword:00000000
+
+;Tắt dự đoán văn bản
+"TextPredictionEnabled"=dword:00000000
+
+;Tắt tải lên từ điện thoại
+"UploadFromPhoneEnabled"=dword:00000000
+
+;Tắt tìm kiếm hình ảnh
+"VisualSearchEnabled"=dword:00000000
+
+;Chuyển hướng hộp tìm kiếm trang tab mới
+"NewTabPageSearchBox"="redirect"
+
+;Tắt trình tạo mật khẩu
+"PasswordGeneratorEnabled"=dword:00000000
+
+;Tắt trình quản lý mật khẩu
+"PasswordManagerEnabled"=dword:00000000
+
+;Tắt giám sát mật khẩu
+"PasswordMonitorAllowed"=dword:00000000
+
+;Tắt cảnh báo bảo vệ mật khẩu
+"PasswordProtectionWarningTrigger"=dword:00000000
+
+;Tắt trang lỗi thay thế
+"AlternateErrorPagesEnabled"=dword:00000000
+
+;Tắt hỏi khi đóng cửa sổ trình duyệt có nhiều tab
+"AskBeforeCloseEnabled"=dword:00000000
+
+;Tắt tự động điền địa chỉ
+"AutofillAddressEnabled"=dword:00000000
+
+;Tắt tự động điền thẻ tín dụng
+"AutofillCreditCardEnabled"=dword:00000000
+
+;Tắt tự động điền thành viên
+"AutofillMembershipsEnabled"=dword:00000000
+
+;Tắt SSO web AAD
+"AADWebSSOAllowed"=dword:00000000
+
+;Tắt chủ đề AI
+"AIGenThemesEnabled"=dword:00000000
+
+;Tắt Access Code Cast
+"AccessCodeCastEnabled"=dword:00000000
+
+;Tắt minh bạch quảng cáo
+"AdsTransparencyEnabled"=dword:00000000
+
+;Tắt Edge Admin Center
+"EdgeAdminCenterEnabled"=dword:00000000
+
+;Chặn quảng cáo Bing
+"BingAdsSuppression"=dword:00000001
+
+;Bật cấu hình Do Not Track
+"ConfigureDoNotTrack"=dword:00000001
+
+;Tắt dịch vụ phân phối tài nguyên Edge
+"EdgeAssetDeliveryServiceEnabled"=dword:00000000
+
+;Tắt trợ lý mua sắm Edge
+"EdgeShoppingAssistantEnabled"=dword:00000000
+
+;Tắt dịch vụ thử nghiệm và cấu hình
+;"ExperimentationAndConfigurationServiceControl"=dword:00000000
+
+;Tắt phản hồi người dùng
+"UserFeedbackAllowed"=dword:00000000
+
+;Tắt Web Widget
+"WebWidgetAllowed"=dword:00000000
+
+;Tắt kiểm tra Typosquatting
+"TyposquattingCheckerEnabled"=dword:00000000
+
+;Tắt chặn đăng nhập
+"SigninInterceptionEnabled"=dword:00000000
+
+;Tắt tìm kiếm bên
+"SideSearchEnabled"=dword:00000000
+
+;Tắt đề xuất PDF mặc định
+"ShowPDFDefaultRecommendationsEnabled"=dword:00000000
+
+;Tắt nút trang chủ
+"ShowHomeButton"=dword:00000000
+
+;Tắt danh sách mua sắm
+"ShoppingListEnabled"=dword:00000000
+
+;Tắt khảo sát Safe Browsing
+"SafeBrowsingSurveysEnabled"=dword:00000000
+
+;Tắt quét sâu Safe Browsing
+"SafeBrowsingDeepScanningEnabled"=dword:00000000
+
+;Tắt kiểm tra thời gian thực ủy quyền Safe Browsing
+"SafeBrowsingProxiedRealTimeChecksAllowed"=dword:00000000
+
+;Tắt bỏ qua cảnh báo mật khẩu bị xâm phạm
+"PasswordDismissCompromisedAlertEnabled"=dword:00000000
+
+;Tắt MAM
+"MAMEnabled"=dword:00000000
+
+;Tắt quản lý Edge
+"EdgeManagementEnabled"=dword:00000000
+
+;Tắt Desktop Sharing Hub
+"DesktopSharingHubEnabled"=dword:00000000
+
+;Tắt ngữ cảnh trang Copilot
+"CopilotPageContextEnabled"=dword:00000000
+
+;Tắt nội dung trang tab mới
+"NewTabPageContentEnabled"=dword:00000000
+
+;Tắt trình khởi chạy ứng dụng trang tab mới
+"NewTabPageAppLauncherEnabled"=dword:00000000
+
+;Tắt Bing Chat trên trang tab mới
+"NewTabPageBingChatEnabled"=dword:00000000
+
+;Tắt liên kết nhanh trang tab mới
+"NewTabPageQuickLinksEnabled"=dword:00000000
+
+;Tắt tạo mã QR
+"QRCodeGeneratorEnabled"=dword:00000000
+
+;Tắt trải nghiệm Spotlight và đề xuất
+"SpotlightExperiencesAndRecommendationsEnabled"=dword:00000000
+
+;Cấu hình ngăn chặn theo dõi ở mức cao
+"TrackingPrevention"=dword:00000003
+
+;Chế độ DNS over HTTPS tự động
+"DnsOverHttpsMode"="automatic"
+
+;Hỗ trợ Manifest V2 cho tiện ích mở rộng
+"ExtensionManifestV2Availability"=dword:00000002
+
+;Tắt DNS client tích hợp
+"BuiltInDnsClientEnabled"=dword:00000000
+
+;Tắt quy trình xác thực chủ động
+"ProactiveAuthWorkflowEnabled"=dword:00000000
+
+;Tắt đồng bộ yêu thích Application Guard
+"ApplicationGuardFavoritesSyncEnabled"=dword:00000000
+
+;Tắt nhận diện lưu lượng Application Guard
+"ApplicationGuardTrafficIdentificationEnabled"=dword:00000000
+
+;Tắt đăng nhập liền mạch từ web sang trình duyệt
+"SeamlessWebToBrowserSignInEnabled"=dword:00000000
+
+;Tắt tự động điền ML
+"EdgeAutofillMlEnabled"=dword:00000000
+
+;Tắt cài đặt mô hình nền tảng GenAI cục bộ
+"GenAILocalFoundationalModelSettings"=dword:00000001
+
+;Tắt cá nhân hóa trang web hàng đầu trong tùy chỉnh thanh bên
+"PersonalizeTopSitesInCustomizeSidebarEnabled"=dword:00000000
+
+;Tắt phát hiện hiệu suất
+"PerformanceDetectorEnabled"=dword:00000000
+
+;Tắt ngữ cảnh trang Copilot Entra
+"EdgeEntraCopilotPageContext"=dword:00000000
+
+;Tắt kiểm tra chính tả
+"SpellcheckEnabled"=dword:00000000
+
+;Tắt kết quả tìm kiếm công việc trong thanh địa chỉ
+"AddressBarWorkSearchResultsEnabled"=dword:00000000
+
+;Tắt bảo vệ Scareware Blocker
+"ScarewareBlockerProtectionEnabled"=dword:00000000
+
+;Tắt gợi ý xu hướng trong thanh địa chỉ
+"AddressBarTrendingSuggestEnabled"=dword:00000000
+
+; Tắt "Continue running background apps when Chromium is closed"
+"BackgroundModeEnabled"=dword:00000000
+
+;Tắt tính năng Startup boost
+"StartupBoostEnabled"=dword:00000000
+
+; Bật Preload pages
+"NetworkPredictionOptions"=dword:00000000
+
+; Bật Use graphics acceleration when available
+"HardwareAccelerationModeEnabled"=dword:00000001
+
+; Tắt rò rỉ IP WebRTC bằng cách thiết lập WebRtcLocalhostIpHandling thành disable_non_proxied_udp
+"WebRtcLocalhostIpHandling"="disable_non_proxied_udp"
+
+; Không cho phép các trang web liên quan xem hoạt động của bạn trong nhóm
+"RelatedWebsiteSetsEnabled"=dword:00000000
+
+;Block third-party cookies (Ngăn các trang web sử dụng cookie theo dõi bạn trên web)
+"BlockThirdPartyCookies"=dword:00000001
+
+;Never share additional operating system region
+"DefaultShareAdditionalOSRegionSetting"=dword:00000002
+
+;Enhance your security on the web Standard mode (bật bảo mật tiêu chuẩn)
+"EnhanceSecurityMode"=dword:00000000
+
+; Tự động chạy HTTPS
+"HttpsUpgradesEnabled"=dword:00000001
+
+; Change default search Google (dùng duy nhất Google làm tìm kiếm)
+"ManagedSearchEngines"="[{\"is_default\":true,\"keyword\":\"google.com\",\"name\":\"Google\",\"search_url\":\"https://www.google.com/search?q={searchTerms}\",\"suggest_url\":\"https://www.google.com/complete/search?output=chrome&q={searchTerms}\"}]"
+
+; Disable the default browser check on startup (tắt kiểm tra trình duyệt mặc định)
+"DefaultBrowserSettingEnabled"=dword:00000000
+
+; Performance (các tab sau 15 phút không truy cập sẽ tự đóng)
+"SleepingTabsEnabled"=dword:00000001
+"SleepingTabsTimeout"=dword:00000384	;15 phút
+"EfficiencyModeEnabled"=dword:00000000
+"HighEfficiencyModeEnabled"=dword:00000000
+"ExtensionsPerformanceDetectorEnabled"=dword:00000000
+
+; Hiển thị nút tải xuống trên thanh công cụ
+"ShowDownloadsToolbarButton"=dword:00000001
+
+;Copilot sẽ không xuất hiện trên thanh công cụ
+"Microsoft365CopilotChatIconEnabled"=dword:00000000
+
+; Bắt buộc dùng HTTPS (hỗ trợ từ phiên bản 140, tạm tắt vì Stable hiện tại đang là 139)
+;"HttpsOnlyMode"="force_enabled"  ;On Windows and macOS since 140 or later
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Edge\ExtensionInstallForcelist]
+; Cài đặt plugin Minimal New Tab
+"1"="khdnagehanbomfdogegmpddmcalmdnbg"
+
+; [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Edge\ExtensionSettings]
+; Cài đặt plugin Canvas Blocker - Fingerprint Protect (có thể tắt nếu thích)
+; "ahiddppepedlomdleppkbljnmkchlmdc"="{\"update_url\":\"https://edge.microsoft.com/extensionwebstorebase/v1/crx\",\"installation_mode\":\"normal_installed\"}"
