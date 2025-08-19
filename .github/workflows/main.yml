@@ -228,10 +228,15 @@ jobs:
               
               # Create ZIP archive using 7-Zip for better compression
               $zipPath = "$env:GITHUB_WORKSPACE\$releaseTag.zip"
-              $sevenZPath = "$tempDir\7zr.exe"
+              
+              # Download 7zr.exe again since temp was cleaned up
+              $sevenZTemp = "$env:TEMP\7zr_zip.exe"
+              if (-not (Test-Path $sevenZTemp)) {
+                  (New-Object System.Net.WebClient).DownloadFile("https://www.7-zip.org/a/7zr.exe", $sevenZTemp)
+              }
               
               # Use 7-Zip to create ZIP with high compression
-              & $sevenZPath a -tzip -mx=9 $zipPath "$rootPath\*"
+              & $sevenZTemp a -tzip -mx=9 $zipPath "$rootPath\*"
               Write-Host "Created optimized ZIP archive: $zipPath"
               
               # Create Release and Upload Asset
