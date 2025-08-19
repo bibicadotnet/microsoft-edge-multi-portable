@@ -19,7 +19,7 @@ jobs:
     - name: Update index.html with latest versions
       shell: powershell
       run: |
-        # Lấy dữ liệu từ Microsoft Edge Updates API
+        # Fetch all Edge release data once
         Write-Host "Fetching Edge release data..."
         try {
             $allReleases = Invoke-RestMethod "https://edgeupdates.microsoft.com/api/products"
@@ -27,8 +27,8 @@ jobs:
             Write-Host "Error fetching Edge data: $_"
             exit 1
         }
-
-        # Lấy phiên bản mới nhất cho từng channel (x64 / Windows)
+        
+        # Lấy phiên bản mới nhất cho từng channel từ Microsoft
         $latestEdgeVersions = @{
             "Stable" = ($allReleases | Where-Object { $_.Product -eq "Stable" }).Releases |
                        Where-Object { $_.Platform -eq "Windows" -and $_.Architecture -eq "x64" } |
@@ -47,11 +47,11 @@ jobs:
                        Sort-Object PublishedTime -Descending |
                        Select-Object -First 1 -ExpandProperty ProductVersion
         }
-
+        
         Write-Host "Latest Edge versions from Microsoft:"
         $latestEdgeVersions.GetEnumerator() | ForEach-Object { Write-Host "  $($_.Key): $($_.Value)" }
-
-        # Lấy releases từ GitHub (repo portable)
+        
+        # Lấy danh sách releases từ GitHub
         Write-Host "Fetching GitHub releases..."
         try {
             $githubReleases = Invoke-RestMethod -Uri "https://api.github.com/repos/bibicadotnet/microsoft-edge-multi-portable/releases" -Headers @{
@@ -61,96 +61,163 @@ jobs:
             Write-Host "Error fetching GitHub releases: $_"
             exit 1
         }
-
+        
+        Write-Host "Found $($githubReleases.Count) releases on GitHub"
+        
+        # Tạo HTML content cho từng channel
         $channels = @("Stable", "Beta", "Dev", "Canary")
         $versionItems = @()
-
+        
         foreach ($channel in $channels) {
-            $channelDisplayName = switch ($channel) {
-                "Stable" { "Microsoft Edge Stable Portable" }
-                "Beta"   { "Microsoft Edge Beta Portable" }
-                "Dev"    { "Microsoft Edge Developer Portable" }
-                "Canary" { "Microsoft Edge Canary Portable" }
-            }
+            $channelDisplayName = if ($channel -eq "Dev") { "Microsoft Edge Developer Portable" } else { "Microsoft Edge $channel Portable" }
             $latestVersion = $latestEdgeVersions[$channel]
-
+            
             if ($latestVersion) {
+                # Tìm release tương ứng trên GitHub với phiên bản mới nhất
                 $releasePattern = "edge-$($channel.ToLower())-portable-x64_$($latestVersion)_"
                 $matchingRelease = $githubReleases | Where-Object { $_.tag_name -like "$releasePattern*" }
-
+                
                 if ($matchingRelease) {
+                    # Có portable release cho phiên bản mới nhất
                     $zipAsset = $matchingRelease.assets | Where-Object { $_.name -like "*.zip" }
+                    
                     if ($zipAsset) {
                         $downloadUrl = $zipAsset.browser_download_url
-                        $versionItems += "  <li class=`"version-item`">"
-                        $versionItems += "    <span class=`"version-name`">$channelDisplayName</span>"
-                        $versionItems += "    <a class=`"version-link`" href=`"$downloadUrl`" target=`"_blank`">$latestVersion</a>"
-                        $versionItems += "  </li>"
+                        $versionItems += "                    <li class=`"version-item`">"
+                        $versionItems += "                        <a href=`"$downloadUrl`" class=`"version-link`" target=`"_blank`">"
+                        $versionItems += "                            $channelDisplayName"
+                        $versionItems += "                        </a>"
+                        $versionItems += "                        <span class=`"version-number`">$latestVersion</span>"
+                        $versionItems += "                    </li>"
                         Write-Host "$channel : $latestVersion (available)"
                     } else {
-                        Write-Host "$channel : $latestVersion (no ZIP asset)"
+                        $versionItems += "                    <li class=`"version-item`">"
+                        $versionItems += "                        <span class=`"version-name`">$channelDisplayName</span>"
+                        $versionItems += "                        <span class=`"version-number`">$latestVersion</span>"
+                        $versionItems += "                    </li>"
+                        Write-Host "$channel : $latestVersion (no ZIP)"
                     }
                 } else {
-                    Write-Host "$channel : $latestVersion (no release found)"
+                    # Chưa có portable release cho phiên bản mới nhất
+                    # Tìm release gần nhất cho channel này
+                    $channelPattern = "edge-$($channel.ToLower())-portable"
+                    $latestChannelRelease = $githubReleases | Where-Object { 
+                        $_.tag_name -like "*$channelPattern*" 
+                    } | Sort-Object published_at -Descending | Select-Object -First 1
+                    
+                    if ($latestChannelRelease) {
+                        # Extract version từ tag name
+                        $versionMatch = $latestChannelRelease.tag_name -match "x64_([0-9.]+)_"
+                        $availableVersion = if ($versionMatch) { $matches[1] } else { "Unknown" }
+                        
+                        $zipAsset = $latestChannelRelease.assets | Where-Object { $_.name -like "*.zip" }
+                        
+                        if ($zipAsset) {
+                            $downloadUrl = $zipAsset.browser_download_url
+                            $versionItems += "                    <li class=`"version-item`">"
+                            $versionItems += "                        <a href=`"$downloadUrl`" class=`"version-link`" target=`"_blank`">"
+                            $versionItems += "                            $channelDisplayName"
+                            $versionItems += "                        </a>"
+                            $versionItems += "                        <span class=`"version-number`">$availableVersion <span class=`"latest-version`">(latest: $latestVersion)</span></span>"
+                            $versionItems += "                    </li>"
+                            Write-Host "$channel : $availableVersion (outdated, latest: $latestVersion)"
+                        } else {
+                            $versionItems += "                    <li class=`"version-item`">"
+                            $versionItems += "                        <span class=`"version-name`">$channelDisplayName</span>"
+                            $versionItems += "                        <span class=`"version-number`">$availableVersion <span class=`"latest-version`">(latest: $latestVersion)</span></span>"
+                            $versionItems += "                    </li>"
+                            Write-Host "$channel : $availableVersion (no ZIP, latest: $latestVersion)"
+                        }
+                    } else {
+                        # Không có release nào cho channel này
+                        $versionItems += "                    <li class=`"version-item`">"
+                        $versionItems += "                        <span class=`"version-name`">$channelDisplayName</span>"
+                        $versionItems += "                        <span class=`"version-number`">- <span class=`"latest-version`">(latest: $latestVersion)</span></span>"
+                        $versionItems += "                    </li>"
+                        Write-Host "$channel : Not available (latest: $latestVersion)"
+                    }
                 }
             } else {
+                # Không thể lấy phiên bản mới nhất từ Microsoft
+                $versionItems += "                    <li class=`"version-item`">"
+                $versionItems += "                        <span class=`"version-name`">$channelDisplayName</span>"
+                $versionItems += "                        <span class=`"version-number`">-</span>"
+                $versionItems += "                    </li>"
                 Write-Host "$channel : Version check failed"
             }
         }
-
-        # Đọc index.html
+        
+        # Đọc file index.html hiện tại
         if (-not (Test-Path "index.html")) {
             Write-Host "index.html not found!"
             exit 1
         }
-
+        
         $indexContent = Get-Content "index.html" -Raw -Encoding UTF8
+        
+        # Thay thế phần versions
         $startMarker = "<!-- AUTO_UPDATE_START -->"
-        $endMarker   = "<!-- AUTO_UPDATE_END -->"
-
+        $endMarker = "<!-- AUTO_UPDATE_END -->"
+        
         $startIndex = $indexContent.IndexOf($startMarker)
-        $endIndex   = $indexContent.IndexOf($endMarker)
-
+        $endIndex = $indexContent.IndexOf($endMarker)
+        
         if ($startIndex -eq -1 -or $endIndex -eq -1) {
-            Write-Host "Markers not found in index.html"
+            Write-Host "Cannot find version markers in index.html"
+            Write-Host "Looking for: '$startMarker' and '$endMarker'"
             exit 1
         }
-
+        
+        # Tách nội dung
         $beforeVersions = $indexContent.Substring(0, $startIndex + $startMarker.Length)
-        $afterVersions  = $indexContent.Substring($endIndex)
-        $versionSection = "`r`n" + ($versionItems -join "`r`n") + "`r`n"
-
+        $afterVersions = $indexContent.Substring($endIndex)
+        
+        # Tạo phần versions mới
+        $versionSection = "`r`n" + ($versionItems -join "`r`n") + "`r`n                    "
+        
+        # Ghép nội dung mới
         $newIndexContent = $beforeVersions + $versionSection + $afterVersions
-
+        
         # Cập nhật thời gian
         $timeStartMarker = "<!-- AUTO_UPDATE_TIME_START -->"
-        $timeEndMarker   = "<!-- AUTO_UPDATE_TIME_END -->"
-        $timeStartIndex  = $newIndexContent.IndexOf($timeStartMarker)
-        $timeEndIndex    = $newIndexContent.IndexOf($timeEndMarker)
-
+        $timeEndMarker = "<!-- AUTO_UPDATE_TIME_END -->"
+        
+        $timeStartIndex = $newIndexContent.IndexOf($timeStartMarker)
+        $timeEndIndex = $newIndexContent.IndexOf($timeEndMarker)
+        
         if ($timeStartIndex -ne -1 -and $timeEndIndex -ne -1) {
             $currentTime = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss UTC")
             $beforeTime = $newIndexContent.Substring(0, $timeStartIndex + $timeStartMarker.Length)
-            $afterTime  = $newIndexContent.Substring($timeEndIndex)
-            $timeSection = "`r`n    Last updated: $currentTime`r`n"
+            $afterTime = $newIndexContent.Substring($timeEndIndex)
+            $timeSection = "`r`n            Last updated: $currentTime`r`n            "
             $newIndexContent = $beforeTime + $timeSection + $afterTime
         }
-
+        
+        # Ghi vào file
         Set-Content "index.html" -Value $newIndexContent -Encoding UTF8 -NoNewline
+        
         Write-Host "index.html updated successfully"
+        
+        # Hiển thị thay đổi
+        Write-Host "`nVersion information updated for index.html"
 
-    - name: Commit changes
+    - name: Check for changes and commit
       shell: powershell
       run: |
+        # Configure git
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-
+        
+        # Check if there are changes
         git add index.html
+        
         $changes = git diff --cached --name-only
         if ([string]::IsNullOrEmpty($changes)) {
             Write-Host "No changes to commit"
         } else {
+            Write-Host "Changes detected, committing..."
             $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss UTC"
             git commit -m "Update index page - $timestamp"
             git push
             Write-Host "Changes committed and pushed"
+        }
