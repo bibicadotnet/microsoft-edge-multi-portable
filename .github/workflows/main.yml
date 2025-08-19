@@ -226,10 +226,13 @@ jobs:
               
               Write-Host "Build completed!" -ForegroundColor Green
               
-              # Create ZIP archive
+              # Create ZIP archive using 7-Zip for better compression
               $zipPath = "$env:GITHUB_WORKSPACE\$releaseTag.zip"
-              Compress-Archive -Path "$rootPath\*" -DestinationPath $zipPath -CompressionLevel Optimal
-              Write-Host "Created archive: $zipPath"
+              $sevenZPath = "$tempDir\7zr.exe"
+              
+              # Use 7-Zip to create ZIP with high compression
+              & $sevenZPath a -tzip -mx=9 $zipPath "$rootPath\*"
+              Write-Host "Created optimized ZIP archive: $zipPath"
               
               # Create Release and Upload Asset
               $releaseTitle = "$channel-portable-$arch`_$version`_${{ steps.chromeplus-version.outputs.CHROMEPLUS_VERSION }}"
