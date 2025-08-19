@@ -193,9 +193,13 @@ jobs:
             $newContent = $beforeTime + $timeSection + $afterTime
         }
         
-        # KIỂM TRA: So sánh nội dung cũ và mới
-        if ($currentContent -eq $newContent) {
-            Write-Host "No changes detected. Skipping update."
+        # KIỂM TRA: So sánh nội dung cũ và mới, bỏ qua timestamp
+        $timePattern = "(?s)<!-- AUTO_UPDATE_TIME_START -->.*?<!-- AUTO_UPDATE_TIME_END -->"
+        $oldWithoutTime = [regex]::Replace($currentContent, $timePattern, "")
+        $newWithoutTime = [regex]::Replace($newContent, $timePattern, "")
+        
+        if ($oldWithoutTime -eq $newWithoutTime) {
+            Write-Host "No version changes detected. Skipping update."
             exit 0
         }
         
