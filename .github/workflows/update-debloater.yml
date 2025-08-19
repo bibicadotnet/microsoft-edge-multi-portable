@@ -1,0 +1,29 @@
+name: Auto Update Debloater
+
+on:
+  schedule:
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Check and update
+      run: |
+        curl -s -o temp.reg https://raw.githubusercontent.com/bibicadotnet/microsoft-edge-debloater/refs/heads/main/vi.edge.reg
+        
+        if [ ! -f "debloater.reg" ] || ! cmp -s debloater.reg temp.reg; then
+          mv temp.reg debloater.reg
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add debloater.reg
+          git commit -m "Auto update debloater.reg"
+          git push
+        else
+          rm temp.reg
+        fi
