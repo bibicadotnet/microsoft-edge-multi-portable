@@ -15,11 +15,28 @@ No installation or setup required. Keeps all history, cookies, extensions, and s
 
 **Download the pre-built [release](https://github.com/bibicadotnet/microsoft-edge-multi-portable/releases)**, extract, and start using immediately.
 
-### ⚠ Virus warning?
+---
 
-Due to the way Microsoft Edge is bypassed to run as a portable app, Microsoft Defender Antivirus may falsely flag it as a trojan.
+### Files and Their Purposes
 
-If this happens, allow/whitelist the file and wait for Microsoft Defender’s definitions to update and remove the false positive.
+* **chrome++.ini**: configuration file for Chrome++
+* **debloater.reg**: removes unnecessary features from Microsoft Edge that I personally don’t use
+* **default-apps-multi-profile.bat**: sets the browser as the default application
+* **update.bat**: updates to the latest version
 
-<img src="https://img.bibica.net/R09ou3pG.png" alt="R09ou3pG">
+---
+
+### ⚠ Microsoft Defender Antivirus warning
+
+<details>
+  <summary>Click to expand</summary>
+
+  Due to the way Microsoft Edge is bypassed to run as a portable app, Microsoft Defender Antivirus may falsely flag it as a trojan.  
+
+  If this happens, allow/whitelist the file and wait for Microsoft Defender’s definitions to update and remove the false positive.  
+
+  <img src="https://img.bibica.net/R09ou3pG.png" alt="R09ou3pG">
+</details>
+
+
 
