@@ -226,17 +226,18 @@ jobs:
               
               Write-Host "Build completed!" -ForegroundColor Green
               
-              # Create ZIP archive using 7-Zip for better compression
+              # Create ZIP archive using full 7-Zip for better compression
               $zipPath = "$env:GITHUB_WORKSPACE\$releaseTag.zip"
               
-              # Download 7zr.exe again since temp was cleaned up
-              $sevenZTemp = "$env:TEMP\7zr_zip.exe"
-              if (-not (Test-Path $sevenZTemp)) {
-                  (New-Object System.Net.WebClient).DownloadFile("https://www.7-zip.org/a/7zr.exe", $sevenZTemp)
+              # Use built-in 7-Zip on GitHub Actions runner
+              $sevenZPath = "C:\Program Files\7-Zip\7z.exe"
+              if (-not (Test-Path $sevenZPath)) {
+                  # Fallback: Install 7-Zip if not available
+                  choco install 7zip -y
               }
               
               # Use 7-Zip to create ZIP with high compression
-              & $sevenZTemp a -tzip -mx=9 $zipPath "$rootPath\*"
+              & $sevenZPath a -tzip -mx=9 $zipPath "$rootPath\*"
               Write-Host "Created optimized ZIP archive: $zipPath"
               
               # Create Release and Upload Asset
