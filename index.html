@@ -376,7 +376,7 @@
                     let status = 'unavailable';
                     let statusText = 'Not available yet';
                     
-                    if (portableRelease) {
+					if (portableRelease) {
                         const versionMatch = portableRelease.tag_name.match(/x64_([0-9.]+)_/);
                         portableVersion = versionMatch ? versionMatch[1] : null;
                         
@@ -388,20 +388,31 @@
                         
                         if (portableVersion && officialVersion) {
                             const comparison = compareVersions(portableVersion, officialVersion);
+                            console.log(`Channel: ${channel.key}, Portable: ${portableVersion}, Official: ${officialVersion}, Comparison: ${comparison}`);
+                            
                             if (comparison === 0) {
                                 status = 'current';
                                 statusText = 'Latest version available';
                             } else if (comparison < 0) {
                                 status = 'outdated';
-                                statusText = `Official: ${officialVersion} (newer available)`;
+                                statusText = `Portable: ${portableVersion} | Official: ${officialVersion} (newer available)`;
                             } else {
                                 status = 'current';
                                 statusText = 'Latest version available';
                             }
+                        } else if (portableVersion) {
+                            // Có portable version nhưng không lấy được official version
+                            status = 'current';
+                            statusText = 'Available for download';
                         } else {
+                            // Có release nhưng không parse được version
                             status = 'current';
                             statusText = 'Available for download';
                         }
+                    } else if (officialVersion) {
+                        // Có official version nhưng chưa có portable release
+                        status = 'unavailable';
+                        statusText = `Official: ${officialVersion} - Portable not yet available`;
                     }
                     
                     html += `
