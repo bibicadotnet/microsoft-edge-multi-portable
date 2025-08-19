@@ -153,14 +153,14 @@ jobs:
             exit 1
         }
         
-        $indexContent = Get-Content "index.html" -Raw -Encoding UTF8
+        $currentContent = Get-Content "index.html" -Raw -Encoding UTF8
         
-        # Thay thế phần versions
+        # Tạo nội dung mới
         $startMarker = "<!-- AUTO_UPDATE_START -->"
         $endMarker = "<!-- AUTO_UPDATE_END -->"
         
-        $startIndex = $indexContent.IndexOf($startMarker)
-        $endIndex = $indexContent.IndexOf($endMarker)
+        $startIndex = $currentContent.IndexOf($startMarker)
+        $endIndex = $currentContent.IndexOf($endMarker)
         
         if ($startIndex -eq -1 -or $endIndex -eq -1) {
             Write-Host "Cannot find version markers in index.html"
@@ -169,37 +169,42 @@ jobs:
         }
         
         # Tách nội dung
-        $beforeVersions = $indexContent.Substring(0, $startIndex + $startMarker.Length)
-        $afterVersions = $indexContent.Substring($endIndex)
+        $beforeVersions = $currentContent.Substring(0, $startIndex + $startMarker.Length)
+        $afterVersions = $currentContent.Substring($endIndex)
         
         # Tạo phần versions mới
         $versionSection = "`r`n" + ($versionItems -join "`r`n") + "`r`n                    "
         
         # Ghép nội dung mới
-        $newIndexContent = $beforeVersions + $versionSection + $afterVersions
+        $newContent = $beforeVersions + $versionSection + $afterVersions
         
         # Cập nhật thời gian
         $timeStartMarker = "<!-- AUTO_UPDATE_TIME_START -->"
         $timeEndMarker = "<!-- AUTO_UPDATE_TIME_END -->"
         
-        $timeStartIndex = $newIndexContent.IndexOf($timeStartMarker)
-        $timeEndIndex = $newIndexContent.IndexOf($timeEndMarker)
+        $timeStartIndex = $newContent.IndexOf($timeStartMarker)
+        $timeEndIndex = $newContent.IndexOf($timeEndMarker)
         
         if ($timeStartIndex -ne -1 -and $timeEndIndex -ne -1) {
             $currentTime = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss UTC")
-            $beforeTime = $newIndexContent.Substring(0, $timeStartIndex + $timeStartMarker.Length)
-            $afterTime = $newIndexContent.Substring($timeEndIndex)
+            $beforeTime = $newContent.Substring(0, $timeStartIndex + $timeStartMarker.Length)
+            $afterTime = $newContent.Substring($timeEndIndex)
             $timeSection = "`r`n            Last updated: $currentTime`r`n            "
-            $newIndexContent = $beforeTime + $timeSection + $afterTime
+            $newContent = $beforeTime + $timeSection + $afterTime
         }
         
+        # KIỂM TRA: So sánh nội dung cũ và mới
+        if ($currentContent -eq $newContent) {
+            Write-Host "No changes detected. Skipping update."
+            exit 0
+        }
+        
+        Write-Host "Changes detected. Updating index.html..."
+        
         # Ghi vào file
-        Set-Content "index.html" -Value $newIndexContent -Encoding UTF8 -NoNewline
+        Set-Content "index.html" -Value $newContent -Encoding UTF8 -NoNewline
         
         Write-Host "index.html updated successfully"
-        
-        # Hiển thị thay đổi
-        Write-Host "`nVersion information updated for index.html"
 
     - name: Check for changes and commit
       shell: powershell
