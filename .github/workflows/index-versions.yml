@@ -1,4 +1,4 @@
-name: Update Portable Versions
+name: Update index.html Versions
 
 on:
   schedule:
