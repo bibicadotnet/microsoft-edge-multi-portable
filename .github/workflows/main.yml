@@ -155,7 +155,13 @@ jobs:
               Write-Host "Downloading Chrome++..." -ForegroundColor Yellow
               $chromePlusDownloadUrl = "https://github.com/Bush2021/chrome_plus/releases/download/${{ steps.chromeplus-version.outputs.CHROMEPLUS_VERSION }}/setdll.7z"
               (New-Object System.Net.WebClient).DownloadFile($chromePlusDownloadUrl, "$tempDir\setdll.7z")
-              (New-Object System.Net.WebClient).DownloadFile("https://raw.githubusercontent.com/bibicadotnet/microsoft-edge-multi-portable/refs/heads/main/chrome%2B%2B.ini", "$edgePath\chrome++.ini")
+
+              # Copy config files from project
+              Write-Host "Copying config files..." -ForegroundColor Yellow
+              Copy-Item "$env:GITHUB_WORKSPACE\chrome++.ini" "$applicationPath\chrome++.ini" -Force
+              Copy-Item "$env:GITHUB_WORKSPACE\update.bat" "$applicationPath\update.bat" -Force
+              Copy-Item "$env:GITHUB_WORKSPACE\debloater.reg" "$applicationPath\debloater.reg" -Force
+              Copy-Item "$env:GITHUB_WORKSPACE\default-apps-multi-profile.bat" "$applicationPath\default-apps-multi-profile.bat" -Force
 
               # Download and customize update.bat for this channel
               Write-Host "Downloading and customizing update.bat for $channel channel..." -ForegroundColor Yellow
