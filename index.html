@@ -1,290 +1,138 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Microsoft Edge Multi Portable</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-            padding: 40px 20px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .header h1 {
-            font-size: 3rem;
-            color: white;
-            margin-bottom: 10px;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-        }
-
-        .header p {
-            font-size: 1.2rem;
-            color: rgba(255, 255, 255, 0.9);
-            margin-bottom: 20px;
-        }
-
-        .github-link {
-            display: inline-flex;
-            align-items: center;
-            padding: 12px 24px;
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            text-decoration: none;
-            border-radius: 50px;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .github-link:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-        }
-
-        .github-icon {
-            width: 20px;
-            height: 20px;
-            margin-right: 8px;
-        }
-
-        .content-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 30px;
-            margin-bottom: 40px;
-        }
-
-        .card {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-        }
-
-        .card h2 {
-            color: #2c3e50;
-            margin-bottom: 15px;
-            font-size: 1.5rem;
-        }
-
-        .version-list {
-            list-style: none;
-            margin: 15px 0;
-        }
-
-        .version-item {
-            padding: 12px 0;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .version-item:last-child {
-            border-bottom: none;
-        }
-
-        .version-name {
-            font-weight: 600;
-            color: #2c3e50;
-        }
-
-        .version-number {
-            font-family: 'Consolas', 'Monaco', monospace;
-            background: #f8f9fa;
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 0.9rem;
-            color: #495057;
-        }
-
-        .download-link {
-            color: #007bff;
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.3s ease;
-            font-size: 0.9rem;
-        }
-
-        .download-link:hover {
-            color: #0056b3;
-        }
-
-        .feature-list {
-            list-style: none;
-        }
-
-        .feature-list li {
-            padding: 8px 0;
-            position: relative;
-            padding-left: 25px;
-        }
-
-        .feature-list li:before {
-            content: "✓";
-            position: absolute;
-            left: 0;
-            color: #28a745;
-            font-weight: bold;
-        }
-
-        .last-updated {
-            text-align: center;
-            margin-top: 30px;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            color: rgba(255, 255, 255, 0.8);
-        }
-
-        .unavailable {
-            color: #666;
-            font-style: italic;
-        }
-
-        .download-link.outdated {
-            color: #ff6b6b;
-            border-color: #ff6b6b;
-        }
-        
-        .latest-version {
-            font-size: 0.8em;
-            color: #888;
-            margin-left: 5px;
-        }        
-
-        @media (max-width: 768px) {
-            .header h1 {
-                font-size: 2rem;
-            }
-            
-            .content-grid {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-            
-            .card {
-                padding: 20px;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Microsoft Edge Multi Portable</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      color: #333;
+    }
+    h1, h2 {
+      color: #2c3e50;
+    }
+    ul {
+      margin: 0 0 1em 1.5em;
+    }
+    li {
+      margin-bottom: 6px;
+    }
+    code {
+      background: #f5f5f5;
+      padding: 2px 4px;
+      border-radius: 4px;
+    }
+    a {
+      color: #007bff;
+      text-decoration: none;
+    }
+    .version-list {
+      list-style: none;
+      padding: 0;
+    }
+    .version-item {
+      margin: 8px 0;
+    }
+    .version-name {
+      font-weight: bold;
+    }
+    .version-number {
+      font-family: Consolas, monospace;
+      margin-left: 8px;
+      color: #555;
+    }
+    .unavailable {
+      color: #888;
+      font-style: italic;
+      margin-left: 10px;
+    }
+    .warning {
+      border-left: 4px solid #e74c3c;
+      background: #fbeaea;
+      padding: 10px;
+      margin: 20px 0;
+    }
+    .last-updated {
+      margin-top: 30px;
+      font-size: 0.9em;
+      color: #666;
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <header class="header">
-            <h1>Microsoft Edge Multi Portable</h1>
-            <p>Portable versions of Microsoft Edge browser for all channels</p>
-            <a href="https://github.com/bibicadotnet/microsoft-edge-multi-portable" class="github-link">
-                <svg class="github-icon" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                </svg>
-                View on GitHub
-            </a>
-        </header>
+  <h1>Microsoft Edge (Stable, Beta, Dev, Canary) Portable</h1>
+  <p>
+    🔗 <a href="https://github.com/ntkhang03/edge-multi-portable" target="_blank">View on GitHub</a>
+  </p>
+  <p>
+    No installation required. Keeps all history, cookies, extensions, and settings even when moved to another device.
+  </p>
 
-        <div class="content-grid">
-            <div class="card">
-                <h2>📦 Available Versions</h2>
-                <ul class="version-list">
-                    <!-- AUTO_UPDATE_START -->
-                    <li class="version-item">
-                        <div>
-                            <div class="version-name">Microsoft Edge Stable</div>
-                            <a href="https://github.com/bibicadotnet/microsoft-edge-multi-portable/releases/download/edge-stable-portable-x64_139.0.3405.102_1.13.0/edge-stable-portable-x64_139.0.3405.102_1.13.0.zip" class="download-link" target="_blank">Download ZIP</a>
-                        </div>
-                        <div class="version-number">139.0.3405.102</div>
-                    </li>
-                    <li class="version-item">
-                        <div>
-                            <div class="version-name">Microsoft Edge Beta</div>
-                            <a href="https://github.com/bibicadotnet/microsoft-edge-multi-portable/releases/download/edge-beta-portable-x64_140.0.3485.14_1.13.0/edge-beta-portable-x64_140.0.3485.14_1.13.0.zip" class="download-link" target="_blank">Download ZIP</a>
-                        </div>
-                        <div class="version-number">140.0.3485.14</div>
-                    </li>
-                    <li class="version-item">
-                        <div>
-                            <div class="version-name">Microsoft Edge Developer</div>
-                            <a href="https://github.com/bibicadotnet/microsoft-edge-multi-portable/releases/download/edge-dev-portable-x64_140.0.3485.6_1.13.0/edge-dev-portable-x64_140.0.3485.6_1.13.0.zip" class="download-link" target="_blank">Download ZIP</a>
-                        </div>
-                        <div class="version-number">140.0.3485.6</div>
-                    </li>
-                    <li class="version-item">
-                        <div>
-                            <div class="version-name">Microsoft Edge Canary</div>
-                            <a href="https://github.com/bibicadotnet/microsoft-edge-multi-portable/releases/download/edge-canary-portable-x64_141.0.3500.0_1.13.0/edge-canary-portable-x64_141.0.3500.0_1.13.0.zip" class="download-link" target="_blank">Download ZIP</a>
-                        </div>
-                        <div class="version-number">141.0.3500.0</div>
-                    </li>
-                    <!-- AUTO_UPDATE_END -->
-                </ul>
-            </div>
+  <h2>🚀 Script Features</h2>
+  <ul>
+    <li>Downloads the latest Edge Stable, Beta, Dev, or Canary x64 from 
+      <a href="https://github.com/bibicadotnet/edge_installer_multi/releases" target="_blank"><code>edge_installer_multi</code></a>
+    </li>
+    <li>Integrates 
+      <a href="https://github.com/Bush2021/chrome_plus" target="_blank">Chrome++</a> 
+      for extra features
+    </li>
+    <li>Manual update script preserves your settings and configurations</li>
+  </ul>
 
-            <div class="card">
-                <h2>🚀 Features</h2>
-                <ul class="feature-list">
-                    <li>Portable versions of Microsoft Edge</li>
-                    <li>All channels: Stable, Beta, Developer, Canary</li>
-                    <li>Windows x64 architecture</li>
-                    <li>Automatic updates via GitHub Actions</li>
-                    <li>No installation required</li>
-                    <li>Pre-configured for portable usage</li>
-                </ul>
-            </div>
+  <h2>📦 Microsoft Edge Portable Latest</h2>
+  <ul class="version-list">
+    <!-- AUTO_UPDATE_START -->
+    <li class="version-item">
+      <span class="version-name">Microsoft Edge Stable Portable</span>
+      <span class="version-number">-</span>
+      <span class="unavailable">Not available yet</span>
+    </li>
+    <li class="version-item">
+      <span class="version-name">Microsoft Edge Beta Portable</span>
+      <span class="version-number">-</span>
+      <span class="unavailable">Not available yet</span>
+    </li>
+    <li class="version-item">
+      <span class="version-name">Microsoft Edge Developer Portable</span>
+      <span class="version-number">-</span>
+      <span class="unavailable">Not available yet</span>
+    </li>
+    <li class="version-item">
+      <span class="version-name">Microsoft Edge Canary Portable</span>
+      <span class="version-number">-</span>
+      <span class="unavailable">Not available yet</span>
+    </li>
+    <!-- AUTO_UPDATE_END -->
+  </ul>
 
-            <div class="card">
-                <h2>💻 How to Use</h2>
-                <ol style="padding-left: 20px;">
-                    <li>Download the desired Edge channel version</li>
-                    <li>Extract the archive to your preferred location</li>
-                    <li>Run the executable file</li>
-                    <li>Enjoy your portable Microsoft Edge!</li>
-                </ol>
-            </div>
+  <p><strong>Download the pre-built release, extract, and start using immediately.</strong></p>
 
-            <div class="card">
-                <h2>🔄 Update Schedule</h2>
-                <p>Versions are automatically checked and updated every 5 minutes using GitHub Actions workflow.</p>
-                <p>The repository monitors Microsoft's official Edge update API and creates new portable releases when updates are available.</p>
-            </div>
-        </div>
+  <h2>🗂 Files and Their Purposes</h2>
+  <ul>
+    <li><code>chrome++.ini</code>: configuration file for Chrome++</li>
+    <li><code>debloater.reg</code>: removes unnecessary features from Microsoft Edge that I personally don’t use</li>
+    <li><code>default-apps-multi-profile.bat</code>: sets the browser as the default application</li>
+    <li><code>update.bat</code>: updates to the latest version</li>
+  </ul>
 
-        <div class="last-updated">
-            <!-- AUTO_UPDATE_TIME_START -->
-            Last updated: 2025-08-19 17:28:35 UTC
-            <!-- AUTO_UPDATE_TIME_END -->
-        </div>
-    </div>
+  <h2>⚠ Microsoft Defender Antivirus Warning</h2>
+  <div class="warning">
+    Due to the way Microsoft Edge is bypassed to run as a portable app, Microsoft Defender Antivirus may falsely flag it as a trojan.  
+    <br><br>
+    If this happens, allow/whitelist the file and wait for Microsoft Defender’s definitions to update and remove the false positive.
+  </div>
+
+  <div class="last-updated">
+    <!-- AUTO_UPDATE_TIME_START -->
+    Last updated: -
+    <!-- AUTO_UPDATE_TIME_END -->
+  </div>
 </body>
 </html>
