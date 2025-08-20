@@ -174,10 +174,8 @@ jobs:
            $htmlItems += $htmlItem
        }
        
-       # Create final HTML with proper indentation
-       $timestamp = Get-Date -Format "yyyy-MM-ddTHH:mm:ssZ"
-       $versionsHtml = "                    <!-- Auto-updated: $timestamp -->`r`n" +
-                      "                    <ul class=`"version-list`">`r`n" +
+       # Create final HTML - NO TIMESTAMP
+       $versionsHtml = "                    <ul class=`"version-list`">`r`n" +
                       ($htmlItems -join "`r`n") + "`r`n" +
                       "                    </ul>"
        
@@ -198,7 +196,6 @@ jobs:
        
        if ($startIndex -eq -1 -or $endIndex -eq -1) {
            Write-Host "Cannot find markers in index.html"
-           Write-Host "Make sure you have <!-- START_VERSIONS --> and <!-- END_VERSIONS --> markers"
            exit 1
        }
        
@@ -222,7 +219,7 @@ jobs:
        
        if (-not [string]::IsNullOrEmpty((git diff --cached --name-only))) {
            $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss UTC"
-           git commit -m "Auto-update portable versions - $timestamp"
+           git commit -m "Update portable versions - $timestamp"
            git push
            Write-Host "Changes committed and pushed"
        } else {
