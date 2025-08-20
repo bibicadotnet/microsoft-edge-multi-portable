@@ -78,7 +78,7 @@ jobs:
       run: |
         try {
           Write-Host "Fetching Chrome++ latest release..." -ForegroundColor Yellow
-          $chromePlusRelease = Invoke-RestMethod "https://api.github.com/repos/Bush2021/chrome_plus/releases/latest"
+          $chromePlusRelease = Invoke-RestMethod "https://api.github.com/repos/bibicadotnet/Chromium_SetDLL/releases/latest"
           $chromePlusVersion = $chromePlusRelease.tag_name
           echo "CHROMEPLUS_VERSION=$chromePlusVersion" >> $env:GITHUB_OUTPUT
           Write-Host "Chrome++ version: $chromePlusVersion" -ForegroundColor Green
@@ -153,7 +153,7 @@ jobs:
               (New-Object System.Net.WebClient).DownloadFile("https://www.7-zip.org/a/7zr.exe", "$tempDir\7zr.exe")
               
               Write-Host "Downloading Chrome++..." -ForegroundColor Yellow
-              $chromePlusDownloadUrl = "https://github.com/Bush2021/chrome_plus/releases/download/${{ steps.chromeplus-version.outputs.CHROMEPLUS_VERSION }}/setdll.7z"
+              $chromePlusDownloadUrl = "https://github.com/bibicadotnet/Chromium_SetDLL/releases/download/${{ steps.chromeplus-version.outputs.CHROMEPLUS_VERSION }}/setdll.7z"
               (New-Object System.Net.WebClient).DownloadFile($chromePlusDownloadUrl, "$tempDir\setdll.7z")
 
               # Copy config files from project
