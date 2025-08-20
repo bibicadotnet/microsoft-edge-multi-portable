@@ -243,6 +243,25 @@ jobs:
               
               gh release create $releaseTag --title $releaseTitle --notes $releaseBody --repo ${{ github.repository }} $zipPath
               Write-Host "Release created successfully!" -ForegroundColor Green
+
+              # Kiểm tra antivirus gửi samples automatically trước, xem có hạn chế cảnh báo nhầm không
+              Write-Host "Enabling Microsoft Defender and scanning build directory..." -ForegroundColor Yellow
+              try {
+                  # Ensure real-time protection is enabled
+                  Set-MpPreference -DisableRealtimeMonitoring $false
+                  Set-MpPreference -SubmitSamplesConsent SendAllSamples  # Send all samples automatically
+                  
+                  # Perform comprehensive scan on the build directory
+                  Write-Host "Scanning build directory: $rootPath" -ForegroundColor Yellow
+                  Start-MpScan -ScanType CustomScan -ScanPath $rootPath
+                  
+                  Write-Host "Microsoft Defender scan completed" -ForegroundColor Green
+                  Write-Host "Any suspicious files will be automatically submitted for cloud analysis" -ForegroundColor Cyan
+                  
+              } catch {
+                  Write-Host "Defender scan failed: $($_.Exception.Message)" -ForegroundColor Red
+                  Write-Host "Continuing with build process..." -ForegroundColor Yellow
+              }
               
               # Set flag có release mới
               $hasNewReleases = $true
