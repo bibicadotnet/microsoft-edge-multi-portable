@@ -153,35 +153,33 @@ jobs:
                 $statusText = "Official: $officialVersion - Portable not yet available"
             }
             
-            # Tạo HTML cho item này
+            # Tạo HTML cho item này - SỬA Ở ĐÂY
             $versionNumberHtml = if ($portableVersion -and $downloadUrl) {
                 "<a href=`"$downloadUrl`" class=`"version-number`" target=`"_blank`">$portableVersion</a>"
             } else {
                 "<span class=`"version-number unavailable`">Not Available</span>"
             }
             
-            $versionItems += @"
-                        <li class="version-item">
-                            <div class="version-info">
-                                <h3>$channelName</h3>
-                                <div class="version-status">
-                                    <span class="status-dot status-$status"></span>
-                                    $statusText
-                                </div>
-                            </div>
-                            $versionNumberHtml
-                        </li>
-"@
+            $htmlItem = "<li class=`"version-item`">" +
+                        "<div class=`"version-info`">" +
+                        "<h3>$channelName</h3>" +
+                        "<div class=`"version-status`">" +
+                        "<span class=`"status-dot status-$status`"></span>" +
+                        "$statusText" +
+                        "</div>" +
+                        "</div>" +
+                        "$versionNumberHtml" +
+                        "</li>"
+            
+            $versionItems += $htmlItem
         }
         
         # Tạo HTML hoàn chỉnh
         $timestamp = Get-Date -Format "yyyy-MM-ddTHH:mm:ssZ"
-        $versionsHtml = @"
-                    <!-- Auto-updated: $timestamp -->
-                    <ul class="version-list">
-$($versionItems -join "`r`n")
-                    </ul>
-"@
+        $versionsHtml = "<!-- Auto-updated: $timestamp -->" + "`r`n" +
+                       "<ul class=`"version-list`">" + "`r`n" +
+                       ($versionItems -join "`r`n") + "`r`n" +
+                       "</ul>"
         
         # Đọc file index.html hiện tại
         if (-not (Test-Path "index.html")) {
@@ -212,11 +210,9 @@ $($versionItems -join "`r`n")
         $beforeVersions = $indexContent.Substring(0, $startIndex)
         $afterVersions = $indexContent.Substring($endIndex)
         
-        $newVersionsDiv = @"
-<div id="versions-content">
-$versionsHtml
-</div>
-"@
+        $newVersionsDiv = '<div id="versions-content">' + "`r`n" +
+                         $versionsHtml + "`r`n" +
+                         '</div>'
         
         $newIndexContent = $beforeVersions + $newVersionsDiv + $afterVersions
         
