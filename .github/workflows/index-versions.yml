@@ -1,4 +1,4 @@
-name: Update index.html Versions
+name: Update Portable Versions
 
 on:
   schedule:
@@ -97,13 +97,10 @@ jobs:
 
         async function generateVersionsHTML() {
             try {
-                // Fetch GitHub releases
                 const githubResponse = await fetch(`${GITHUB_API_BASE}/releases`);
                 if (!githubResponse.ok) throw new Error('Failed to fetch releases');
                 
                 const releases = await githubResponse.json();
-                
-                // Get official versions
                 const officialVersions = await getOfficialVersions();
                 
                 const channels = [
@@ -118,7 +115,6 @@ jobs:
                 for (const channel of channels) {
                     const officialVersion = officialVersions[channel.key];
                     
-                    // Find portable release
                     const portableReleases = releases
                         .filter(release => release.tag_name.includes(`${channel.key}-portable-x64`))
                         .map(release => {
@@ -141,7 +137,6 @@ jobs:
                         const versionMatch = portableRelease.tag_name.match(/x64_([0-9.]+)_/);
                         portableVersion = versionMatch ? versionMatch[1] : null;
                         
-                        // Find direct download link
                         const asset = portableRelease.assets && portableRelease.assets.find(asset => 
                             asset.name.endsWith('.zip')
                         );
@@ -149,7 +144,6 @@ jobs:
                         
                         if (portableVersion && officialVersion) {
                             const comparison = compareVersions(portableVersion, officialVersion);
-                            console.log(`Channel: ${channel.key}, Portable: ${portableVersion}, Official: ${officialVersion}, Comparison: ${comparison}`);
                             
                             if (comparison === 0) {
                                 status = 'current';
@@ -202,11 +196,8 @@ jobs:
         async function updateIndexHTML() {
             try {
                 const versionsHTML = await generateVersionsHTML();
-                
-                // Read current index.html
                 let indexContent = fs.readFileSync('index.html', 'utf8');
                 
-                // Replace the versions content div
                 const startMarker = '<div id="versions-content">';
                 const endMarker = '</div>';
                 
@@ -214,7 +205,9 @@ jobs:
                 const endIndex = indexContent.indexOf(endMarker, startIndex) + endMarker.length;
                 
                 if (startIndex !== -1 && endIndex !== -1) {
+                    const timestamp = new Date().toISOString();
                     const newVersionsDiv = `<div id="versions-content">
+                    <!-- Auto-updated: ${timestamp} -->
                     ${versionsHTML}
                 </div>`;
                     
@@ -222,26 +215,10 @@ jobs:
                                      newVersionsDiv + 
                                      indexContent.substring(endIndex);
                     
-                    // Add timestamp comment
-                    const timestamp = new Date().toISOString();
-                    const updatedContent = newContent.replace(
-                        '<!-- Last updated:',
-                        `<!-- Last updated: ${timestamp} -->\n<!-- Last updated:`
-                    ).replace(
-                        '<div class="container">',
-                        `<!-- Last updated: ${timestamp} -->\n<div class="container">`
-                    );
-                    
-                    fs.writeFileSync('index.html', updatedContent);
+                    fs.writeFileSync('index.html', newContent);
                     console.log('Successfully updated index.html');
-                    
-                    // Write summary for GitHub Actions
-                    const summaryPath = process.env.GITHUB_STEP_SUMMARY;
-                    if (summaryPath) {
-                        fs.writeFileSync(summaryPath, `# Version Update Summary\n\nUpdated at: ${timestamp}\n\n${versionsHTML}`);
-                    }
                 } else {
-                    console.error('Could not find versions-content div in index.html');
+                    console.error('Could not find versions-content div');
                     process.exit(1);
                 }
                 
@@ -261,10 +238,8 @@ jobs:
       run: |
         if git diff --quiet; then
           echo "has_changes=false" >> $GITHUB_OUTPUT
-          echo "No changes detected"
         else
           echo "has_changes=true" >> $GITHUB_OUTPUT
-          echo "Changes detected"
           git diff --name-only
         fi
     
@@ -274,13 +249,5 @@ jobs:
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
         git add index.html
-        git commit -m "Auto-update portable versions - $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+        git commit -m "Auto-update versions $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
         git push
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    
-    - name: No changes summary
-      if: steps.check_changes.outputs.has_changes == 'false'
-      run: |
-        echo "# No Changes" >> $GITHUB_STEP_SUMMARY
-        echo "No version updates were needed at $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
