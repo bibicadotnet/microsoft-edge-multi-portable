@@ -1,232 +1,230 @@
 name: Update Portable Versions
 
 on:
-  schedule:
-    - cron: '*/5 * * * *'
-  workflow_dispatch:
+ schedule:
+   - cron: '*/5 * * * *'
+ workflow_dispatch:
 
 jobs:
-  update-versions:
-    runs-on: windows-latest
-    
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
+ update-versions:
+   runs-on: windows-latest
+   
+   steps:
+   - name: Checkout repository
+     uses: actions/checkout@v4
+     with:
+       token: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Update index.html
-      shell: powershell
-      run: |
-        # Fetch Edge official versions
-        Write-Host "Fetching Edge official versions..."
-        try {
-            $edgeData = Invoke-RestMethod "https://edgeupdates.microsoft.com/api/products"
-        } catch {
-            Write-Host "Error fetching Edge data: $_"
-            exit 1
-        }
-        
-        # Get latest versions for each channel
-        $officialVersions = @{}
-        
-        $channelMapping = @{
-            "Stable" = "stable"
-            "Beta" = "beta" 
-            "Dev" = "dev"
-            "Canary" = "canary"
-        }
-        
-        foreach ($product in $edgeData) {
-            $channelKey = $channelMapping[$product.Product]
-            if ($channelKey -and $product.Releases) {
-                $windowsReleases = $product.Releases | Where-Object { 
-                    $_.Platform -eq "Windows" -and $_.Architecture -eq "x64" 
-                }
-                
-                if ($windowsReleases) {
-                    $latest = $windowsReleases | Sort-Object { [DateTime]$_.PublishedTime } -Descending | Select-Object -First 1
-                    $officialVersions[$channelKey] = $latest.ProductVersion
-                    Write-Host "Official $channelKey`: $($latest.ProductVersion)"
-                }
-            }
-        }
-        
-        # Fetch GitHub releases
-        Write-Host "Fetching GitHub releases..."
-        try {
-            $githubReleases = Invoke-RestMethod -Uri "https://api.github.com/repos/bibicadotnet/microsoft-edge-multi-portable/releases"
-        } catch {
-            Write-Host "Error fetching GitHub releases: $_"
-            exit 1
-        }
-        
-        # Version comparison function
-        function Compare-Version {
-            param([string]$v1, [string]$v2)
-            
-            $parts1 = $v1.Split('.') | ForEach-Object { [int]$_ }
-            $parts2 = $v2.Split('.') | ForEach-Object { [int]$_ }
-            
-            $maxLen = [Math]::Max($parts1.Length, $parts2.Length)
-            
-            for ($i = 0; $i -lt $maxLen; $i++) {
-                $p1 = if ($i -lt $parts1.Length) { $parts1[$i] } else { 0 }
-                $p2 = if ($i -lt $parts2.Length) { $parts2[$i] } else { 0 }
-                
-                if ($p1 -gt $p2) { return 1 }
-                if ($p1 -lt $p2) { return -1 }
-            }
-            return 0
-        }
-        
-        # Process each channel
-        $channels = @(
-            @{ key = "stable"; name = "Microsoft Edge Stable" },
-            @{ key = "beta"; name = "Microsoft Edge Beta" },
-            @{ key = "dev"; name = "Microsoft Edge Developer" },
-            @{ key = "canary"; name = "Microsoft Edge Canary" }
-        )
-        
-        $htmlItems = @()
-        
-        foreach ($channel in $channels) {
-            $channelKey = $channel.key
-            $channelName = $channel.name
-            $officialVersion = $officialVersions[$channelKey]
-            
-            Write-Host "Processing $channelKey..."
-            
-            # Find portable releases for this channel
-            $portableReleases = @()
-            foreach ($release in $githubReleases) {
-                if ($release.tag_name -like "*$channelKey-portable-x64*") {
-                    if ($release.tag_name -match "x64_([0-9.]+)_") {
-                        $portableReleases += @{
-                            Release = $release
-                            Version = $matches[1]
-                        }
-                    }
-                }
-            }
-            
-            # Sort by version (newest first)
-            $portableReleases = $portableReleases | Sort-Object { 
-                $parts = $_.Version.Split('.')
-                [int]$parts[0] * 1000000 + [int]$parts[1] * 10000 + [int]$parts[2] * 100 + [int]$parts[3]
-            } -Descending
-            
-            $portableRelease = $portableReleases | Select-Object -First 1
-            
-            # Determine status
-            $portableVersion = $null
-            $downloadUrl = $null
-            $status = "unavailable"
-            $statusText = "Not available yet"
-            
-            if ($portableRelease) {
-                $portableVersion = $portableRelease.Version
-                
-                # Find download URL
-                $zipAsset = $portableRelease.Release.assets | Where-Object { $_.name -like "*.zip" } | Select-Object -First 1
-                $downloadUrl = if ($zipAsset) { $zipAsset.browser_download_url } else { $portableRelease.Release.html_url }
-                
-                if ($portableVersion -and $officialVersion) {
-                    $comparison = Compare-Version $portableVersion $officialVersion
-                    
-                    if ($comparison -eq 0) {
-                        $status = "current"
-                        $statusText = "Latest version available"
-                    } elseif ($comparison -lt 0) {
-                        $status = "outdated" 
-                        $statusText = "Portable: $portableVersion | Official: $officialVersion (newer available)"
-                    } else {
-                        $status = "current"
-                        $statusText = "Latest version available"
-                    }
-                } elseif ($portableVersion) {
-                    $status = "current"
-                    $statusText = "Available for download"
-                }
-            } elseif ($officialVersion) {
-                $status = "unavailable"
-                $statusText = "Official: $officialVersion - Portable not yet available"
-            }
-            
-            # Create HTML item with proper indentation - DÙNG STRING CONCATENATION
-            $versionLink = if ($portableVersion -and $downloadUrl) {
-                "                            <a href=`"$downloadUrl`" class=`"version-number`" target=`"_blank`">$portableVersion</a>"
-            } else {
-                "                            <span class=`"version-number unavailable`">Not Available</span>"
-            }
-            
-            $htmlItem = "                        <li class=`"version-item`">`r`n" +
-                       "                            <div class=`"version-info`">`r`n" +
-                       "                                <h3>$channelName</h3>`r`n" +
-                       "                                <div class=`"version-status`">`r`n" +
-                       "                                    <span class=`"status-dot status-$status`"></span>`r`n" +
-                       "                                    $statusText`r`n" +
-                       "                                </div>`r`n" +
-                       "                            </div>`r`n" +
-                       "$versionLink`r`n" +
-                       "                        </li>"
-            
-            $htmlItems += $htmlItem
-        }
-        
-        # Create final HTML
-        $timestamp = Get-Date -Format "yyyy-MM-ddTHH:mm:ssZ"
-        $versionsHtml = "                    <!-- Auto-updated: $timestamp -->`r`n" +
-                       "                    <ul class=`"version-list`">`r`n" +
-                       ($htmlItems -join "`r`n") + "`r`n" +
-                       "                    </ul>"
-        
-        # Read current index.html
-        if (-not (Test-Path "index.html")) {
-            Write-Host "index.html not found!"
-            exit 1
-        }
-        
-        $indexContent = Get-Content "index.html" -Raw -Encoding UTF8
-        
-        # Replace versions-content div
-        $startMarker = '<div id="versions-content">'
-        $endMarker = '</div>'
-        
-        $startIndex = $indexContent.IndexOf($startMarker)
-        $endIndex = $indexContent.IndexOf($endMarker, $startIndex) + $endMarker.Length
-        
-        if ($startIndex -eq -1 -or $endIndex -eq -1) {
-            Write-Host "Cannot find version markers in index.html"
-            exit 1
-        }
-        
-        $beforeContent = $indexContent.Substring(0, $startIndex)
-        $afterContent = $indexContent.Substring($endIndex)
-        
-        $newVersionsDiv = "<div id=`"versions-content`">`r`n" +
-                         $versionsHtml + "`r`n" +
-                         "                </div>"
-        
-        $newContent = $beforeContent + $newVersionsDiv + $afterContent
-        
-        # Write updated file
-        Set-Content "index.html" -Value $newContent -Encoding UTF8 -NoNewline
-        Write-Host "index.html updated successfully"
+   - name: Update index.html
+     shell: powershell
+     run: |
+       # Fetch Edge official versions
+       Write-Host "Fetching Edge official versions..."
+       try {
+           $edgeData = Invoke-RestMethod "https://edgeupdates.microsoft.com/api/products"
+       } catch {
+           Write-Host "Error fetching Edge data: $_"
+           exit 1
+       }
+       
+       # Get latest versions for each channel
+       $officialVersions = @{}
+       
+       $channelMapping = @{
+           "Stable" = "stable"
+           "Beta" = "beta"
+           "Dev" = "dev"
+           "Canary" = "canary"
+       }
+       
+       foreach ($product in $edgeData) {
+           $channelKey = $channelMapping[$product.Product]
+           if ($channelKey -and $product.Releases) {
+               $windowsReleases = $product.Releases | Where-Object { 
+                   $_.Platform -eq "Windows" -and $_.Architecture -eq "x64" 
+               }
+               
+               if ($windowsReleases) {
+                   $latest = $windowsReleases | Sort-Object { [DateTime]$_.PublishedTime } -Descending | Select-Object -First 1
+                   $officialVersions[$channelKey] = $latest.ProductVersion
+                   Write-Host "Official $channelKey`: $($latest.ProductVersion)"
+               }
+           }
+       }
+       
+       # Fetch GitHub releases
+       Write-Host "Fetching GitHub releases..."
+       try {
+           $githubReleases = Invoke-RestMethod -Uri "https://api.github.com/repos/bibicadotnet/microsoft-edge-multi-portable/releases"
+       } catch {
+           Write-Host "Error fetching GitHub releases: $_"
+           exit 1
+       }
+       
+       # Version comparison function
+       function Compare-Version {
+           param([string]$v1, [string]$v2)
+           
+           $parts1 = $v1.Split('.') | ForEach-Object { [int]$_ }
+           $parts2 = $v2.Split('.') | ForEach-Object { [int]$_ }
+           
+           $maxLen = [Math]::Max($parts1.Length, $parts2.Length)
+           
+           for ($i = 0; $i -lt $maxLen; $i++) {
+               $p1 = if ($i -lt $parts1.Length) { $parts1[$i] } else { 0 }
+               $p2 = if ($i -lt $parts2.Length) { $parts2[$i] } else { 0 }
+               
+               if ($p1 -gt $p2) { return 1 }
+               if ($p1 -lt $p2) { return -1 }
+           }
+           return 0
+       }
+       
+       # Process each channel
+       $channels = @(
+           @{ key = "stable"; name = "Microsoft Edge Stable" },
+           @{ key = "beta"; name = "Microsoft Edge Beta" },
+           @{ key = "dev"; name = "Microsoft Edge Developer" },
+           @{ key = "canary"; name = "Microsoft Edge Canary" }
+       )
+       
+       $htmlItems = @()
+       
+       foreach ($channel in $channels) {
+           $channelKey = $channel.key
+           $channelName = $channel.name
+           $officialVersion = $officialVersions[$channelKey]
+           
+           Write-Host "Processing $channelKey..."
+           
+           # Find portable releases for this channel
+           $portableReleases = @()
+           foreach ($release in $githubReleases) {
+               if ($release.tag_name -like "*$channelKey-portable-x64*") {
+                   if ($release.tag_name -match "x64_([0-9.]+)_") {
+                       $portableReleases += @{
+                           Release = $release
+                           Version = $matches[1]
+                       }
+                   }
+               }
+           }
+           
+           # Sort by version (newest first)
+           $portableReleases = $portableReleases | Sort-Object { 
+               $parts = $_.Version.Split('.')
+               [int]$parts[0] * 1000000 + [int]$parts[1] * 10000 + [int]$parts[2] * 100 + [int]$parts[3]
+           } -Descending
+           
+           $portableRelease = $portableReleases | Select-Object -First 1
+           
+           # Determine status
+           $portableVersion = $null
+           $downloadUrl = $null
+           $status = "unavailable"
+           $statusText = "Not available yet"
+           
+           if ($portableRelease) {
+               $portableVersion = $portableRelease.Version
+               
+               # Find download URL
+               $zipAsset = $portableRelease.Release.assets | Where-Object { $_.name -like "*.zip" } | Select-Object -First 1
+               $downloadUrl = if ($zipAsset) { $zipAsset.browser_download_url } else { $portableRelease.Release.html_url }
+               
+               if ($portableVersion -and $officialVersion) {
+                   $comparison = Compare-Version $portableVersion $officialVersion
+                   
+                   if ($comparison -eq 0) {
+                       $status = "current"
+                       $statusText = "Latest version available"
+                   } elseif ($comparison -lt 0) {
+                       $status = "outdated"
+                       $statusText = "Portable: $portableVersion | Official: $officialVersion (newer available)"
+                   } else {
+                       $status = "current"
+                       $statusText = "Latest version available"
+                   }
+               } elseif ($portableVersion) {
+                   $status = "current"
+                   $statusText = "Available for download"
+               }
+           } elseif ($officialVersion) {
+               $status = "unavailable"
+               $statusText = "Official: $officialVersion - Portable not yet available"
+           }
+           
+           # Create HTML item
+           $versionLink = if ($portableVersion -and $downloadUrl) {
+               "                            <a href=`"$downloadUrl`" class=`"version-number`" target=`"_blank`">$portableVersion</a>"
+           } else {
+               "                            <span class=`"version-number unavailable`">Not Available</span>"
+           }
+           
+           $htmlItem = "                        <li class=`"version-item`">`r`n" +
+                      "                            <div class=`"version-info`">`r`n" +
+                      "                                <h3>$channelName</h3>`r`n" +
+                      "                                <div class=`"version-status`">`r`n" +
+                      "                                    <span class=`"status-dot status-$status`"></span>`r`n" +
+                      "                                    $statusText`r`n" +
+                      "                                </div>`r`n" +
+                      "                            </div>`r`n" +
+                      "$versionLink`r`n" +
+                      "                        </li>"
+           
+           $htmlItems += $htmlItem
+       }
+       
+       # Create final HTML with proper indentation
+       $timestamp = Get-Date -Format "yyyy-MM-ddTHH:mm:ssZ"
+       $versionsHtml = "                    <!-- Auto-updated: $timestamp -->`r`n" +
+                      "                    <ul class=`"version-list`">`r`n" +
+                      ($htmlItems -join "`r`n") + "`r`n" +
+                      "                    </ul>"
+       
+       # Read current index.html
+       if (-not (Test-Path "index.html")) {
+           Write-Host "index.html not found!"
+           exit 1
+       }
+       
+       $indexContent = Get-Content "index.html" -Raw -Encoding UTF8
+       
+       # Replace content between markers
+       $startMarker = "<!-- <bắt đầu> -->"
+       $endMarker = "<!-- <kết thúc> -->"
+       
+       $startIndex = $indexContent.IndexOf($startMarker)
+       $endIndex = $indexContent.IndexOf($endMarker) + $endMarker.Length
+       
+       if ($startIndex -eq -1 -or $endIndex -eq -1) {
+           Write-Host "Cannot find markers in index.html"
+           Write-Host "Make sure you have <!-- <bắt đầu> --> and <!-- <kết thúc> --> markers"
+           exit 1
+       }
+       
+       # Replace content
+       $beforeContent = $indexContent.Substring(0, $startIndex)
+       $afterContent = $indexContent.Substring($endIndex)
+       
+       $newContent = $beforeContent + "<!-- <bắt đầu> -->`r`n" + $versionsHtml + "`r`n            <!-- <kết thúc> -->" + $afterContent
+       
+       # Write updated file
+       Set-Content "index.html" -Value $newContent -Encoding UTF8 -NoNewline
+       Write-Host "index.html updated successfully"
 
-    - name: Commit changes
-      shell: powershell  
-      run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        
-        git add index.html
-        
-        if (-not [string]::IsNullOrEmpty((git diff --cached --name-only))) {
-            $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss UTC"
-            git commit -m "Auto-update portable versions - $timestamp"
-            git push
-            Write-Host "Changes committed and pushed"
-        } else {
-            Write-Host "No changes to commit"
-        }
+   - name: Commit changes
+     shell: powershell
+     run: |
+       git config --local user.email "action@github.com"
+       git config --local user.name "GitHub Action"
+       
+       git add index.html
+       
+       if (-not [string]::IsNullOrEmpty((git diff --cached --name-only))) {
+           $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss UTC"
+           git commit -m "Auto-update portable versions - $timestamp"
+           git push
+           Write-Host "Changes committed and pushed"
+       } else {
+           Write-Host "No changes to commit"
+       }
