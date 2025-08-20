@@ -105,6 +105,7 @@ jobs:
                        $portableReleases += @{
                            Release = $release
                            Version = $matches[1]
+                           TagName = $release.tag_name
                        }
                    }
                }
@@ -126,10 +127,25 @@ jobs:
            
            if ($portableRelease) {
                $portableVersion = $portableRelease.Version
+               $tagName = $portableRelease.TagName
                
-               # Find download URL
+               # Find download URL from GitHub asset
                $zipAsset = $portableRelease.Release.assets | Where-Object { $_.name -like "*.zip" } | Select-Object -First 1
-               $downloadUrl = if ($zipAsset) { $zipAsset.browser_download_url } else { $portableRelease.Release.html_url }
+               
+               if ($zipAsset) {
+                   # Convert GitHub download URL to custom URL
+                   # Original: https://github.com/bibicadotnet/microsoft-edge-multi-portable/releases/download/edge-stable-portable-x64_139.0.3405.102_1.13.0/edge-stable-portable-x64_139.0.3405.102_1.13.0.zip
+                   # New: https://edge.bibica.net/edge-stable-portable-x64_139.0.3405.102_1.13.0/edge-stable-portable-x64_139.0.3405.102_1.13.0.zip
+                   
+                   $originalUrl = $zipAsset.browser_download_url
+                   $customUrl = $originalUrl -replace "https://github\.com/bibicadotnet/microsoft-edge-multi-portable/releases/download/", "https://edge.bibica.net/"
+                   $downloadUrl = $customUrl
+                   
+                   Write-Host "Original URL: $originalUrl"
+                   Write-Host "Custom URL: $customUrl"
+               } else {
+                   $downloadUrl = $portableRelease.Release.html_url
+               }
                
                if ($portableVersion -and $officialVersion) {
                    $comparison = Compare-Version $portableVersion $officialVersion
