@@ -190,15 +190,15 @@ jobs:
        $indexContent = Get-Content "index.html" -Raw -Encoding UTF8
        
        # Replace content between markers
-       $startMarker = "<!-- <bắt đầu> -->"
-       $endMarker = "<!-- <kết thúc> -->"
+       $startMarker = "<!-- START_VERSIONS -->"
+       $endMarker = "<!-- END_VERSIONS -->"
        
        $startIndex = $indexContent.IndexOf($startMarker)
        $endIndex = $indexContent.IndexOf($endMarker) + $endMarker.Length
        
        if ($startIndex -eq -1 -or $endIndex -eq -1) {
            Write-Host "Cannot find markers in index.html"
-           Write-Host "Make sure you have <!-- <bắt đầu> --> and <!-- <kết thúc> --> markers"
+           Write-Host "Make sure you have <!-- START_VERSIONS --> and <!-- END_VERSIONS --> markers"
            exit 1
        }
        
@@ -206,7 +206,7 @@ jobs:
        $beforeContent = $indexContent.Substring(0, $startIndex)
        $afterContent = $indexContent.Substring($endIndex)
        
-       $newContent = $beforeContent + "<!-- <bắt đầu> -->`r`n" + $versionsHtml + "`r`n            <!-- <kết thúc> -->" + $afterContent
+       $newContent = $beforeContent + "<!-- START_VERSIONS -->`r`n" + $versionsHtml + "`r`n            <!-- END_VERSIONS -->" + $afterContent
        
        # Write updated file
        Set-Content "index.html" -Value $newContent -Encoding UTF8 -NoNewline
