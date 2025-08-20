@@ -1,8 +1,9 @@
-name: Delete Old Workflow Runs
+name: Delete All Workflow Runs
+
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 20 * * *'
+    - cron: '0 20 * * *' # chạy hàng ngày lúc 20:00 UTC
 
 jobs:
   del_runs:
@@ -13,5 +14,5 @@ jobs:
         with:
           token: ${{ github.token }}
           repository: ${{ github.repository }}
-          retain_days: 1
+          retain_days: 0
           keep_minimum_runs: 0
