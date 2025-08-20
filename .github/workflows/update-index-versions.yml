@@ -2,7 +2,7 @@ name: Update Portable Versions
 
 on:
  schedule:
-    - cron: '15 * * * *'  # Chạy mỗi 1 giờ, vào phút 15
+    - cron: '30 * * * *'  # Chạy mỗi 1 giờ, vào phút 30
  workflow_dispatch:
 
 jobs:
