@@ -2,7 +2,7 @@ name: Edge Multi Portable Auto Builder
 
 on:
   schedule:
-    - cron: '0 * * * *'  # Chạy mỗi 1 giờ
+    - cron: '*/15 * * * *'  # Chạy mỗi 15 phút
   workflow_dispatch:  # Cho phép chạy thủ công
 
 permissions:
