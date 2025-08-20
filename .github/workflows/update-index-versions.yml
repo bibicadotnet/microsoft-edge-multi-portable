@@ -1,0 +1,247 @@
+name: Update Portable Versions
+
+on:
+  schedule:
+    # Chạy mỗi 5 phút
+    - cron: '*/5 * * * *'
+  workflow_dispatch: # Cho phép chạy thủ công
+
+jobs:
+  update-versions:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Check Edge versions and update index.html
+      shell: powershell
+      run: |
+        # Fetch all Edge release data once
+        Write-Host "Fetching Edge release data..."
+        try {
+            $allReleases = Invoke-RestMethod "https://edgeupdates.microsoft.com/api/products"
+        } catch {
+            Write-Host "Error fetching Edge data: $_"
+            exit 1
+        }
+        
+        # Lấy phiên bản cho từng channel
+        $channelVersions = @{
+            "stable" = ($allReleases | Where-Object { $_.Product -eq "Stable" }).Releases |
+                       Where-Object { $_.Platform -eq "Windows" -and $_.Architecture -eq "x64" } |
+                       Sort-Object PublishedTime -Descending |
+                       Select-Object -First 1 -ExpandProperty ProductVersion
+            "beta" = ($allReleases | Where-Object { $_.Product -eq "Beta" }).Releases |
+                     Where-Object { $_.Platform -eq "Windows" -and $_.Architecture -eq "x64" } |
+                     Sort-Object PublishedTime -Descending |
+                     Select-Object -First 1 -ExpandProperty ProductVersion
+            "dev" = ($allReleases | Where-Object { $_.Product -eq "Dev" }).Releases |
+                    Where-Object { $_.Platform -eq "Windows" -and $_.Architecture -eq "x64" } |
+                    Sort-Object PublishedTime -Descending |
+                    Select-Object -First 1 -ExpandProperty ProductVersion
+            "canary" = ($allReleases | Where-Object { $_.Product -eq "Canary" }).Releases |
+                       Where-Object { $_.Platform -eq "Windows" -and $_.Architecture -eq "x64" } |
+                       Sort-Object PublishedTime -Descending |
+                       Select-Object -First 1 -ExpandProperty ProductVersion
+        }
+        
+        Write-Host "Latest versions:"
+        $channelVersions.GetEnumerator() | ForEach-Object { Write-Host "  $($_.Key): $($_.Value)" }
+        
+        # Lấy danh sách releases từ GitHub
+        Write-Host "Fetching GitHub releases..."
+        try {
+            $githubReleases = Invoke-RestMethod -Uri "https://api.github.com/repos/bibicadotnet/microsoft-edge-multi-portable/releases" -Headers @{
+                "User-Agent" = "GitHub-Actions"
+            }
+        } catch {
+            Write-Host "Error fetching GitHub releases: $_"
+            exit 1
+        }
+        
+        # Function để so sánh version
+        function Compare-Versions {
+            param([string]$version1, [string]$version2)
+            
+            $v1Parts = $version1.Split('.') | ForEach-Object { [int]$_ }
+            $v2Parts = $version2.Split('.') | ForEach-Object { [int]$_ }
+            
+            $maxLength = [Math]::Max($v1Parts.Length, $v2Parts.Length)
+            
+            for ($i = 0; $i -lt $maxLength; $i++) {
+                $part1 = if ($i -lt $v1Parts.Length) { $v1Parts[$i] } else { 0 }
+                $part2 = if ($i -lt $v2Parts.Length) { $v2Parts[$i] } else { 0 }
+                
+                if ($part1 -gt $part2) { return 1 }
+                if ($part1 -lt $part2) { return -1 }
+            }
+            return 0
+        }
+        
+        # Tạo HTML cho versions
+        $channels = @(
+            @{ key = "stable"; name = "Microsoft Edge Stable" },
+            @{ key = "beta"; name = "Microsoft Edge Beta" },
+            @{ key = "dev"; name = "Microsoft Edge Developer" },
+            @{ key = "canary"; name = "Microsoft Edge Canary" }
+        )
+        
+        $versionItems = @()
+        
+        foreach ($channel in $channels) {
+            $officialVersion = $channelVersions[$channel.key]
+            $channelKey = $channel.key
+            $channelName = $channel.name
+            
+            Write-Host "Processing channel: $channelKey"
+            
+            # Tìm portable releases cho channel này
+            $portableReleases = $githubReleases | Where-Object { 
+                $_.tag_name -like "*$channelKey-portable-x64*" 
+            } | ForEach-Object {
+                if ($_.tag_name -match "x64_([0-9.]+)_") {
+                    $version = $matches[1]
+                    [PSCustomObject]@{
+                        Release = $_
+                        Version = $version
+                        TagName = $_.tag_name
+                    }
+                }
+            } | Sort-Object { 
+                # Custom sort by version
+                $parts = $_.Version.Split('.') | ForEach-Object { [int]$_ }
+                $parts[0] * 1000000000 + $parts[1] * 1000000 + $parts[2] * 1000 + $parts[3]
+            } -Descending
+            
+            $portableRelease = $portableReleases | Select-Object -First 1
+            
+            $portableVersion = $null
+            $downloadUrl = $null
+            $status = "unavailable"
+            $statusText = "Not available yet"
+            
+            if ($portableRelease) {
+                $portableVersion = $portableRelease.Version
+                
+                # Tìm file .zip để download
+                $asset = $portableRelease.Release.assets | Where-Object { $_.name -like "*.zip" } | Select-Object -First 1
+                $downloadUrl = if ($asset) { $asset.browser_download_url } else { $portableRelease.Release.html_url }
+                
+                if ($portableVersion -and $officialVersion) {
+                    $comparison = Compare-Versions $portableVersion $officialVersion
+                    Write-Host "  Channel: $channelKey, Portable: $portableVersion, Official: $officialVersion, Comparison: $comparison"
+                    
+                    if ($comparison -eq 0) {
+                        $status = "current"
+                        $statusText = "Latest version available"
+                    } elseif ($comparison -lt 0) {
+                        $status = "outdated"
+                        $statusText = "Portable: $portableVersion | Official: $officialVersion (newer available)"
+                    } else {
+                        $status = "current"
+                        $statusText = "Latest version available"
+                    }
+                } elseif ($portableVersion) {
+                    $status = "current"
+                    $statusText = "Available for download"
+                }
+            } elseif ($officialVersion) {
+                $status = "unavailable"
+                $statusText = "Official: $officialVersion - Portable not yet available"
+            }
+            
+            # Tạo HTML cho item này
+            $versionNumberHtml = if ($portableVersion -and $downloadUrl) {
+                "<a href=`"$downloadUrl`" class=`"version-number`" target=`"_blank`">$portableVersion</a>"
+            } else {
+                "<span class=`"version-number unavailable`">Not Available</span>"
+            }
+            
+            $versionItems += @"
+                        <li class="version-item">
+                            <div class="version-info">
+                                <h3>$channelName</h3>
+                                <div class="version-status">
+                                    <span class="status-dot status-$status"></span>
+                                    $statusText
+                                </div>
+                            </div>
+                            $versionNumberHtml
+                        </li>
+"@
+        }
+        
+        # Tạo HTML hoàn chỉnh
+        $timestamp = Get-Date -Format "yyyy-MM-ddTHH:mm:ssZ"
+        $versionsHtml = @"
+                    <!-- Auto-updated: $timestamp -->
+                    <ul class="version-list">
+$($versionItems -join "`r`n")
+                    </ul>
+"@
+        
+        # Đọc file index.html hiện tại
+        if (-not (Test-Path "index.html")) {
+            Write-Host "index.html not found!"
+            exit 1
+        }
+        
+        $indexContent = Get-Content "index.html" -Raw -Encoding UTF8
+        
+        # Tìm và thay thế phần versions-content
+        $startMarker = '<div id="versions-content">'
+        $endMarker = '</div>'
+        
+        $startIndex = $indexContent.IndexOf($startMarker)
+        if ($startIndex -eq -1) {
+            Write-Host "Cannot find start marker in index.html"
+            exit 1
+        }
+        
+        $endIndex = $indexContent.IndexOf($endMarker, $startIndex)
+        if ($endIndex -eq -1) {
+            Write-Host "Cannot find end marker in index.html"
+            exit 1
+        }
+        $endIndex += $endMarker.Length
+        
+        # Tạo nội dung mới
+        $beforeVersions = $indexContent.Substring(0, $startIndex)
+        $afterVersions = $indexContent.Substring($endIndex)
+        
+        $newVersionsDiv = @"
+<div id="versions-content">
+$versionsHtml
+</div>
+"@
+        
+        $newIndexContent = $beforeVersions + $newVersionsDiv + $afterVersions
+        
+        # Ghi file mới
+        Set-Content "index.html" -Value $newIndexContent -Encoding UTF8 -NoNewline
+        
+        Write-Host "index.html updated successfully"
+
+    - name: Check for changes and commit
+      shell: powershell
+      run: |
+        # Configure git
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        
+        # Check if there are changes
+        git add index.html
+        
+        $changes = git diff --cached --name-only
+        if ([string]::IsNullOrEmpty($changes)) {
+            Write-Host "No changes to commit"
+        } else {
+            Write-Host "Changes detected, committing..."
+            $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss UTC"
+            git commit -m "Auto-update portable versions - $timestamp"
+            git push
+            Write-Host "Changes committed and pushed"
+        }
