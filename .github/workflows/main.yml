@@ -83,7 +83,7 @@ jobs:
           Write-Host "Fetching Chrome++ latest release..." -ForegroundColor Yellow
           $chromePlusRelease = Invoke-RestMethod "https://api.github.com/repos/bibicadotnet/Chromium_SetDLL/releases/latest"
           $chromePlusVersion = $chromePlusRelease.tag_name
-          "CHROMEPLUS_VERSION=$chromePlusVersion" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          echo "CHROMEPLUS_VERSION=$chromePlusVersion" >> $env:GITHUB_OUTPUT
           Write-Host "Chrome++ version: $chromePlusVersion" -ForegroundColor Green
         } catch {
           Write-Error "Failed to get Chrome++ version: $($_.Exception.Message)"
@@ -111,8 +111,7 @@ jobs:
             $arch = $asset.arch
             
             # Create release tag for this specific version and architecture
-            $chromePlusVer = "${{ steps.chromeplus-version.outputs.CHROMEPLUS_VERSION }}"
-            $releaseTag = "edge-$channel-portable-$arch`_$version`_$chromePlusVer"
+            $releaseTag = "edge-$channel-portable-$arch`_$version`_${{ steps.chromeplus-version.outputs.CHROMEPLUS_VERSION }}"
             
             Write-Host "=== Processing $channel $version $arch ===" -ForegroundColor Cyan
             
