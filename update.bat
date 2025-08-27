@@ -17,6 +17,9 @@ echo   $channelReleases = $allReleases ^| Where-Object { $_.tag_name -like "edge
 echo   $latestRelease = $channelReleases ^| Sort-Object { if ^($_.tag_name -match "([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)"^) { [System.Version]$matches[1] } else { [System.Version]"0.0.0.0" } } -Descending ^| Select-Object -First 1
 echo   $latestVersion = ^($latestRelease.tag_name -split "_"^)^[1^]
 echo   $downloadUrl = $latestRelease.assets^[0^].browser_download_url
+echo   if ^($downloadUrl -like "https://github.com/bibicadotnet/microsoft-edge-multi-portable/releases/download/*"^) {
+echo     $downloadUrl = $downloadUrl -replace "https://github.com/bibicadotnet/microsoft-edge-multi-portable/releases/download/", "https://edge.bibica.net/"
+echo   }
 echo.
 echo   Write-Host "Current version: $currentVersion" -ForegroundColor Yellow
 echo   Write-Host "Latest version: $latestVersion" -ForegroundColor Yellow
@@ -35,7 +38,7 @@ echo   if ^(Test-Path $tempDir^) { Remove-Item $tempDir -Recurse -Force }
 echo   New-Item -ItemType Directory -Path $tempDir -Force ^| Out-Null
 echo   $zipFile = Join-Path $tempDir "update.zip"
 echo.
-echo   Write-Host "Downloading..."
+echo   Write-Host "Downloading from: $downloadUrl"
 echo   ^(New-Object System.Net.WebClient^).DownloadFile^($downloadUrl, $zipFile^)
 echo.
 echo   Write-Host "Extracting..."
