@@ -1,0 +1,25 @@
+name: Delete All Releases & Tags
+
+on:
+  workflow_dispatch:
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Delete all releases and tags
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Deleting all releases..."
+          gh release list --limit 100 | cut -f1 | xargs -I {} gh release delete {} --yes
+          
+          echo "Deleting all tags..."
+          git tag | xargs -I {} git push origin --delete refs/tags/{}
+          
+          echo "Done!"
