@@ -17,9 +17,23 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "Deleting all releases..."
-          gh release list --limit 100 | tail -n +2 | cut -f1 | grep -v "^$" | xargs -r -I {} gh release delete {} --yes || echo "No releases to delete"
+          releases=$(gh release list --json tagName --jq '.[].tagName' 2>/dev/null || echo "")
+          if [ -n "$releases" ]; then
+            echo "$releases" | while read tag; do
+              [ -n "$tag" ] && gh release delete "$tag" --yes
+            done
+          else
+            echo "No releases found"
+          fi
           
           echo "Deleting all tags..."
-          git tag | xargs -r -I {} git push origin --delete refs/tags/{} || echo "No tags to delete"
+          tags=$(git tag -l)
+          if [ -n "$tags" ]; then
+            echo "$tags" | while read tag; do
+              [ -n "$tag" ] && git push origin --delete "refs/tags/$tag"
+            done
+          else
+            echo "No tags found"
+          fi
           
           echo "Done!"
