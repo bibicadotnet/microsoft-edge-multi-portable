@@ -49,15 +49,20 @@ echo   if ^(Test-Path "msedge.exe"^) { Remove-Item "msedge.exe" -Force }
 echo   if ^(Test-Path "version.dll"^) { Remove-Item "version.dll" -Force }
 echo   if ^(Test-Path $currentVersion^) { Remove-Item $currentVersion -Recurse -Force }
 echo.
-echo   Get-ChildItem $extractedDir.FullName -Recurse ^| Where-Object { $_.Name -notin "update.bat","chrome++.ini","debloater.reg","default-apps-multi-profile.bat" } ^| ForEach-Object {
+echo   Get-ChildItem $extractedDir.FullName -Recurse ^| ForEach-Object {
 echo     $relativePath = $_.FullName.Substring^($extractedDir.FullName.Length + 1^)
 echo     $destPath = Join-Path $currentDir $relativePath
 echo     if ^($_.PSIsContainer^) {
 echo       New-Item -ItemType Directory -Path $destPath -Force ^| Out-Null
 echo     } else {
-echo       $destFolder = Split-Path $destPath -Parent
-echo       if ^(-not ^(Test-Path $destFolder^)^) { New-Item -ItemType Directory -Path $destFolder -Force ^| Out-Null }
-echo       Copy-Item $_.FullName -Destination $destPath -Force
+echo       $protectedFiles = @^("chrome++.ini","debloater.reg","default-apps-multi-profile.bat"^)
+echo       if ^($_.Name -in $protectedFiles -and ^(Test-Path $destPath^)^) {
+echo         Write-Host "Skipping: " $_.Name
+echo       } else {
+echo         $destFolder = Split-Path $destPath -Parent
+echo         if ^(-not ^(Test-Path $destFolder^)^) { New-Item -ItemType Directory -Path $destFolder -Force ^| Out-Null }
+echo         Copy-Item $_.FullName -Destination $destPath -Force
+echo       }
 echo     }
 echo   }
 echo.
