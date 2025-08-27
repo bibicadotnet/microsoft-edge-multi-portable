@@ -335,10 +335,10 @@ jobs:
           
           if [ "$status" = "completed" ]; then
             if [ "$conclusion" = "success" ]; then
-              echo "✅ Versions workflow completed successfully"
+              echo "Versions workflow completed successfully"
               break
             else
-              echo "❌ Versions workflow failed with conclusion: $conclusion"
+              echo "Versions workflow failed with conclusion: $conclusion"
               exit 1
             fi
           fi
@@ -349,7 +349,7 @@ jobs:
         done
         
         if [ $timeout -le 0 ]; then
-          echo "⏰ Timeout waiting for versions workflow"
+          echo "Timeout waiting for versions workflow"
           exit 1
         fi
       env:
@@ -395,10 +395,10 @@ jobs:
           
           if [ "$status" = "completed" ]; then
             if [ "$conclusion" = "success" ]; then
-              echo "✅ Update-index workflow completed successfully"
+              echo "Update-index workflow completed successfully"
               break
             else
-              echo "❌ Update-index workflow failed with conclusion: $conclusion"
+              echo "Update-index workflow failed with conclusion: $conclusion"
               exit 1
             fi
           fi
@@ -409,7 +409,7 @@ jobs:
         done
         
         if [ $timeout -le 0 ]; then
-          echo "⏰ Timeout waiting for update-index workflow"
+          echo "Timeout waiting for update-index workflow"
           exit 1
         fi
       env:
@@ -417,9 +417,9 @@ jobs:
 
     - name: Final summary
       run: |
-        echo "🎉 All workflows completed successfully!"
-        echo "✅ Main workflow: Created new releases"
-        echo "✅ Versions workflow: Updated version listings"
-        echo "✅ Update-index workflow: Updated index files"
+        echo "All workflows completed successfully!"
+        echo "Main workflow: Created new releases"
+        echo "Versions workflow: Updated version listings"
+        echo "Update-index workflow: Updated index files"
         echo ""
         echo "The entire pipeline has finished successfully."
