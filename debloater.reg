@@ -3,9 +3,11 @@ Windows Registry Editor Version 5.00
 ; Phục hồi về mặc định
 [-HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Edge]
 [-HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\EdgeUpdate]
+[-HKEY_CURRENT_USER\Software\Policies\Microsoft\Edge]
+[-HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\EdgeUpdate]
 
 ; Cấu hình cài đặt
-[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Edge]
+[HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\Edge]
 
 ;Tắt màn hình chào mừng khi khởi chạy Edge lần đầu
 "HideFirstRunExperience"=dword:00000001
@@ -419,10 +421,10 @@ Windows Registry Editor Version 5.00
 ; Bắt buộc dùng HTTPS (hỗ trợ từ phiên bản 140, tạm tắt vì Stable hiện tại đang là 139)
 ;"HttpsOnlyMode"="force_enabled"  ;On Windows and macOS since 140 or later
 
-[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Edge\ExtensionInstallForcelist]
+[HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\Edge\ExtensionInstallForcelist]
 ; Cài đặt plugin Minimal New Tab
 "1"="khdnagehanbomfdogegmpddmcalmdnbg"
 
-; [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Edge\ExtensionSettings]
+; [HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\Edge\ExtensionSettings]
 ; Cài đặt plugin Canvas Blocker - Fingerprint Protect (có thể tắt nếu thích)
 ; "ahiddppepedlomdleppkbljnmkchlmdc"="{\"update_url\":\"https://edge.microsoft.com/extensionwebstorebase/v1/crx\",\"installation_mode\":\"normal_installed\"}"
