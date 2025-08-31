@@ -26,6 +26,12 @@ No installation required. Keeps all history, cookies, extensions, and settings e
 
 ---
 
+### DRM
+
+Videos, auto running through DRM will have errors, for example crunchyroll.com has error `SHAK-6007`
+
+No solution yet, because Secure Preferences has been bypassed
+
 ### ⚠ Microsoft Defender Antivirus warning
 
 <details>
