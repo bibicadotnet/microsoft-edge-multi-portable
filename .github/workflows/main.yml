@@ -26,7 +26,27 @@ jobs:
       run: |
         try {
           Write-Host "Fetching Edge releases from edge_installer_multi..." -ForegroundColor Yellow
-          $edgeReleases = Invoke-RestMethod "https://api.github.com/repos/bibicadotnet/edge_installer_multi/releases"
+          # Retry logic for API calls
+          $maxRetries = 3
+          $retryCount = 0
+          $edgeReleases = $null
+          
+          do {
+            try {
+              $edgeReleases = Invoke-RestMethod "https://api.github.com/repos/bibicadotnet/edge_installer_multi/releases"
+              break
+            } catch {
+              $retryCount++
+              Write-Host "API call failed (attempt $retryCount/$maxRetries): $($_.Exception.Message)" -ForegroundColor Red
+              if ($retryCount -lt $maxRetries) {
+                $waitTime = 30 * $retryCount
+                Write-Host "Waiting $waitTime seconds before retry..." -ForegroundColor Yellow
+                Start-Sleep -Seconds $waitTime
+              } else {
+                throw
+              }
+            }
+          } while ($retryCount -lt $maxRetries)
           $releaseData = @()
           
           foreach ($release in $edgeReleases) {
