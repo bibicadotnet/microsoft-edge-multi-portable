@@ -8,13 +8,10 @@ on:
 permissions:
   contents: write
   packages: write
-  actions: write  # Cần để trigger workflows khác
 
 jobs:
   check-and-build:
     runs-on: windows-latest
-    outputs:
-      has_new_releases: ${{ steps.process-releases.outputs.has_new }}
     
     steps:
     - name: Checkout repository
@@ -299,12 +296,10 @@ jobs:
           }
         }
         
-        # Set output để trigger workflows khác
+        # Log kết quả cuối
         if ($hasNewReleases) {
-          echo "has_new=true" >> $env:GITHUB_OUTPUT
-          Write-Host "New releases were created - will trigger dependent workflows" -ForegroundColor Cyan
+          Write-Host "New releases were created successfully" -ForegroundColor Cyan
         } else {
-          echo "has_new=false" >> $env:GITHUB_OUTPUT
           Write-Host "No new releases created" -ForegroundColor Yellow
         }
         
@@ -313,133 +308,3 @@ jobs:
       run: |
         Write-Host "Processing completed!" -ForegroundColor Green
         Write-Host "Processed ${{ steps.edge-releases.outputs.RELEASES_COUNT }} Edge releases" -ForegroundColor Yellow
-
-  # Job để trigger versions workflow và chờ hoàn thành
-  trigger-versions:
-    needs: check-and-build
-    runs-on: ubuntu-latest
-    if: needs.check-and-build.outputs.has_new_releases == 'true'
-    
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      
-    - name: Wait for any pending workflows
-      run: |
-        echo "Waiting 30 seconds for any pending operations..."
-        sleep 30
-      
-    - name: Trigger versions workflow
-      id: trigger-versions
-      run: |
-        echo "Triggering versions.yml workflow..."
-        gh workflow run versions.yml --repo ${{ github.repository }}
-        echo "Workflow triggered successfully"
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: Wait for versions workflow to complete
-      run: |
-        echo "Waiting for versions workflow to complete..."
-        sleep 30  # Chờ workflow bắt đầu
-        
-        # Chờ workflow hoàn thành với timeout 10 phút
-        timeout=600
-        while [ $timeout -gt 0 ]; do
-          # Lấy workflow run mới nhất của versions.yml
-          latest_run=$(gh run list --workflow=versions.yml --limit=1 --json status,conclusion --jq '.[0]')
-          status=$(echo "$latest_run" | jq -r '.status')
-          conclusion=$(echo "$latest_run" | jq -r '.conclusion')
-          
-          echo "Current status: $status, conclusion: $conclusion"
-          
-          if [ "$status" = "completed" ]; then
-            if [ "$conclusion" = "success" ]; then
-              echo "Versions workflow completed successfully"
-              break
-            else
-              echo "Versions workflow failed with conclusion: $conclusion"
-              exit 1
-            fi
-          fi
-          
-          echo "Still running... ($timeout seconds left)"
-          sleep 15
-          timeout=$((timeout-15))
-        done
-        
-        if [ $timeout -le 0 ]; then
-          echo "Timeout waiting for versions workflow"
-          exit 1
-        fi
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  # Job để trigger update-index workflow sau khi versions hoàn thành
-  trigger-update-index:
-    needs: [check-and-build, trigger-versions]
-    runs-on: ubuntu-latest
-    if: needs.check-and-build.outputs.has_new_releases == 'true'
-    
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      
-    - name: Wait before triggering
-      run: |
-        echo "Waiting 15 seconds before triggering update-index workflow..."
-        sleep 15
-        
-    - name: Trigger update-index workflow
-      run: |
-        echo "Triggering update-index-versions.yml workflow..."
-        gh workflow run update-index-versions.yml --repo ${{ github.repository }}
-        echo "Update-index workflow triggered successfully"
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: Wait for update-index workflow to complete
-      run: |
-        echo "Waiting for update-index workflow to complete..."
-        sleep 30  # Chờ workflow bắt đầu
-        
-        # Chờ workflow hoàn thành với timeout 10 phút
-        timeout=600
-        while [ $timeout -gt 0 ]; do
-          # Lấy workflow run mới nhất của update-index-versions.yml
-          latest_run=$(gh run list --workflow=update-index-versions.yml --limit=1 --json status,conclusion --jq '.[0]')
-          status=$(echo "$latest_run" | jq -r '.status')
-          conclusion=$(echo "$latest_run" | jq -r '.conclusion')
-          
-          echo "Current status: $status, conclusion: $conclusion"
-          
-          if [ "$status" = "completed" ]; then
-            if [ "$conclusion" = "success" ]; then
-              echo "Update-index workflow completed successfully"
-              break
-            else
-              echo "Update-index workflow failed with conclusion: $conclusion"
-              exit 1
-            fi
-          fi
-          
-          echo "Still running... ($timeout seconds left)"
-          sleep 15
-          timeout=$((timeout-15))
-        done
-        
-        if [ $timeout -le 0 ]; then
-          echo "Timeout waiting for update-index workflow"
-          exit 1
-        fi
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: Final summary
-      run: |
-        echo "All workflows completed successfully!"
-        echo "Main workflow: Created new releases"
-        echo "Versions workflow: Updated version listings"
-        echo "Update-index workflow: Updated index files"
-        echo ""
-        echo "The entire pipeline has finished successfully."
