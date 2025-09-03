@@ -337,8 +337,28 @@
         // Lấy thông tin releases từ GitHub API
         async function fetchReleases() {
             try {
-                const response = await fetch('https://api.github.com/repos/bibicadotnet/microsoft-edge-multi-portable/releases?per_page=100');
-                const releases = await response.json();
+				let allReleases = [];
+				let page = 1;
+				const perPage = 100;
+
+				while (true) {
+					const response = await fetch(`https://api.github.com/repos/bibicadotnet/microsoft-edge-multi-portable/releases?per_page=${perPage}&page=${page}`);
+					const releases = await response.json();
+					
+					if (!Array.isArray(releases) || releases.length === 0) {
+						break; // Hết releases hoặc lỗi
+					}
+					
+					allReleases = allReleases.concat(releases);
+					
+					// Nếu số releases trả về < perPage thì đã hết
+					if (releases.length < perPage) {
+						break;
+					}
+					
+					page++;
+				}
+				const releases = allReleases;
                 
                 if (!Array.isArray(releases)) {
                     throw new Error('Invalid response format');
