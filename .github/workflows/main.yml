@@ -144,7 +144,7 @@ jobs:
               
               # Check if any release exists with this Edge version and channel and architecture
               $existingRelease = $allReleases | Where-Object { 
-                $_.tag_name -match "^edge-$channel-portable-$arch`_$([regex]::Escape($version))`_" 
+                $_.tag_name -match "^edge-$channel-portable-$arch`_$([regex]::Escape($version))`_.*$" 
               } | Select-Object -First 1
               
               if ($existingRelease) {
