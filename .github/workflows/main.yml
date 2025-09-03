@@ -139,16 +139,28 @@ jobs:
                 'Accept' = 'application/vnd.github.v3+json'
               }
               
-              # Get all releases for this repository
-              $allReleases = Invoke-RestMethod -Uri "https://api.github.com/repos/${{ github.repository }}/releases" -Headers $headers
+              # Tạo pattern tìm kiếm đơn giản: edge-{channel}-portable-{arch}_{version}_
+              $searchPattern = "edge-$channel-portable-$arch`_$version`_"
               
-              # Check if any release exists with this Edge version and channel and architecture
-              $existingRelease = $allReleases | Where-Object { 
-                $_.tag_name -match "^edge-$channel-portable-$arch`_$([regex]::Escape($version))`_.*$" 
-              } | Select-Object -First 1
+              # Get releases với pagination để đảm bảo lấy hết
+              $page = 1
+              $foundExisting = $false
               
-              if ($existingRelease) {
-                Write-Host "Release for Edge $channel $version $arch already exists ($($existingRelease.tag_name)), skipping..." -ForegroundColor Yellow
+              do {
+                $releases = Invoke-RestMethod -Uri "https://api.github.com/repos/${{ github.repository }}/releases?page=$page&per_page=100" -Headers $headers -ErrorAction Stop
+                
+                $existingRelease = $releases | Where-Object { $_.tag_name.StartsWith($searchPattern) } | Select-Object -First 1
+                
+                if ($existingRelease) {
+                  Write-Host "Release for Edge $channel $version $arch already exists ($($existingRelease.tag_name)), skipping..." -ForegroundColor Yellow
+                  $foundExisting = $true
+                  break
+                }
+                
+                $page++
+              } while ($releases.Count -eq 100)  # Continue if full page returned
+              
+              if ($foundExisting) {
                 continue
               } else {
                 Write-Host "No release found for Edge $channel $version $arch, will create new one" -ForegroundColor Green
@@ -156,7 +168,7 @@ jobs:
               
             } catch {
               Write-Host "Error checking existing releases: $($_.Exception.Message)" -ForegroundColor Red
-              continue
+              Write-Host "Proceeding with build (assuming no existing release)..." -ForegroundColor Yellow
             }
             
             # Build Edge Portable for this architecture
