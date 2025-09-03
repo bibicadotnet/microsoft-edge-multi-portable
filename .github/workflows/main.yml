@@ -30,7 +30,19 @@ jobs:
           
           do {
             try {
-              $edgeReleases = Invoke-RestMethod "https://api.github.com/repos/bibicadotnet/edge_installer_multi/releases"
+            # Get all releases with pagination
+            $edgeReleases = @()
+            $page = 1
+            do {
+              Write-Host "Fetching page $page of Edge releases..." -ForegroundColor Cyan
+              $pageReleases = Invoke-RestMethod "https://api.github.com/repos/bibicadotnet/edge_installer_multi/releases?page=$page&per_page=100"
+              if ($pageReleases.Count -gt 0) {
+                $edgeReleases += $pageReleases
+                Write-Host "Collected $($pageReleases.Count) releases from page $page (total: $($edgeReleases.Count))" -ForegroundColor Green
+                $page++
+              }
+            } while ($pageReleases.Count -eq 100)
+            Write-Host "Total Edge releases found: $($edgeReleases.Count)" -ForegroundColor Green
               break
             } catch {
               $retryCount++
