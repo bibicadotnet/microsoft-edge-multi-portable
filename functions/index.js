@@ -12,6 +12,5 @@ export async function onRequest(context) {
     });
   }
   
-  // Continue to next handler/static files
-  return;
+  return new Response("Not found", { status: 404 });
 }
