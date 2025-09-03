@@ -132,32 +132,33 @@ jobs:
             
             Write-Host "=== Processing $channel $version $arch ===" -ForegroundColor Cyan
             
-            # Check if Edge version already exists (regardless of Chrome++ version)
+            # Check if any release exists for this Edge version (regardless of Chrome++ version)
             try {
               $headers = @{
                 'Authorization' = 'token ${{ secrets.GITHUB_TOKEN }}'
                 'Accept' = 'application/vnd.github.v3+json'
               }
               
-              # Get all existing releases
-              $existingReleases = Invoke-RestMethod -Uri "https://api.github.com/repos/${{ github.repository }}/releases" -Headers $headers -ErrorAction Stop
+              # Get all releases for this repository
+              $allReleases = Invoke-RestMethod -Uri "https://api.github.com/repos/${{ github.repository }}/releases" -Headers $headers
               
-              # Check if any release exists for this Edge version (ignore Chrome++ version)
-              $edgeVersionPattern = "edge-$channel-portable-$arch`_$version`_"
-              $existingRelease = $existingReleases | Where-Object { $_.tag_name -like "$edgeVersionPattern*" }
+              # Check if any release exists with this Edge version and channel and architecture
+              $existingRelease = $allReleases | Where-Object { 
+                $_.tag_name -match "^edge-$channel-portable-$arch`_$([regex]::Escape($version))`_" 
+              } | Select-Object -First 1
               
               if ($existingRelease) {
-                Write-Host "Edge $channel $version $arch already exists (existing tag: $($existingRelease.tag_name)), skipping..." -ForegroundColor Yellow
+                Write-Host "Release for Edge $channel $version $arch already exists ($($existingRelease.tag_name)), skipping..." -ForegroundColor Yellow
                 continue
               } else {
-                Write-Host "Edge $channel $version $arch does not exist, will create new release with latest Chrome++" -ForegroundColor Green
+                Write-Host "No release found for Edge $channel $version $arch, will create new one" -ForegroundColor Green
               }
               
             } catch {
               Write-Host "Error checking existing releases: $($_.Exception.Message)" -ForegroundColor Red
               continue
             }
-
+            
             # Build Edge Portable for this architecture
             Write-Host "Building Microsoft Edge $channel $arch Portable with Chrome++" -ForegroundColor Green
             
