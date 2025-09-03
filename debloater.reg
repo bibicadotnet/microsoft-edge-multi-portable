@@ -321,8 +321,10 @@ Windows Registry Editor Version 5.00
 ;Cấu hình ngăn chặn theo dõi ở mức balanced
 "TrackingPrevention"=dword:00000002
 
-;Chế độ DNS over HTTPS tự động
+;Chế độ DNS over HTTPS tự động (sử dụng Cloudflare DNS)
 "DnsOverHttpsMode"="automatic"
+"DnsOverHttpsTemplates"="https://cloudflare-dns.com/dns-query{?dns}"
+;"DnsOverHttpsTemplates"="https://dns.google/dns-query{?dns}"
 
 ;Hỗ trợ Manifest V2 cho tiện ích mở rộng
 "ExtensionManifestV2Availability"=dword:00000002
