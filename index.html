@@ -337,7 +337,7 @@
         // Lấy thông tin releases từ GitHub API
         async function fetchReleases() {
             try {
-                const response = await fetch('https://api.github.com/repos/bibicadotnet/microsoft-edge-multi-portable/releases');
+                const response = await fetch('https://api.github.com/repos/bibicadotnet/microsoft-edge-multi-portable/releases?per_page=100');
                 const releases = await response.json();
                 
                 if (!Array.isArray(releases)) {
