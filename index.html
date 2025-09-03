@@ -443,10 +443,10 @@
                     <li class="version-item">
                         <div class="version-info">
                             <h3>${channelRelease.name}</h3>
-                            <div class="version-status">
-                                <span class="status-dot status-current"></span>
-                                Available for download
-                            </div>
+                                <div class="version-status">
+                                    <span class="status-dot status-current"></span>
+                                    Released: ${new Date(release.published_at).toLocaleDateString('vi-VN')}
+                                </div>
                         </div>
                         <a href="${downloadUrl}" class="version-number" target="_blank">${release.edgeVersion}</a>
                     </li>
