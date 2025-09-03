@@ -7,11 +7,6 @@ No installation required. Keeps all history, cookies, extensions, and settings e
 * Downloads the latest Edge Stable, Beta, Dev, or Canary x64 from [edge_installer_multi](https://github.com/bibicadotnet/edge_installer_multi/releases)
 * Integrates Chromium_SetDLL ([Chrome++](https://github.com/Bush2021/chrome_plus) for extra features)
 * Manual update script preserves your settings and configurations
-### Microsoft Edge Portable Latest
-- Microsoft Edge Stable Portable [139.0.3405.125](https://github.com/bibicadotnet/microsoft-edge-multi-portable/releases/tag/edge-stable-portable-x64_139.0.3405.125_1.13.1)
-- Microsoft Edge Beta Portable [140.0.3485.40](https://github.com/bibicadotnet/microsoft-edge-multi-portable/releases/tag/edge-beta-portable-x64_140.0.3485.40_1.13.1)
-- Microsoft Edge Developer Portable [141.0.3514.0](https://github.com/bibicadotnet/microsoft-edge-multi-portable/releases/tag/edge-dev-portable-x64_141.0.3514.0_1.13.1)
-- Microsoft Edge Canary Portable [141.0.3533.0](https://github.com/bibicadotnet/microsoft-edge-multi-portable/releases/tag/edge-canary-portable-x64_141.0.3533.0_1.13.1 edge-canary-portable-x64_141.0.3533.0_1.13.0)
 
 **Download the pre-built [release](https://github.com/bibicadotnet/microsoft-edge-multi-portable/releases)**, extract, and start using immediately.
 
