@@ -17,7 +17,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "Deleting all releases..."
-          releases=$(gh release list --json tagName --jq '.[].tagName' 2>/dev/null || echo "")
+          releases=$(gh release list --draft --json tagName --jq '.[].tagName' 2>/dev/null || echo "")
           if [ -n "$releases" ]; then
             echo "$releases" | while read tag; do
               [ -n "$tag" ] && gh release delete "$tag" --yes
