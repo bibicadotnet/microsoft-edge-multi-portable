@@ -39,5 +39,5 @@ No solution yet, because Secure Preferences has been bypassed
   <img src="https://img.bibica.net/R09ou3pG.png" alt="R09ou3pG">
 </details>
 
-
+[![Powered by DartNode](https://dartnode.com/branding/DN-Open-Source-sm.png)](https://dartnode.com "Powered by DartNode - Free VPS for Open Source")
 
