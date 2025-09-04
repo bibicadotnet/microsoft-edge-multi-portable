@@ -1,8 +1,6 @@
 name: Delete All Releases & Tags
-
 on:
   workflow_dispatch:
-
 jobs:
   cleanup:
     runs-on: ubuntu-latest
@@ -11,19 +9,25 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
       - name: Delete all releases and tags
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "Deleting all releases..."
-          releases=$(gh release list --draft --json tagName --jq '.[].tagName' 2>/dev/null || echo "")
+          # Delete published releases
+          releases=$(gh release list --json tagName --jq '.[].tagName' 2>/dev/null || echo "")
           if [ -n "$releases" ]; then
             echo "$releases" | while read tag; do
               [ -n "$tag" ] && gh release delete "$tag" --yes
             done
-          else
-            echo "No releases found"
+          fi
+          
+          # Delete draft releases
+          draft_releases=$(gh release list --draft --json tagName --jq '.[].tagName' 2>/dev/null || echo "")
+          if [ -n "$draft_releases" ]; then
+            echo "$draft_releases" | while read tag; do
+              [ -n "$tag" ] && gh release delete "$tag" --yes
+            done
           fi
           
           echo "Deleting all tags..."
