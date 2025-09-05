@@ -401,6 +401,9 @@ Windows Registry Editor Version 5.00
 ; Tự động chạy HTTPS
 "HttpsUpgradesEnabled"=dword:00000001
 
+; Bắt buộc dùng HTTPS (hỗ trợ từ phiên bản 140)
+"HttpsOnlyMode"="force_enabled"
+
 ; Change default search Google (dùng duy nhất Google làm tìm kiếm)
 "ManagedSearchEngines"="[{\"is_default\":true,\"keyword\":\"google.com\",\"name\":\"Google\",\"search_url\":\"https://www.google.com/search?q={searchTerms}\",\"suggest_url\":\"https://www.google.com/complete/search?output=chrome&q={searchTerms}\"}]"
 
@@ -419,9 +422,6 @@ Windows Registry Editor Version 5.00
 
 ;Copilot sẽ không xuất hiện trên thanh công cụ
 "Microsoft365CopilotChatIconEnabled"=dword:00000000
-
-; Bắt buộc dùng HTTPS (hỗ trợ từ phiên bản 140, tạm tắt vì Stable hiện tại đang là 139)
-;"HttpsOnlyMode"="force_enabled"  ;On Windows and macOS since 140 or later
 
 [HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\Edge\ExtensionInstallForcelist]
 ; Cài đặt plugin Minimal New Tab
