@@ -420,11 +420,18 @@ Windows Registry Editor Version 5.00
 ; Hiển thị nút tải xuống trên thanh công cụ
 "ShowDownloadsToolbarButton"=dword:00000001
 
-;Copilot sẽ không xuất hiện trên thanh công cụ
+; Copilot sẽ không xuất hiện trên thanh công cụ
 "Microsoft365CopilotChatIconEnabled"=dword:00000000
 
-[HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\Edge\ExtensionInstallForcelist]
+; Chặn tìm kiếm AI trong lịch sử duyệt web
+"EdgeHistoryAISearchEnabled"=dword:00000000
+
+; Chặn New Tab mặc định
+[HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\Edge\URLBlocklist]
+"1"="ntp.msn.com"
+
 ; Cài đặt plugin Minimal New Tab
+[HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\Edge\ExtensionInstallForcelist]
 "1"="khdnagehanbomfdogegmpddmcalmdnbg"
 
 ; [HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\Edge\ExtensionSettings]
