@@ -323,7 +323,7 @@ Windows Registry Editor Version 5.00
 
 ; Cấu hình DNS tự động hỗ trợ ECS (chặn quảng cáo bởi HaGeZi's Pro++ và ABPVN)
 "DnsOverHttpsMode"="automatic"
-"DnsOverHttpsTemplates"="https://dns.bibica.net/dns-query{?dns}"
+"DnsOverHttpsTemplates"="https://iabucttpma.cloudflare-gateway.com/dns-query{?dns}"
 
 ;Hỗ trợ Manifest V2 cho tiện ích mở rộng
 "ExtensionManifestV2Availability"=dword:00000002
