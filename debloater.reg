@@ -402,8 +402,9 @@ Windows Registry Editor Version 5.00
 ; Tự động chạy HTTPS
 "HttpsUpgradesEnabled"=dword:00000001
 
-; Bắt buộc dùng HTTPS (hỗ trợ từ phiên bản 140)
-"HttpsOnlyMode"="force_enabled"
+; Bắt buộc dùng HTTPS (hỗ trợ từ phiên bản 140) (tạm tắt)
+; Không cần thiết, tự chạy https cũng đủ rồi
+;"HttpsOnlyMode"="force_enabled"
 
 ; Change default search Google (dùng duy nhất Google làm tìm kiếm)
 "ManagedSearchEngines"="[{\"is_default\":true,\"keyword\":\"google.com\",\"name\":\"Google\",\"search_url\":\"https://www.google.com/search?q={searchTerms}\",\"suggest_url\":\"https://www.google.com/complete/search?output=chrome&q={searchTerms}\"}]"
