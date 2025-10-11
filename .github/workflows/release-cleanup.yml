@@ -1,43 +1,43 @@
 name: Delete All Releases & Tags
 on:
   workflow_dispatch:
+
+permissions:
+  contents: write
+
 jobs:
   cleanup:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Delete all releases and tags
-        env:
+
+      - run: sudo apt-get install -y gh jq
+
+      - env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "Deleting all releases..."
-          # Delete published releases
-          releases=$(gh release list --json tagName --jq '.[].tagName' 2>/dev/null || echo "")
-          if [ -n "$releases" ]; then
-            echo "$releases" | while read tag; do
-              [ -n "$tag" ] && gh release delete "$tag" --yes
+          set -euo pipefail
+          repo="${GITHUB_REPOSITORY}"
+          per_page=100
+          page=1
+          while :; do
+            releases_json=$(gh api "repos/${repo}/releases?per_page=${per_page}&page=${page}" 2>/dev/null || echo "[]")
+            count=$(echo "$releases_json" | jq 'length')
+            [ "$count" -eq 0 ] && break
+            echo "$releases_json" | jq -r '.[] | [.id, .tag_name] | @tsv' | while IFS=$'\t' read -r rid tag; do
+              gh api --method DELETE "repos/${repo}/releases/${rid}" || true
+              [ -n "$tag" ] && git push origin --delete "refs/tags/$tag" || true
             done
-          fi
-          
-          # Delete draft releases
-          draft_releases=$(gh release list --draft --json tagName --jq '.[].tagName' 2>/dev/null || echo "")
-          if [ -n "$draft_releases" ]; then
-            echo "$draft_releases" | while read tag; do
-              [ -n "$tag" ] && gh release delete "$tag" --yes
-            done
-          fi
-          
-          echo "Deleting all tags..."
+            page=$((page + 1))
+          done
+
+          git fetch --tags --force
           tags=$(git tag -l)
           if [ -n "$tags" ]; then
-            echo "$tags" | while read tag; do
-              [ -n "$tag" ] && git push origin --delete "refs/tags/$tag"
+            echo "$tags" | while read -r tag; do
+              [ -n "$tag" ] && git push origin --delete "refs/tags/$tag" || true
             done
-          else
-            echo "No tags found"
+            git tag -d $(git tag -l) || true
           fi
-          
-          echo "Done!"
