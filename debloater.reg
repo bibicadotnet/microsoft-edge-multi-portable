@@ -153,8 +153,8 @@ Windows Registry Editor Version 5.00
 ;Tắt bộ lọc tìm kiếm
 "SearchFiltersEnabled"=dword:00000000
 
-;Bật gợi ý tìm kiếm
-"SearchSuggestEnabled"=dword:00000001
+; Khi bật gợi ý tìm kiếm, trình duyệt không bật lên được (bỏ tính năng này)
+;"SearchSuggestEnabled"=dword:00000001
 
 ;Tắt thanh tìm kiếm
 "SearchbarAllowed"=dword:00000000
