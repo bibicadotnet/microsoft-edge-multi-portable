@@ -23,7 +23,7 @@ jobs:
           per_page=100
           page=1
 
-          # delete published releases (paged)
+          # delete all published & pre-releases
           while :; do
             releases_json=$(gh api "repos/${repo}/releases?per_page=${per_page}&page=${page}" 2>/dev/null || echo "[]")
             count=$(echo "$releases_json" | jq 'length')
@@ -35,8 +35,9 @@ jobs:
             page=$((page + 1))
           done
 
-          # delete draft releases (using gh CLI)
-          gh release list --limit 1000 --draft --json name,tagName --jq '.[] | [.name, .tagName] | @tsv' | while IFS=$'\t' read -r name tag; do
+          # delete all drafts (filter via jq)
+          gh release list --limit 1000 --json name,tagName,isDraft --jq '.[] | select(.isDraft == true) | [.name, .tagName] | @tsv' | \
+          while IFS=$'\t' read -r name tag; do
             gh release delete "$tag" --yes || true
             [ -n "$tag" ] && git push origin --delete "refs/tags/$tag" || true
           done
