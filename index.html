@@ -391,174 +391,70 @@ border-radius: 50% !important;
             }
         }
 
-        // Lấy thông tin releases từ GitHub API
-        async function fetchReleases() {
-            try {
-				let allReleases = [];
-				let page = 1;
-				const perPage = 100;
+        // Lấy thông tin releases từ latest-versions.json
+		async function fetchReleases() {
+		    try {
+		        const response = await fetch('https://edge.bibica.net/latest-versions.json');
+		        const data = await response.json();
+		        
+		        if (!data.channels) {
+		            throw new Error('Invalid JSON format');
+		        }
+		        
+		        displayReleases(data.channels);
+		        
+		    } catch (error) {
+		        console.error('Error fetching releases:', error);
+		        document.getElementById('versions-content').innerHTML = 
+		            '<div class="error">Unable to load versions. Please try again later.</div>';
+		    }
+		}
 
-				while (true) {
-					const response = await fetch(`https://api.github.com/repos/bibicadotnet/microsoft-edge-multi-portable/releases?per_page=${perPage}&page=${page}`);
-					const releases = await response.json();
-					
-					if (!Array.isArray(releases) || releases.length === 0) {
-						break; // Hết releases hoặc lỗi
-					}
-					
-					allReleases = allReleases.concat(releases);
-					
-					// Nếu số releases trả về < perPage thì đã hết
-					if (releases.length < perPage) {
-						break;
-					}
-					
-					page++;
-				}
-				const releases = allReleases;
-                
-                if (!Array.isArray(releases)) {
-                    throw new Error('Invalid response format');
-                }
-
-                // Lọc và sắp xếp releases
-                const processedReleases = processReleases(releases);
-                displayReleases(processedReleases);
-                
-            } catch (error) {
-                console.error('Error fetching releases:', error);
-                document.getElementById('versions-content').innerHTML = 
-                    '<div class="error">Unable to load versions. Please try again later.</div>';
-            }
-        }
-
-        function processReleases(releases) {
-            // Lọc các releases có tag_name phù hợp với pattern edge-{channel}-portable-x64_{version}_{chromeplus}
-            const validReleases = releases.filter(release => {
-                return release.tag_name && release.tag_name.match(/^edge-(stable|beta|dev|canary)-portable-x64_[\d\.]+_[\d\.]+$/);
-            });
-
-            // Tạo map để nhóm theo channel
-            const channelMap = new Map();
-            channelMap.set('stable', { name: 'Microsoft Edge Stable', releases: [] });
-            channelMap.set('beta', { name: 'Microsoft Edge Beta', releases: [] });
-            channelMap.set('dev', { name: 'Microsoft Edge Developer', releases: [] });
-            channelMap.set('canary', { name: 'Microsoft Edge Canary', releases: [] });
-            
-            validReleases.forEach(release => {
-                const match = release.tag_name.match(/^edge-(stable|beta|dev|canary)-portable-x64_([\d\.]+)_([\d\.]+)$/);
-                if (match) {
-                    const channel = match[1];
-                    const edgeVersion = match[2];
-                    const chromePlusVersion = match[3];
-                    
-                    if (channelMap.has(channel)) {
-                        channelMap.get(channel).releases.push({
-                            ...release,
-                            channel: channel,
-                            edgeVersion: edgeVersion,
-                            chromePlusVersion: chromePlusVersion
-                        });
-                    }
-                }
-            });
-
-            // Lấy phiên bản mới nhất cho mỗi channel
-            const result = [];
-            channelMap.forEach((channelData, channel) => {
-                if (channelData.releases.length > 0) {
-                    // Sắp xếp theo edge version giảm dần và lấy phiên bản mới nhất
-                    const sorted = channelData.releases.sort((a, b) => {
-                        return compareVersions(b.edgeVersion, a.edgeVersion);
-                    });
-                    
-                    result.push({
-                        channel: channel,
-                        name: channelData.name,
-                        latest: sorted[0]
-                    });
-                }
-            });
-
-            return result;
-        }
-
-        function compareVersions(v1, v2) {
-            const parts1 = v1.split('.').map(n => parseInt(n, 10));
-            const parts2 = v2.split('.').map(n => parseInt(n, 10));
-            
-            for (let i = 0; i < Math.max(parts1.length, parts2.length); i++) {
-                const num1 = parts1[i] || 0;
-                const num2 = parts2[i] || 0;
-                if (num1 > num2) return 1;
-                if (num1 < num2) return -1;
-            }
-            return 0;
-        }
-
-        function displayReleases(channelReleases) {
-            if (channelReleases.length === 0) {
-                document.getElementById('versions-content').innerHTML = 
-                    '<div class="error">No versions found.</div>';
-                return;
-            }
-
-            let html = '<ul class="version-list">';
-            
-            // Sắp xếp theo thứ tự: stable, beta, dev, canary
-            const order = ['stable', 'beta', 'dev', 'canary'];
-            const sortedReleases = channelReleases.sort((a, b) => {
-                return order.indexOf(a.channel) - order.indexOf(b.channel);
-            });
-
-            sortedReleases.forEach(channelRelease => {
-                const release = channelRelease.latest;
-                const fileName = `edge-${release.channel}-portable-x64_${release.edgeVersion}_${release.chromePlusVersion}`;
-                const downloadUrl = `https://edge.bibica.net/${fileName}/${fileName}.zip`;
-                
-                html += `
-                    <li class="version-item">
-                        <div class="version-info">
-                            <h3>${channelRelease.name}</h3>
-                                <div class="version-status">
-                                    <span class="status-dot status-current"></span>
-                                    Released: ${new Date(release.published_at).toLocaleDateString('en-GB')}
-                                </div>
-                        </div>
-                        <a href="${downloadUrl}" class="version-number" target="_blank">${release.edgeVersion}</a>
-                    </li>
-                `;
-            });
-
-            // Thêm các channel không có release
-            const availableChannels = channelReleases.map(r => r.channel);
-            const allChannels = [
-                { channel: 'stable', name: 'Microsoft Edge Stable' },
-                { channel: 'beta', name: 'Microsoft Edge Beta' },
-                { channel: 'dev', name: 'Microsoft Edge Developer' },
-                { channel: 'canary', name: 'Microsoft Edge Canary' }
-            ];
-
-            allChannels.forEach(channelInfo => {
-                if (!availableChannels.includes(channelInfo.channel)) {
-                    html += `
-                        <li class="version-item">
-                            <div class="version-info">
-                                <h3>${channelInfo.name}</h3>
-                                <div class="version-status">
-                                    <span class="status-dot status-unavailable"></span>
-                                    Currently unavailable
-                                </div>
-                            </div>
-                            <span class="version-number unavailable">N/A</span>
-                        </li>
-                    `;
-                }
-            });
-            
-            html += '</ul>';
-            document.getElementById('versions-content').innerHTML = html;
-        }
+			function displayReleases(channels) {
+			    const channelOrder = ['stable', 'beta', 'dev', 'canary'];
+			    const channelNames = {
+			        'stable': 'Microsoft Edge Stable',
+			        'beta': 'Microsoft Edge Beta',
+			        'dev': 'Microsoft Edge Developer',
+			        'canary': 'Microsoft Edge Canary'
+			    };
+			    
+			    let html = '<ul class="version-list">';
+			    
+			    channelOrder.forEach(channel => {
+			        if (channels[channel]) {
+			            const info = channels[channel];
+			            html += `
+			                <li class="version-item">
+			                    <div class="version-info">
+			                        <h3>${info.name}</h3>
+			                        <div class="version-status">
+			                            <span class="status-dot status-current"></span>
+			                            Released: ${new Date(info.published_at).toLocaleDateString('en-GB')}
+			                        </div>
+			                    </div>
+			                    <a href="${info.download_url}" class="version-number" target="_blank">${info.version}</a>
+			                </li>
+			            `;
+			        } else {
+			            html += `
+			                <li class="version-item">
+			                    <div class="version-info">
+			                        <h3>${channelNames[channel]}</h3>
+			                        <div class="version-status">
+			                            <span class="status-dot status-unavailable"></span>
+			                            Currently unavailable
+			                        </div>
+			                    </div>
+			                    <span class="version-number unavailable">N/A</span>
+			                </li>
+			            `;
+			        }
+			    });
+			    
+			    html += '</ul>';
+			    document.getElementById('versions-content').innerHTML = html;
+			}
 
         // Initialize when page loads
         document.addEventListener('DOMContentLoaded', function() {
