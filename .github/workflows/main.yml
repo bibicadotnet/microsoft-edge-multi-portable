@@ -332,8 +332,10 @@ jobs:
         # Log kết quả cuối
         if ($hasNewReleases) {
           Write-Host "New releases were created successfully" -ForegroundColor Cyan
+          echo "HAS_NEW_RELEASES=true" >> $env:GITHUB_OUTPUT
         } else {
           Write-Host "No new releases created" -ForegroundColor Yellow
+          echo "HAS_NEW_RELEASES=false" >> $env:GITHUB_OUTPUT
         }
         
     - name: Summary
@@ -341,3 +343,67 @@ jobs:
       run: |
         Write-Host "Processing completed!" -ForegroundColor Green
         Write-Host "Processed ${{ steps.edge-releases.outputs.RELEASES_COUNT }} Edge releases" -ForegroundColor Yellow
+
+    - name: Generate latest versions JSON
+      if: steps.process-releases.outputs.HAS_NEW_RELEASES == 'true'
+      shell: powershell
+      run: |
+        Write-Host "Generating latest-versions.json..." -ForegroundColor Yellow
+        
+        # Fetch releases từ API
+        $allReleases = @()
+        $page = 1
+        do {
+          $releases = Invoke-RestMethod "https://api.github.com/repos/${{ github.repository }}/releases?page=$page&per_page=100"
+          if ($releases.Count -gt 0) {
+            $allReleases += $releases
+          }
+          $page++
+        } while ($releases.Count -eq 100)
+        
+        # Lọc và nhóm theo channel
+        $channels = @{}
+        $channelNames = @{
+          'stable' = 'Microsoft Edge Stable'
+          'beta' = 'Microsoft Edge Beta'
+          'dev' = 'Microsoft Edge Developer'
+          'canary' = 'Microsoft Edge Canary'
+        }
+        
+        foreach ($release in $allReleases) {
+          if ($release.tag_name -match '^edge-(stable|beta|dev|canary)-portable-x64_([\d\.]+)_([\d\.]+)$') {
+            $channel = $matches[1]
+            $edgeVer = $matches[2]
+            $chromePlusVer = $matches[3]
+            
+            # Nếu chưa có hoặc version mới hơn
+            if (-not $channels.ContainsKey($channel)) {
+              $channels[$channel] = @{
+                name = $channelNames[$channel]
+                version = $edgeVer
+                chromePlus = $chromePlusVer
+                published_at = $release.published_at
+                download_url = "https://edge.bibica.net/$($release.tag_name)/$($release.tag_name).zip"
+                tag_name = $release.tag_name
+              }
+            }
+          }
+        }
+        
+        # Tạo JSON
+        $jsonData = @{
+          last_updated = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+          channels = $channels
+        }
+        
+        $jsonData | ConvertTo-Json -Depth 10 | Out-File -FilePath "latest-versions.json" -Encoding UTF8
+        Write-Host "Generated latest-versions.json" -ForegroundColor Green
+        
+    - name: Commit latest-versions.json
+      if: steps.process-releases.outputs.HAS_NEW_RELEASES == 'true'
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        git add latest-versions.json
+        git commit -m "Update latest-versions.json [skip ci]"
+        git push        
