@@ -14,8 +14,9 @@ echo try {
 echo   $currentVersion = if ^(Test-Path $edgePath^) { ^(Get-Item $edgePath^).VersionInfo.ProductVersion } else { "Not installed" }
 echo   $data = Invoke-RestMethod -Uri $apiUrl
 echo.
+echo   $channelName = "{CHANNEL_LOWER}"
 echo   $channelInfo = $null
-echo   switch ^("{CHANNEL_LOWER}"^) {
+echo   switch ($channelName) {
 echo     "stable" { $channelInfo = $data.channels.stable }
 echo     "beta" { $channelInfo = $data.channels.beta }
 echo     "dev" { $channelInfo = $data.channels.dev }
