@@ -7,19 +7,16 @@ echo.
 echo # Microsoft Edge {CHANNEL} Updater
 echo $ErrorActionPreference = "Stop"
 echo $edgePath = Join-Path "%~dp0" "msedge.exe"
-echo $apiUrl = "https://api.github.com/repos/{REPOSITORY}/releases"
+echo $apiUrl = "https://edge.bibica.net/latest-versions.json"
 echo $tempDir = Join-Path $env:TEMP "Edge{CHANNEL_TITLE}Update"
 echo.
 echo try {
 echo   $currentVersion = if ^(Test-Path $edgePath^) { ^(Get-Item $edgePath^).VersionInfo.ProductVersion } else { "Not installed" }
-echo   $allReleases = Invoke-RestMethod -Uri $apiUrl
-echo   $channelReleases = $allReleases ^| Where-Object { $_.tag_name -like "edge-{CHANNEL}-portable-x64_*" }
-echo   $latestRelease = $channelReleases ^| Sort-Object { if ^($_.tag_name -match "([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)"^) { [System.Version]$matches[1] } else { [System.Version]"0.0.0.0" } } -Descending ^| Select-Object -First 1
-echo   $latestVersion = ^($latestRelease.tag_name -split "_"^)^[1^]
-echo   $downloadUrl = $latestRelease.assets^[0^].browser_download_url
-echo   if ^($downloadUrl -like "https://github.com/bibicadotnet/microsoft-edge-multi-portable/releases/download/*"^) {
-echo     $downloadUrl = $downloadUrl -replace "https://github.com/bibicadotnet/microsoft-edge-multi-portable/releases/download/", "https://edge.bibica.net/"
-echo   }
+echo   $data = Invoke-RestMethod -Uri $apiUrl
+echo   $channelInfo = $data.channels.{CHANNEL_LOWER}
+echo   if ^(-not $channelInfo^) { throw "{CHANNEL} channel not found" }
+echo   $latestVersion = $channelInfo.version
+echo   $downloadUrl = $channelInfo.download_url
 echo.
 echo   Write-Host "Current version: $currentVersion" -ForegroundColor Yellow
 echo   Write-Host "Latest version: $latestVersion" -ForegroundColor Yellow
