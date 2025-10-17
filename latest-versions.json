@@ -1,0 +1,37 @@
+﻿{
+    "channels":  {
+                     "canary":  {
+                                    "version":  "143.0.3623.0",
+                                    "name":  "Microsoft Edge Canary",
+                                    "published_at":  "2025-10-17T07:49:56Z",
+                                    "chromePlus":  "1.13.2",
+                                    "download_url":  "https://edge.bibica.net/edge-canary-portable-x64_143.0.3623.0_1.13.2/edge-canary-portable-x64_143.0.3623.0_1.13.2.zip",
+                                    "tag_name":  "edge-canary-portable-x64_143.0.3623.0_1.13.2"
+                                },
+                     "beta":  {
+                                  "version":  "142.0.3595.19",
+                                  "name":  "Microsoft Edge Beta",
+                                  "published_at":  "2025-10-17T09:23:33Z",
+                                  "chromePlus":  "1.13.2",
+                                  "download_url":  "https://edge.bibica.net/edge-beta-portable-x64_142.0.3595.19_1.13.2/edge-beta-portable-x64_142.0.3595.19_1.13.2.zip",
+                                  "tag_name":  "edge-beta-portable-x64_142.0.3595.19_1.13.2"
+                              },
+                     "dev":  {
+                                 "version":  "143.0.3614.1",
+                                 "name":  "Microsoft Edge Developer",
+                                 "published_at":  "2025-10-17T07:40:38Z",
+                                 "chromePlus":  "1.13.2",
+                                 "download_url":  "https://edge.bibica.net/edge-dev-portable-x64_143.0.3614.1_1.13.2/edge-dev-portable-x64_143.0.3614.1_1.13.2.zip",
+                                 "tag_name":  "edge-dev-portable-x64_143.0.3614.1_1.13.2"
+                             },
+                     "stable":  {
+                                    "version":  "141.0.3537.71",
+                                    "name":  "Microsoft Edge Stable",
+                                    "published_at":  "2025-10-17T07:30:10Z",
+                                    "chromePlus":  "1.13.2",
+                                    "download_url":  "https://edge.bibica.net/edge-stable-portable-x64_141.0.3537.71_1.13.2/edge-stable-portable-x64_141.0.3537.71_1.13.2.zip",
+                                    "tag_name":  "edge-stable-portable-x64_141.0.3537.71_1.13.2"
+                                }
+                 },
+    "last_updated":  "2025-10-17T09:49:38Z"
+}
