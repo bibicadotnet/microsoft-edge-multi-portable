@@ -12,11 +12,15 @@ echo $tempDir = Join-Path $env:TEMP "Edge{CHANNEL_TITLE}Update"
 echo.
 echo try {
 echo   $currentVersion = if ^(Test-Path $edgePath^) { ^(Get-Item $edgePath^).VersionInfo.ProductVersion } else { "Not installed" }
-echo   $data = Invoke-RestMethod -Uri $apiUrl
+echo   [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
+echo   $webClient = New-Object System.Net.WebClient
+echo   $webClient.Encoding = [System.Text.Encoding]::UTF8
+echo   $jsonString = $webClient.DownloadString^($apiUrl^)
+echo   $data = $jsonString ^| ConvertFrom-Json
 echo.
 echo   $channelName = "{CHANNEL_LOWER}"
 echo   $channelInfo = $null
-echo   switch ($channelName) {
+echo   switch ^($channelName^) {
 echo     "stable" { $channelInfo = $data.channels.stable }
 echo     "beta" { $channelInfo = $data.channels.beta }
 echo     "dev" { $channelInfo = $data.channels.dev }
