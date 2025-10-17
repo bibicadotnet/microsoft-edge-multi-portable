@@ -110,7 +110,7 @@ jobs:
           
           $releaseData | ConvertTo-Json -Depth 10 | Out-File -FilePath "edge_releases.json" -Encoding UTF8
           Write-Host "`nProcessed $($releaseData.Count) Edge releases with x64 assets" -ForegroundColor Green
-          echo "RELEASES_COUNT=$($releaseData.Count)" >> $env:GITHUB_OUTPUT
+          "RELEASES_COUNT=$($releaseData.Count)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
           
         } catch {
           Write-Error "Failed: $($_.Exception.Message)"
@@ -124,7 +124,7 @@ jobs:
         try {
           $chromePlusRelease = Invoke-RestMethod "https://api.github.com/repos/bibicadotnet/Chromium_SetDLL/releases/latest"
           $chromePlusVersion = $chromePlusRelease.tag_name
-          echo "CHROMEPLUS_VERSION=$chromePlusVersion" >> $env:GITHUB_OUTPUT
+          "CHROMEPLUS_VERSION=$chromePlusVersion" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
           Write-Host "Chrome++ version: $chromePlusVersion" -ForegroundColor Green
         } catch {
           Write-Error "Failed to get Chrome++ version: $($_.Exception.Message)"
@@ -275,11 +275,8 @@ jobs:
         Write-Host "`n=== SUMMARY ===" -ForegroundColor Yellow
         Write-Host "Processed: $processedCount | Skipped: $skippedCount" -ForegroundColor Cyan
         
-        if ($hasNewReleases) {
-          echo "HAS_NEW_RELEASES=true" >> $env:GITHUB_OUTPUT
-        } else {
-          echo "HAS_NEW_RELEASES=false" >> $env:GITHUB_OUTPUT
-        }
+        $hasNewReleasesValue = if ($hasNewReleases) { "true" } else { "false" }
+        "HAS_NEW_RELEASES=$hasNewReleasesValue" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
 
     - name: Generate latest versions JSON
       if: steps.process-releases.outputs.HAS_NEW_RELEASES == 'true'
