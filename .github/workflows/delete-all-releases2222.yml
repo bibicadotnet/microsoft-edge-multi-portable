@@ -1,0 +1,64 @@
+name: Delete All Releases & Tags
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout repo full history
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Cài gh CLI và jq
+      - run: sudo apt-get update && sudo apt-get install -y gh jq
+
+      # Xóa tất cả releases và tags
+      - name: Delete all releases and tags
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          repo="${GITHUB_REPOSITORY}"
+
+          echo "=== Lấy toàn bộ releases ==="
+          all_ids=()
+          all_tags=()
+          page=1
+          per_page=100
+          while :; do
+            releases=$(gh api "repos/${repo}/releases?per_page=${per_page}&page=${page}" 2>/dev/null || echo "[]")
+            count=$(echo "$releases" | jq 'length')
+            [ "$count" -eq 0 ] && break
+            ids=$(echo "$releases" | jq -r '.[].id')
+            tags=$(echo "$releases" | jq -r '.[].tag_name')
+            all_ids+=($ids)
+            all_tags+=($tags)
+            page=$((page + 1))
+          done
+
+          echo "=== Xóa tất cả releases ==="
+          for rid in "${all_ids[@]}"; do
+            echo "Deleting release ID: $rid"
+            gh api --method DELETE "repos/${repo}/releases/$rid" || true
+          done
+
+          echo "=== Xóa tất cả tags liên quan releases ==="
+          for tag in "${all_tags[@]}"; do
+            [ -n "$tag" ] && git push origin --delete "refs/tags/$tag" || true
+          done
+
+          echo "=== Xóa tất cả tags còn sót trên remote ==="
+          git fetch --tags --force
+          git tag -l | while read -r tag; do
+            [ -n "$tag" ] && git push origin --delete "refs/tags/$tag" || true
+          done
+
+          echo "=== Xóa tất cả tags local ==="
+          git tag -d $(git tag -l) || true
+
+          echo "=== Hoàn tất xóa tất cả releases & tags ==="
