@@ -14,7 +14,6 @@ echo try {
 echo   $currentVersion = if ^(Test-Path $edgePath^) { ^(Get-Item $edgePath^).VersionInfo.ProductVersion } else { "Not installed" }
 echo   $data = Invoke-RestMethod -Uri $apiUrl
 echo.
-echo   # Truy cập channel bằng switch để tránh lỗi PSCustomObject
 echo   $channelInfo = $null
 echo   switch ^("{CHANNEL_LOWER}"^) {
 echo     "stable" { $channelInfo = $data.channels.stable }
