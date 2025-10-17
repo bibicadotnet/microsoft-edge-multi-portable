@@ -13,8 +13,16 @@ echo.
 echo try {
 echo   $currentVersion = if ^(Test-Path $edgePath^) { ^(Get-Item $edgePath^).VersionInfo.ProductVersion } else { "Not installed" }
 echo   $data = Invoke-RestMethod -Uri $apiUrl
-echo   $channelName = "{CHANNEL_LOWER}"
-echo   $channelInfo = $data.channels.$channelName
+echo.
+echo   # Truy cập channel bằng switch để tránh lỗi PSCustomObject
+echo   $channelInfo = $null
+echo   switch ^("{CHANNEL_LOWER}"^) {
+echo     "stable" { $channelInfo = $data.channels.stable }
+echo     "beta" { $channelInfo = $data.channels.beta }
+echo     "dev" { $channelInfo = $data.channels.dev }
+echo     "canary" { $channelInfo = $data.channels.canary }
+echo   }
+echo.
 echo   if ^(-not $channelInfo^) { throw "{CHANNEL} channel not found" }
 echo   $latestVersion = $channelInfo.version
 echo   $downloadUrl = $channelInfo.download_url
