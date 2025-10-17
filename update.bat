@@ -13,7 +13,8 @@ echo.
 echo try {
 echo   $currentVersion = if ^(Test-Path $edgePath^) { ^(Get-Item $edgePath^).VersionInfo.ProductVersion } else { "Not installed" }
 echo   $data = Invoke-RestMethod -Uri $apiUrl
-echo   $channelInfo = $data.channels.{CHANNEL_LOWER}
+echo   $channelName = "{CHANNEL_LOWER}"
+echo   $channelInfo = $data.channels.$channelName
 echo   if ^(-not $channelInfo^) { throw "{CHANNEL} channel not found" }
 echo   $latestVersion = $channelInfo.version
 echo   $downloadUrl = $channelInfo.download_url
