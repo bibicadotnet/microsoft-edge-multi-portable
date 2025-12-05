@@ -8,6 +8,14 @@
                                   "download_url":  "https://edge.bibica.net/edge-beta-portable-x64_143.0.3650.66_1.13.4/edge-beta-portable-x64_143.0.3650.66_1.13.4.zip",
                                   "tag_name":  "edge-beta-portable-x64_143.0.3650.66_1.13.4"
                               },
+                     "stable":  {
+                                    "version":  "143.0.3650.66",
+                                    "name":  "Microsoft Edge Stable",
+                                    "published_at":  "2025-12-05T02:08:54Z",
+                                    "chromePlus":  "1.13.4",
+                                    "download_url":  "https://edge.bibica.net/edge-stable-portable-x64_143.0.3650.66_1.13.4/edge-stable-portable-x64_143.0.3650.66_1.13.4.zip",
+                                    "tag_name":  "edge-stable-portable-x64_143.0.3650.66_1.13.4"
+                                },
                      "dev":  {
                                  "version":  "144.0.3705.0",
                                  "name":  "Microsoft Edge Developer",
@@ -23,15 +31,7 @@
                                     "chromePlus":  "1.13.4",
                                     "download_url":  "https://edge.bibica.net/edge-canary-portable-x64_144.0.3718.0_1.13.4/edge-canary-portable-x64_144.0.3718.0_1.13.4.zip",
                                     "tag_name":  "edge-canary-portable-x64_144.0.3718.0_1.13.4"
-                                },
-                     "stable":  {
-                                    "version":  "142.0.3595.94",
-                                    "name":  "Microsoft Edge Stable",
-                                    "published_at":  "2025-11-20T20:31:16Z",
-                                    "chromePlus":  "1.13.3",
-                                    "download_url":  "https://edge.bibica.net/edge-stable-portable-x64_142.0.3595.94_1.13.3/edge-stable-portable-x64_142.0.3595.94_1.13.3.zip",
-                                    "tag_name":  "edge-stable-portable-x64_142.0.3595.94_1.13.3"
                                 }
                  },
-    "last_updated":  "2025-12-04T23:27:57Z"
+    "last_updated":  "2025-12-05T02:08:58Z"
 }
