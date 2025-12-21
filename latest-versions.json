@@ -9,12 +9,12 @@
                                   "tag_name":  "edge-beta-portable-x64_144.0.3719.11_1.13.5"
                               },
                      "stable":  {
-                                    "version":  "143.0.3650.80",
+                                    "version":  "143.0.3650.96",
                                     "name":  "Microsoft Edge Stable",
-                                    "published_at":  "2025-12-11T19:26:34Z",
+                                    "published_at":  "2025-12-21T06:34:01Z",
                                     "chromePlus":  "1.13.5",
-                                    "download_url":  "https://edge.bibica.net/edge-stable-portable-x64_143.0.3650.80_1.13.5/edge-stable-portable-x64_143.0.3650.80_1.13.5.zip",
-                                    "tag_name":  "edge-stable-portable-x64_143.0.3650.80_1.13.5"
+                                    "download_url":  "https://edge.bibica.net/edge-stable-portable-x64_143.0.3650.96_1.13.5/edge-stable-portable-x64_143.0.3650.96_1.13.5.zip",
+                                    "tag_name":  "edge-stable-portable-x64_143.0.3650.96_1.13.5"
                                 },
                      "dev":  {
                                  "version":  "145.0.3734.1",
@@ -25,13 +25,13 @@
                                  "tag_name":  "edge-dev-portable-x64_145.0.3734.1_1.13.5"
                              },
                      "canary":  {
-                                    "version":  "145.0.3743.0",
+                                    "version":  "145.0.3748.0",
                                     "name":  "Microsoft Edge Canary",
-                                    "published_at":  "2025-12-17T13:41:06Z",
+                                    "published_at":  "2025-12-21T06:35:15Z",
                                     "chromePlus":  "1.13.5",
-                                    "download_url":  "https://edge.bibica.net/edge-canary-portable-x64_145.0.3743.0_1.13.5/edge-canary-portable-x64_145.0.3743.0_1.13.5.zip",
-                                    "tag_name":  "edge-canary-portable-x64_145.0.3743.0_1.13.5"
+                                    "download_url":  "https://edge.bibica.net/edge-canary-portable-x64_145.0.3748.0_1.13.5/edge-canary-portable-x64_145.0.3748.0_1.13.5.zip",
+                                    "tag_name":  "edge-canary-portable-x64_145.0.3748.0_1.13.5"
                                 }
                  },
-    "last_updated":  "2025-12-17T13:41:10Z"
+    "last_updated":  "2025-12-21T06:38:56Z"
 }
