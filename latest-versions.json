@@ -17,12 +17,12 @@
                                  "tag_name":  "edge-dev-portable-x64_145.0.3775.0_1.14.0"
                              },
                      "canary":  {
-                                    "version":  "145.0.3783.0",
+                                    "version":  "145.0.3785.0",
                                     "name":  "Microsoft Edge Canary",
-                                    "published_at":  "2026-01-06T15:32:26Z",
+                                    "published_at":  "2026-01-07T18:43:48Z",
                                     "chromePlus":  "1.14.0",
-                                    "download_url":  "https://edge.bibica.net/edge-canary-portable-x64_145.0.3783.0_1.14.0/edge-canary-portable-x64_145.0.3783.0_1.14.0.zip",
-                                    "tag_name":  "edge-canary-portable-x64_145.0.3783.0_1.14.0"
+                                    "download_url":  "https://edge.bibica.net/edge-canary-portable-x64_145.0.3785.0_1.14.0/edge-canary-portable-x64_145.0.3785.0_1.14.0.zip",
+                                    "tag_name":  "edge-canary-portable-x64_145.0.3785.0_1.14.0"
                                 },
                      "stable":  {
                                     "version":  "143.0.3650.96",
@@ -33,5 +33,5 @@
                                     "tag_name":  "edge-stable-portable-x64_143.0.3650.96_1.13.5"
                                 }
                  },
-    "last_updated":  "2026-01-06T21:28:50Z"
+    "last_updated":  "2026-01-07T18:43:52Z"
 }
