@@ -1,12 +1,12 @@
 ﻿{
     "channels":  {
                      "beta":  {
-                                  "version":  "145.0.3800.13",
+                                  "version":  "145.0.3800.17",
                                   "name":  "Microsoft Edge Beta",
-                                  "published_at":  "2026-01-22T23:31:12Z",
+                                  "published_at":  "2026-01-24T08:36:07Z",
                                   "chromePlus":  "1.14.0",
-                                  "download_url":  "https://edge.bibica.net/edge-beta-portable-x64_145.0.3800.13_1.14.0/edge-beta-portable-x64_145.0.3800.13_1.14.0.zip",
-                                  "tag_name":  "edge-beta-portable-x64_145.0.3800.13_1.14.0"
+                                  "download_url":  "https://edge.bibica.net/edge-beta-portable-x64_145.0.3800.17_1.14.0/edge-beta-portable-x64_145.0.3800.17_1.14.0.zip",
+                                  "tag_name":  "edge-beta-portable-x64_145.0.3800.17_1.14.0"
                               },
                      "stable":  {
                                     "version":  "144.0.3719.92",
@@ -33,5 +33,5 @@
                                     "tag_name":  "edge-canary-portable-x64_146.0.3819.0_1.14.0"
                                 }
                  },
-    "last_updated":  "2026-01-23T23:29:26Z"
+    "last_updated":  "2026-01-24T08:36:10Z"
 }
