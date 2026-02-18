@@ -1,12 +1,12 @@
 ﻿{
     "channels":  {
                      "beta":  {
-                                  "version":  "145.0.3800.58",
+                                  "version":  "145.0.3800.65",
                                   "name":  "Microsoft Edge Beta",
-                                  "published_at":  "2026-02-14T08:44:38Z",
+                                  "published_at":  "2026-02-17T20:50:34Z",
                                   "chromePlus":  "1.15.0",
-                                  "download_url":  "https://edge.bibica.net/edge-beta-portable-x64_145.0.3800.58_1.15.0/edge-beta-portable-x64_145.0.3800.58_1.15.0.zip",
-                                  "tag_name":  "edge-beta-portable-x64_145.0.3800.58_1.15.0"
+                                  "download_url":  "https://edge.bibica.net/edge-beta-portable-x64_145.0.3800.65_1.15.0/edge-beta-portable-x64_145.0.3800.65_1.15.0.zip",
+                                  "tag_name":  "edge-beta-portable-x64_145.0.3800.65_1.15.0"
                               },
                      "stable":  {
                                     "version":  "145.0.3800.65",
@@ -25,13 +25,13 @@
                                  "tag_name":  "edge-dev-portable-x64_146.0.3844.0_1.15.0"
                              },
                      "canary":  {
-                                    "version":  "147.0.3866.0",
+                                    "version":  "147.0.3867.0",
                                     "name":  "Microsoft Edge Canary",
-                                    "published_at":  "2026-02-17T14:55:26Z",
+                                    "published_at":  "2026-02-18T02:49:30Z",
                                     "chromePlus":  "1.15.0",
-                                    "download_url":  "https://edge.bibica.net/edge-canary-portable-x64_147.0.3866.0_1.15.0/edge-canary-portable-x64_147.0.3866.0_1.15.0.zip",
-                                    "tag_name":  "edge-canary-portable-x64_147.0.3866.0_1.15.0"
+                                    "download_url":  "https://edge.bibica.net/edge-canary-portable-x64_147.0.3867.0_1.15.0/edge-canary-portable-x64_147.0.3867.0_1.15.0.zip",
+                                    "tag_name":  "edge-canary-portable-x64_147.0.3867.0_1.15.0"
                                 }
                  },
-    "last_updated":  "2026-02-17T20:50:36Z"
+    "last_updated":  "2026-02-18T02:49:34Z"
 }
