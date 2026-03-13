@@ -1,12 +1,20 @@
 ﻿{
     "channels":  {
+                     "canary":  {
+                                    "version":  "147.0.3912.0",
+                                    "name":  "Microsoft Edge Canary",
+                                    "published_at":  "2026-03-12T14:58:55Z",
+                                    "chromePlus":  "1.15.1",
+                                    "download_url":  "https://edge.bibica.net/edge-canary-portable-x64_147.0.3912.0_1.15.1/edge-canary-portable-x64_147.0.3912.0_1.15.1.zip",
+                                    "tag_name":  "edge-canary-portable-x64_147.0.3912.0_1.15.1"
+                                },
                      "beta":  {
-                                  "version":  "146.0.3856.54",
+                                  "version":  "146.0.3856.59",
                                   "name":  "Microsoft Edge Beta",
-                                  "published_at":  "2026-03-11T22:36:23Z",
+                                  "published_at":  "2026-03-13T19:38:56Z",
                                   "chromePlus":  "1.15.1",
-                                  "download_url":  "https://edge.bibica.net/edge-beta-portable-x64_146.0.3856.54_1.15.1/edge-beta-portable-x64_146.0.3856.54_1.15.1.zip",
-                                  "tag_name":  "edge-beta-portable-x64_146.0.3856.54_1.15.1"
+                                  "download_url":  "https://edge.bibica.net/edge-beta-portable-x64_146.0.3856.59_1.15.1/edge-beta-portable-x64_146.0.3856.59_1.15.1.zip",
+                                  "tag_name":  "edge-beta-portable-x64_146.0.3856.59_1.15.1"
                               },
                      "dev":  {
                                  "version":  "147.0.3901.1",
@@ -16,22 +24,14 @@
                                  "download_url":  "https://edge.bibica.net/edge-dev-portable-x64_147.0.3901.1_1.15.1/edge-dev-portable-x64_147.0.3901.1_1.15.1.zip",
                                  "tag_name":  "edge-dev-portable-x64_147.0.3901.1_1.15.1"
                              },
-                     "canary":  {
-                                    "version":  "147.0.3912.0",
-                                    "name":  "Microsoft Edge Canary",
-                                    "published_at":  "2026-03-12T14:58:55Z",
-                                    "chromePlus":  "1.15.1",
-                                    "download_url":  "https://edge.bibica.net/edge-canary-portable-x64_147.0.3912.0_1.15.1/edge-canary-portable-x64_147.0.3912.0_1.15.1.zip",
-                                    "tag_name":  "edge-canary-portable-x64_147.0.3912.0_1.15.1"
-                                },
                      "stable":  {
-                                    "version":  "145.0.3800.82",
+                                    "version":  "146.0.3856.59",
                                     "name":  "Microsoft Edge Stable",
-                                    "published_at":  "2026-03-09T17:54:15Z",
+                                    "published_at":  "2026-03-13T19:37:34Z",
                                     "chromePlus":  "1.15.1",
-                                    "download_url":  "https://edge.bibica.net/edge-stable-portable-x64_145.0.3800.82_1.15.1/edge-stable-portable-x64_145.0.3800.82_1.15.1.zip",
-                                    "tag_name":  "edge-stable-portable-x64_145.0.3800.82_1.15.1"
+                                    "download_url":  "https://edge.bibica.net/edge-stable-portable-x64_146.0.3856.59_1.15.1/edge-stable-portable-x64_146.0.3856.59_1.15.1.zip",
+                                    "tag_name":  "edge-stable-portable-x64_146.0.3856.59_1.15.1"
                                 }
                  },
-    "last_updated":  "2026-03-12T14:59:10Z"
+    "last_updated":  "2026-03-13T19:39:01Z"
 }
