@@ -1,20 +1,20 @@
 ﻿{
     "channels":  {
                      "canary":  {
-                                    "version":  "147.0.3912.0",
+                                    "version":  "148.0.3920.0",
                                     "name":  "Microsoft Edge Canary",
-                                    "published_at":  "2026-03-12T14:58:55Z",
+                                    "published_at":  "2026-03-16T22:42:34Z",
                                     "chromePlus":  "1.15.1",
-                                    "download_url":  "https://edge.bibica.net/edge-canary-portable-x64_147.0.3912.0_1.15.1/edge-canary-portable-x64_147.0.3912.0_1.15.1.zip",
-                                    "tag_name":  "edge-canary-portable-x64_147.0.3912.0_1.15.1"
+                                    "download_url":  "https://edge.bibica.net/edge-canary-portable-x64_148.0.3920.0_1.15.1/edge-canary-portable-x64_148.0.3920.0_1.15.1.zip",
+                                    "tag_name":  "edge-canary-portable-x64_148.0.3920.0_1.15.1"
                                 },
                      "beta":  {
-                                  "version":  "146.0.3856.59",
+                                  "version":  "146.0.3856.62",
                                   "name":  "Microsoft Edge Beta",
-                                  "published_at":  "2026-03-13T19:38:56Z",
+                                  "published_at":  "2026-03-15T18:54:18Z",
                                   "chromePlus":  "1.15.1",
-                                  "download_url":  "https://edge.bibica.net/edge-beta-portable-x64_146.0.3856.59_1.15.1/edge-beta-portable-x64_146.0.3856.59_1.15.1.zip",
-                                  "tag_name":  "edge-beta-portable-x64_146.0.3856.59_1.15.1"
+                                  "download_url":  "https://edge.bibica.net/edge-beta-portable-x64_146.0.3856.62_1.15.1/edge-beta-portable-x64_146.0.3856.62_1.15.1.zip",
+                                  "tag_name":  "edge-beta-portable-x64_146.0.3856.62_1.15.1"
                               },
                      "dev":  {
                                  "version":  "147.0.3901.1",
@@ -33,5 +33,5 @@
                                     "tag_name":  "edge-stable-portable-x64_146.0.3856.62_1.15.1"
                                 }
                  },
-    "last_updated":  "2026-03-15T18:54:23Z"
+    "last_updated":  "2026-03-16T22:42:40Z"
 }
