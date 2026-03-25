@@ -1,0 +1,7 @@
+Windows Registry Editor Version 5.00
+
+; Phục hồi về mặc định
+[-HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Edge]
+[-HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\EdgeUpdate]
+[-HKEY_CURRENT_USER\Software\Policies\Microsoft\Edge]
+[-HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\EdgeUpdate]
