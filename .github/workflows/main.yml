@@ -315,7 +315,7 @@ jobs:
         }
         
         foreach ($release in $allReleases) {
-          if ($release.tag_name -match '^edge-(stable|beta|dev|canary)-portable-x64_([\d\.]+)_([\d\.]+)$') {
+          if ($release.tag_name -match '^edge-(stable|beta|dev|canary)-portable-x64_([^_]+)_([^_]+)$') {
             $channel = $matches[1]
             $edgeVer = $matches[2]
             $chromePlusVer = $matches[3]
