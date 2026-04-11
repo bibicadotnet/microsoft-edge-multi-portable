@@ -124,7 +124,7 @@ jobs:
       shell: powershell
       run: |
         try {
-          $chromePlusRelease = Invoke-RestMethod "https://api.github.com/repos/bibicadotnet/Build_Edge_Verison_chrome_plus/releases/latest"
+          $chromePlusRelease = Invoke-RestMethod "https://api.github.com/repos/bibicadotnet/Chromium_SetDLL/releases/latest"
           $chromePlusVersion = $chromePlusRelease.tag_name
           Add-Content -Path $env:GITHUB_OUTPUT -Value "CHROMEPLUS_VERSION=$chromePlusVersion"
           Write-Host "Chrome++ version: $chromePlusVersion" -ForegroundColor Green
@@ -195,7 +195,7 @@ jobs:
             (New-Object System.Net.WebClient).DownloadFile($assetUrl, $assetPath)
             (New-Object System.Net.WebClient).DownloadFile("https://www.7-zip.org/a/7zr.exe", "$tempDir\7zr.exe")
             
-            $chromePlusUrl = "https://github.com/bibicadotnet/Build_Edge_Verison_chrome_plus/releases/download/$chromePlusVer/setdll.7z"
+            $chromePlusUrl = "https://github.com/bibicadotnet/Chromium_SetDLL/releases/download/$chromePlusVer/setdll.7z"
             (New-Object System.Net.WebClient).DownloadFile($chromePlusUrl, "$tempDir\setdll.7z")
 
             Copy-Item "$env:GITHUB_WORKSPACE\chrome++.ini" "$edgePath\chrome++.ini" -Force
@@ -315,7 +315,7 @@ jobs:
         }
         
         foreach ($release in $allReleases) {
-          if ($release.tag_name -match '^edge-(stable|beta|dev|canary)-portable-x64_([^_]+)_([^_]+)$') {
+          if ($release.tag_name -match '^edge-(stable|beta|dev|canary)-portable-x64_([\d\.]+)_([\d\.]+)$') {
             $channel = $matches[1]
             $edgeVer = $matches[2]
             $chromePlusVer = $matches[3]
