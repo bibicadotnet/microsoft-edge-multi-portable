@@ -66,9 +66,6 @@ Windows Registry Editor Version 5.00
 ;Tắt nhãn hình ảnh trợ năng
 "AccessibilityImageLabelsEnabled"=dword:00000000
 
-;Tắt nhà cung cấp tìm kiếm Bing trong thanh địa chỉ
-;"AddressBarMicrosoftSearchInBingProviderEnabled"=dword:00000000
-
 ;Tắt menu trò chơi
 "AllowGamesMenu"=dword:00000000
 
@@ -225,8 +222,7 @@ Windows Registry Editor Version 5.00
 ;Tắt chủ đề AI
 "AIGenThemesEnabled"=dword:00000000
 
-;Tắt Access Code Cast
-"AccessCodeCastEnabled"=dword:00000000
+
 
 ;Tắt minh bạch quảng cáo
 "AdsTransparencyEnabled"=dword:00000000
@@ -258,29 +254,11 @@ Windows Registry Editor Version 5.00
 ;Tắt kiểm tra Typosquatting
 "TyposquattingCheckerEnabled"=dword:00000000
 
-;Tắt chặn đăng nhập
-"SigninInterceptionEnabled"=dword:00000000
-
-;Tắt tìm kiếm bên
-"SideSearchEnabled"=dword:00000000
-
 ;Tắt đề xuất PDF mặc định
 "ShowPDFDefaultRecommendationsEnabled"=dword:00000000
 
 ;Tắt nút trang chủ
 "ShowHomeButton"=dword:00000000
-
-;Tắt danh sách mua sắm
-"ShoppingListEnabled"=dword:00000000
-
-;Tắt khảo sát Safe Browsing
-"SafeBrowsingSurveysEnabled"=dword:00000000
-
-;Tắt quét sâu Safe Browsing
-"SafeBrowsingDeepScanningEnabled"=dword:00000000
-
-;Tắt kiểm tra thời gian thực ủy quyền Safe Browsing
-"SafeBrowsingProxiedRealTimeChecksAllowed"=dword:00000000
 
 ;Tắt bỏ qua cảnh báo mật khẩu bị xâm phạm
 "PasswordDismissCompromisedAlertEnabled"=dword:00000000
@@ -290,9 +268,6 @@ Windows Registry Editor Version 5.00
 
 ;Tắt quản lý Edge
 "EdgeManagementEnabled"=dword:00000000
-
-;Tắt Desktop Sharing Hub
-"DesktopSharingHubEnabled"=dword:00000000
 
 ;Tắt ngữ cảnh trang Copilot
 "CopilotPageContextEnabled"=dword:00000000
@@ -423,22 +398,3 @@ Windows Registry Editor Version 5.00
 ; Cài đặt plugin Minimal New Tab
 [HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\Edge\ExtensionInstallForcelist]
 "1"="khdnagehanbomfdogegmpddmcalmdnbg"
-
-; ====================================
-; CÁC TÍNH NĂNG TẠM TẮT - GHI CHÚ LẠI
-; ====================================
-
-; [HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\Edge\ExtensionSettings]
-; Cài đặt plugin Canvas Blocker - Fingerprint Protect (có thể tắt nếu thích)
-; "ahiddppepedlomdleppkbljnmkchlmdc"="{\"update_url\":\"https://edge.microsoft.com/extensionwebstorebase/v1/crx\",\"installation_mode\":\"normal_installed\"}"
-
-; Khi bật gợi ý tìm kiếm, trình duyệt không bật lên được (bỏ tính năng này)
-;"SearchSuggestEnabled"=dword:00000001
-
-; Bắt buộc dùng HTTPS (hỗ trợ từ phiên bản 140) (tạm tắt)
-; Không cần thiết, user tự quản lý
-;"HttpsOnlyMode"="force_enabled"
-
-; Tự động chạy HTTPS
-; Không cần thiết, user tự quản lý
-;"HttpsUpgradesEnabled"=dword:00000001
