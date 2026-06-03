@@ -222,8 +222,6 @@ Windows Registry Editor Version 5.00
 ;Tắt chủ đề AI
 "AIGenThemesEnabled"=dword:00000000
 
-
-
 ;Tắt minh bạch quảng cáo
 "AdsTransparencyEnabled"=dword:00000000
 
@@ -390,6 +388,11 @@ Windows Registry Editor Version 5.00
 ; Cloudflare Gateway DNS ECS (chặn quảng cáo bởi bộ lọc AdGuard và ABPVN)
 "DnsOverHttpsMode"="secure"
 "DnsOverHttpsTemplates"="https://iabucttpma.cloudflare-gateway.com/dns-query{?dns}"
+
+; v148
+"AllowBrowsingWithCopilot"=dword:00000000
+"BuiltInAIAPIsEnabled"=dword:00000000
+"ApplicationBoundEncryptionEnabled"=dword:00000000
 
 ; Chặn New Tab mặc định
 [HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\Edge\URLBlocklist]
