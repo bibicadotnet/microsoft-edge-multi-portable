@@ -1,5 +1,7 @@
 ﻿# Microsoft Edge (Stable, Beta, Dev, Canary) Portable
 
+- Please try version v2 [here](https://github.com/bibicadotnet/edge-portable-chrome-next-mini/)
+
 No installation required. Keeps all history, cookies, extensions, and settings even when moved to another device.
 
 ### Script features:
