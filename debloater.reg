@@ -1,403 +1,570 @@
 Windows Registry Editor Version 5.00
 
-; Phục hồi về mặc định
+; Khôi phục về mặc định / Restore to default
 [-HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Edge]
 [-HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\EdgeUpdate]
 [-HKEY_CURRENT_USER\Software\Policies\Microsoft\Edge]
 [-HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\EdgeUpdate]
 
-; Cấu hình cài đặt
 [HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\Edge]
 
-;Tắt màn hình chào mừng khi khởi chạy Edge lần đầu
+; Hide the First-run experience and splash screen
+; Tắt màn hình chào mừng khi khởi chạy Edge lần đầu
 "HideFirstRunExperience"=dword:00000001
 
-;Vô hiệu hóa tính năng tìm kiếm trong thanh bên
+; Disable the search in sidebar feature
+; Vô hiệu hóa tính năng tìm kiếm trong thanh bên
 "SearchInSidebarEnabled"=dword:00000002
 
-;Tắt tính năng Hubs Sidebar
+; Disable the Sidebar launcher bar
+; Tắt thanh khởi chạy Sidebar ở bên phải
 "HubsSidebarEnabled"=dword:00000000
 
-;Tắt tính năng đọc to (Read Aloud)
+; Disable the Read Aloud feature
+; Tắt tính năng Đọc to (Read Aloud)
 "ReadAloudEnabled"=dword:00000000
 
-;Tắt gửi dữ liệu chẩn đoán
+; Disable sending required and optional diagnostic data to Microsoft
+; Tắt gửi dữ liệu chẩn đoán bắt buộc và tùy chọn cho Microsoft
 "DiagnosticData"=dword:00000000
 
-;Tắt gửi URL để phân tích lỗi (UrlDiagnosticDataEnabled)
+; Disable sending URLs of pages visited to Microsoft
+; Tắt gửi URL các trang đã truy cập cho Microsoft
 "UrlDiagnosticDataEnabled"=dword:00000000
 
-;Tắt ghim nút Browser Essentials trên thanh công cụ
+; Unpin the Browser Essentials button from the toolbar
+; Không ghim nút Browser Essentials lên thanh công cụ
 "PinBrowserEssentialsToolbarButton"=dword:00000000
 
-;Tắt tính năng Collections
+; Disable the Collections feature
+; Tắt tính năng Bộ sưu tập (Collections)
 "EdgeCollectionsEnabled"=dword:00000000
 
-;Tắt báo cáo cá nhân hóa
+; Disable sending browsing history to personalize recommendations
+; Tắt gửi lịch sử duyệt web để cá nhân hóa đề xuất
 "PersonalizationReportingEnabled"=dword:00000000
 
-;Tắt tính năng chia đôi màn hình
+; Disable the split screen feature
+; Tắt tính năng chia đôi màn hình
 "SplitScreenEnabled"=dword:00000000
 
-;Tắt tính năng chụp web
+; Disable the Screenshot (formerly web capture) feature
+; Tắt tính năng Chụp ảnh màn hình (Screenshot/Web capture)
 "WebCaptureEnabled"=dword:00000000
 
-;Tắt tính năng chuyển đổi có hướng dẫn
+; Disable prompting to switch profiles for personal/work links
+; Tắt nhắc chuyển hồ sơ cho liên kết cá nhân/công việc
 "GuidedSwitchEnabled"=dword:00000000
 
-;Tắt hiển thị Microsoft Rewards
+; Disable Microsoft Rewards experiences
+; Tắt hiển thị trải nghiệm Microsoft Rewards
 "ShowMicrosoftRewards"=dword:00000000
 
-;Tắt tính năng nhập tự động và phần nhập của trải nghiệm lần chạy đầu tiên bị bỏ qua
+; Disable automatic import of browser data and settings at first run
+; Tắt tự động nhập dữ liệu từ trình duyệt khác trong lần chạy đầu tiên
 "AutoImportAtFirstRun"=dword:00000004
 
-;Tắt tính năng Workspaces
+; Disable Microsoft Edge Workspaces
+; Tắt Không gian làm việc (Workspaces) của Edge
 "EdgeWorkspacesEnabled"=dword:00000000
 
-;Tắt tính năng thanh toán Edge Wallet
+; Disable Edge Wallet checkout
+; Tắt tính năng thanh toán nhanh bằng Edge Wallet
 "EdgeWalletCheckoutEnabled"=dword:00000000
 
-;Tắt tính năng Etree trong Edge Wallet
+; Disable the E-Tree feature in Edge Wallet
+; Tắt tính năng E-Tree trong Edge Wallet
 "EdgeWalletEtreeEnabled"=dword:00000000
 
-;Tắt SSO website AAD
+; Disable single sign-on (SSO) for Microsoft Entra ID personal sites
+; Tắt đăng nhập một lần (SSO) cho các trang web cá nhân Microsoft Entra ID
 "AADWebSiteSSOUsingThisProfileEnabled"=dword:00000000
 
-;Tắt nhãn hình ảnh trợ năng
+; Disable descriptions of unlabeled images for screen readers
+; Tắt mô tả hình ảnh không có nhãn cho trình đọc màn hình
 "AccessibilityImageLabelsEnabled"=dword:00000000
 
-;Tắt menu trò chơi
+; Disable the Games menu
+; Tắt menu Trò chơi
 "AllowGamesMenu"=dword:00000000
 
-;Tắt soạn thảo nội tuyến
+; Disable writing support features like Rewrite
+; Tắt các tính năng hỗ trợ viết như Viết lại (Rewrite)
 "ComposeInlineEnabled"=dword:00000000
 
-;Tắt tự động đăng nhập tài khoản tại chỗ
+; Disable automatic sign-in with Azure AD accounts
+; Tắt tự động đăng nhập bằng tài khoản Azure AD
 "ConfigureOnPremisesAccountAutoSignIn"=dword:00000000
 
-;Tắt cấu hình chuyển văn bản thành giọng nói trực tuyến
+; Disable Online Text to Speech voice fonts
+; Tắt phông chữ chuyển văn bản thành giọng nói trực tuyến
 "ConfigureOnlineTextToSpeech"=dword:00000000
 
-;Tắt cấu hình chia sẻ
+; Disable the Share experience with other apps
+; Tắt tính năng Chia sẻ với các ứng dụng khác
 "ConfigureShare"=dword:00000000
 
-;Tắt chiến dịch cài đặt trình duyệt mặc định
+; Disable the campaign to set Edge as default browser
+; Tắt chiến dịch gợi ý đặt Edge làm trình duyệt mặc định
 "DefaultBrowserSettingsCampaignEnabled"=dword:00000000
 
-;Tắt telemetry SERP bên thứ 3
+; Disable capturing searches on third-party providers
+; Tắt thu thập từ khóa tìm kiếm trên bên thứ ba
 "Edge3PSerpTelemetryEnabled"=dword:00000000
 
-;Tắt tính năng Edge Drop
+; Disable the Drop feature
+; Tắt tính năng chia sẻ tệp Drop
 "EdgeEDropEnabled"=dword:00000000
 
-;Tắt tính năng quyên góp qua Wallet
+; Disable the Edge Wallet donation feature
+; Tắt tính năng quyên góp qua Edge Wallet
 "WalletDonationEnabled"=dword:00000000
 
-;Tắt nhập dữ liệu mỗi khi khởi chạy
+; Disable prompt to import browsing data on each launch
+; Tắt lời nhắc nhập dữ liệu duyệt web ở mỗi lần khởi chạy
 "ImportOnEachLaunch"=dword:00000000
 
-;Tắt hỗ trợ trong ứng dụng
+; Disable in-app support for contacting agents directly
+; Tắt tính năng liên hệ trực tiếp nhân viên hỗ trợ trong ứng dụng
 "InAppSupportEnabled"=dword:00000000
 
-;Tắt chia sẻ dữ liệu trình duyệt cục bộ
+; Disable Windows indexing of locally stored Edge browsing data
+; Tắt việc Windows lập chỉ mục dữ liệu duyệt web của Edge
 "LocalBrowserDataShareEnabled"=dword:00000000
 
-;Tắt phụ đề trực tiếp
+; Disable the Live captions feature
+; Tắt tính năng Phụ đề trực tiếp (Live captions)
 "LiveCaptionsAllowed"=dword:00000000
 
-;Tắt SSO website MSA
+; Disable single sign-on for Microsoft personal sites using MSA credentials
+; Tắt SSO cho các trang web cá nhân Microsoft bằng tài khoản MSA
 "MSAWebSiteSSOUsingThisProfileAllowed"=dword:00000000
 
-;Tắt quảng cáo Microsoft Edge Insider
+; Disable content promoting the Edge Insider channels
+; Tắt quảng bá các kênh Edge Insider
 "MicrosoftEdgeInsiderPromotionEnabled"=dword:00000000
 
-;Tắt từ đồng nghĩa Microsoft Editor
+; Disable synonyms feature of Microsoft Editor
+; Tắt tính năng từ đồng nghĩa của Microsoft Editor
 "MicrosoftEditorSynonymsEnabled"=dword:00000000
 
-;Tắt kiểm tra chính tả Microsoft Editor
+; Disable enhanced spell and grammar checking via Microsoft Editor
+; Tắt kiểm tra chính tả và ngữ pháp nâng cao qua Microsoft Editor
 "MicrosoftEditorProofingEnabled"=dword:00000000
 
-;Tắt Related Website Sets
+; Disable Related Website Sets
+; Tắt Related Website Sets (ngăn các web liên quan xem hoạt động của bạn)
 "RelatedWebsiteSetsEnabled"=dword:00000000
 
-;Tắt truy vấn phương thức thanh toán
+; Disable websites from checking if payment methods are saved
+; Tắt việc cho phép trang web kiểm tra phương thức thanh toán đã lưu
 "PaymentMethodQueryEnabled"=dword:00000000
 
-;Tắt Pinning Wizard
+; Disable the Pin to taskbar wizard
+; Tắt thuật sĩ ghim trang web vào thanh tác vụ
 "PinningWizardAllowed"=dword:00000000
 
-;Tắt tab quảng cáo
+; Disable full-tab promotional or educational content
+; Tắt nội dung quảng cáo hoặc giáo dục toàn tab
 "PromotionalTabsEnabled"=dword:00000000
 
-;Tắt hiển thị menu nhỏ tìm kiếm nhanh
-;"QuickSearchShowMiniMenu"=dword:00000000
-
-;Tắt xem nhanh file Office
+; Disable viewing publicly accessible Office files on the web
+; Tắt xem nhanh các tệp Office công khai trên web
 "QuickViewOfficeFilesEnabled"=dword:00000000
 
-;Tắt gỡ lỗi từ xa
+; Disable remote debugging
+; Tắt gỡ lỗi từ xa (remote debugging)
 "RemoteDebuggingAllowed"=dword:00000000
 
-;Tắt sử dụng dịch vụ web để giải quyết lỗi điều hướng
+; Disable probing networks for connectivity (like hotel Wi-Fi)
+; Tắt thăm dò kết nối mạng (như Wi-Fi khách sạn)
 "ResolveNavigationErrorsUseWebService"=dword:00000000
 
-;Tắt hỗ trợ hồ sơ di động
+; Disable roaming profiles for saving Edge settings
+; Tắt sử dụng cấu hình chuyển vùng để lưu cài đặt Edge
 "RoamingProfileSupportEnabled"=dword:00000000
 
-;Tắt tìm kiếm bằng hình ảnh
+; Disable the Image Search feature in the context menu
+; Tắt tính năng Tìm kiếm hình ảnh trong menu chuột phải
 "SearchForImageEnabled"=dword:00000000
 
-;Tắt bộ lọc tìm kiếm
+; Disable search filters in the autosuggestions ribbon
+; Tắt các bộ lọc trong thanh đề xuất tìm kiếm
 "SearchFiltersEnabled"=dword:00000000
 
-;Tắt thanh tìm kiếm
+; Disable the search bar web widget on desktop
+; Tắt thanh tìm kiếm trên màn hình desktop
 "SearchbarAllowed"=dword:00000000
 
-;Tắt thanh tìm kiếm khi khởi động
+; Disable the Search bar starting at Windows startup
+; Tắt việc khởi chạy thanh tìm kiếm cùng Windows
 "SearchbarIsEnabledOnStartup"=dword:00000000
 
-;Tắt liên kết chia sẻ
+; Disable shared links
+; Tắt hiển thị các liên kết được chia sẻ
 "SharedLinksEnabled"=dword:00000000
 
-;Tắt nút đăng ký Acrobat
+; Disable the Acrobat premium subscription button in PDF viewer
+; Tắt nút đăng ký dịch vụ Acrobat cao cấp trong trình xem PDF
 "ShowAcrobatSubscriptionButton"=dword:00000000
 
-;Tắt lối tắt Office trong thanh yêu thích
+; Disable showing Office shortcut in Favorites bar
+; Tắt lối tắt Office trên thanh Yêu thích
 "ShowOfficeShortcutInFavoritesBar"=dword:00000000
 
-;Tắt đề xuất
+; Disable in-browser assistance notifications for feature recommendations
+; Tắt các thông báo đề xuất tính năng trong trình duyệt
 "ShowRecommendationsEnabled"=dword:00000000
 
-;Tắt nhận dạng giọng nói
+; Disable websites from using the Web Speech API
+; Tắt cho phép trang web sử dụng API Web Speech để nhận dạng giọng nói
 "SpeechRecognitionEnabled"=dword:00000000
 
-;Tắt Hubs Sidebar độc lập
+; Disable the standalone Hubs Sidebar feature
+; Tắt tính năng Hubs Sidebar độc lập
 "StandaloneHubsSidebarEnabled"=dword:00000000
 
-;Tắt dịch vụ tab
+; Disable the tab organization service
+; Tắt dịch vụ tổ chức tab tự động
 "TabServicesEnabled"=dword:00000000
 
-;Tắt dự đoán văn bản
+; Disable text predictions for long-form text fields
+; Tắt tự động dự đoán văn bản
 "TextPredictionEnabled"=dword:00000000
 
-;Tắt tải lên từ điện thoại
+; Disable the "Upload from mobile" feature
+; Tắt tính năng "Tải lên từ thiết bị di động"
 "UploadFromPhoneEnabled"=dword:00000000
 
-;Tắt tìm kiếm hình ảnh
+; Disable Visual search for exploring images
+; Tắt Tìm kiếm trực quan trong hình ảnh
 "VisualSearchEnabled"=dword:00000000
 
-;Chuyển hướng hộp tìm kiếm trang tab mới
+; Redirect the new tab page search box to use the Address bar
+; Chuyển hướng hộp tìm kiếm của trang tab mới sang thanh địa chỉ
 "NewTabPageSearchBox"="redirect"
 
-;Tắt trình tạo mật khẩu
+; Disable Password Generator
+; Tắt Trình tạo mật khẩu
 "PasswordGeneratorEnabled"=dword:00000000
 
-;Tắt trình quản lý mật khẩu
+; Disable saving user passwords
+; Tắt lưu mật khẩu người dùng
 "PasswordManagerEnabled"=dword:00000000
 
-;Tắt giám sát mật khẩu
+; Disable monitoring user passwords for leaks
+; Tắt giám sát rò rỉ mật khẩu người dùng
 "PasswordMonitorAllowed"=dword:00000000
 
-;Tắt cảnh báo bảo vệ mật khẩu
+; Disable password protection warning triggers
+; Tắt cảnh báo bảo vệ mật khẩu
 "PasswordProtectionWarningTrigger"=dword:00000000
 
-;Tắt trang lỗi thay thế
+; Disable alternate error pages for HTTP error codes
+; Tắt các trang lỗi thay thế cho các mã lỗi HTTP
 "AlternateErrorPagesEnabled"=dword:00000000
 
-;Tắt hỏi khi đóng cửa sổ trình duyệt có nhiều tab
+; Disable confirmation dialog before closing a window with multiple tabs
+; Tắt hộp thoại xác nhận khi đóng cửa sổ có nhiều tab
 "AskBeforeCloseEnabled"=dword:00000000
 
-;Tắt tự động điền địa chỉ
+; Disable AutoFill feature for addresses
+; Tắt tự động điền địa chỉ
 "AutofillAddressEnabled"=dword:00000000
 
-;Tắt tự động điền thẻ tín dụng
+; Disable AutoFill feature for credit cards
+; Tắt tự động điền thẻ tín dụng
 "AutofillCreditCardEnabled"=dword:00000000
 
-;Tắt tự động điền thành viên
+; Disable AutoFill feature for membership info
+; Tắt tự động điền thông tin thẻ thành viên
 "AutofillMembershipsEnabled"=dword:00000000
 
-;Tắt SSO web AAD
+; Disable single sign-on (SSO) for Microsoft Entra ID websites
+; Tắt đăng nhập một lần (SSO) cho các trang web Microsoft Entra ID
 "AADWebSSOAllowed"=dword:00000000
 
-;Tắt chủ đề AI
-"AIGenThemesEnabled"=dword:00000000
-
-;Tắt minh bạch quảng cáo
+; Disable ads transparency feature for tracking prevention
+; Tắt tính năng minh bạch quảng cáo trong ngăn chặn theo dõi
 "AdsTransparencyEnabled"=dword:00000000
 
-;Tắt Edge Admin Center
+; Disable the Edge Admin Center
+; Tắt Trung tâm Quản trị Edge (Edge Admin Center)
 "EdgeAdminCenterEnabled"=dword:00000000
 
-;Chặn quảng cáo Bing
+; Enable an ad-free search experience on Bing.com
+; Bật trải nghiệm tìm kiếm không quảng cáo trên Bing.com
 "BingAdsSuppression"=dword:00000001
 
-;Bật cấu hình Do Not Track
+; Send Do Not Track requests to websites
+; Gửi yêu cầu Không theo dõi (Do Not Track) tới các trang web
 "ConfigureDoNotTrack"=dword:00000001
 
-;Tắt dịch vụ phân phối tài nguyên Edge
+; Disable the Edge Asset Delivery Service
+; Tắt Dịch vụ Phân phối Tài nguyên của Edge
 "EdgeAssetDeliveryServiceEnabled"=dword:00000000
 
-;Tắt trợ lý mua sắm Edge
+; Disable Edge Shopping Assistant
+; Tắt Trợ lý Mua sắm (Shopping Assistant)
 "EdgeShoppingAssistantEnabled"=dword:00000000
 
-;Tắt dịch vụ thử nghiệm và cấu hình
-;"ExperimentationAndConfigurationServiceControl"=dword:00000000
-
-;Tắt phản hồi người dùng
+; Disable providing user feedback to Microsoft
+; Tắt tính năng gửi phản hồi cho Microsoft
 "UserFeedbackAllowed"=dword:00000000
 
-;Tắt Web Widget
+; Disable the search bar web widget
+; Tắt widget tìm kiếm web trên màn hình
 "WebWidgetAllowed"=dword:00000000
 
-;Tắt kiểm tra Typosquatting
+; Disable Edge Website Typo Protection
+; Tắt bảo vệ lỗi chính tả trang web (chống lừa đảo)
 "TyposquattingCheckerEnabled"=dword:00000000
 
-;Tắt đề xuất PDF mặc định
+; Disable default PDF recommendations
+; Tắt các đề xuất PDF mặc định
 "ShowPDFDefaultRecommendationsEnabled"=dword:00000000
 
-;Tắt nút trang chủ
+; Hide the Home button on Microsoft Edge's toolbar
+; Ẩn nút Trang chủ trên thanh công cụ của Edge
 "ShowHomeButton"=dword:00000000
 
-;Tắt bỏ qua cảnh báo mật khẩu bị xâm phạm
+; Disable dismissing compromised password alerts
+; Tắt tính năng bỏ qua cảnh báo mật khẩu bị xâm phạm
 "PasswordDismissCompromisedAlertEnabled"=dword:00000000
 
-;Tắt MAM
+; Disable retrieving policies from Intune
+; Tắt nhận chính sách từ dịch vụ Intune
 "MAMEnabled"=dword:00000000
 
-;Tắt quản lý Edge
+; Disable Microsoft Edge management service
+; Tắt dịch vụ quản lý Microsoft Edge
 "EdgeManagementEnabled"=dword:00000000
 
-;Tắt ngữ cảnh trang Copilot
-"CopilotPageContextEnabled"=dword:00000000
-
-;Tắt nội dung trang tab mới
+; Disable Enterprise new tab page content
+; Tắt nội dung trang tab mới dành cho Doanh nghiệp
 "NewTabPageContentEnabled"=dword:00000000
 
-;Tắt trình khởi chạy ứng dụng trang tab mới
+; Hide the App Launcher on the new tab page
+; Ẩn Trình khởi chạy ứng dụng trên trang tab mới
 "NewTabPageAppLauncherEnabled"=dword:00000000
 
-;Tắt Bing Chat trên trang tab mới
+; Hide Bing Chat entry points on the new tab page
+; Ẩn các điểm truy cập Bing Chat trên trang tab mới
 "NewTabPageBingChatEnabled"=dword:00000000
 
-;Tắt liên kết nhanh trang tab mới
+; Hide quick links on the new tab page
+; Ẩn các liên kết nhanh trên trang tab mới
 "NewTabPageQuickLinksEnabled"=dword:00000000
 
-;Tắt tạo mã QR
+; Disable the QR Code generator feature
+; Tắt tính năng tạo Mã QR
 "QRCodeGeneratorEnabled"=dword:00000000
 
-;Tắt trải nghiệm Spotlight và đề xuất
+; Disable customized background images and Spotlight experiences
+; Tắt hình nền tùy chỉnh và trải nghiệm Spotlight
 "SpotlightExperiencesAndRecommendationsEnabled"=dword:00000000
 
-;Cấu hình ngăn chặn theo dõi ở mức balanced
+; Set tracking prevention to Balanced mode
+; Bật ngăn chặn theo dõi ở mức Cân bằng
 "TrackingPrevention"=dword:00000002
 
-;Hỗ trợ Manifest V2 cho tiện ích mở rộng
+; Allow the use of Manifest V2 extensions
+; Cho phép sử dụng tiện ích mở rộng Manifest V2
 "ExtensionManifestV2Availability"=dword:00000002
 
-;Tắt DNS client tích hợp
+; Disable the built-in DNS client
+; Tắt máy khách DNS tích hợp sẵn
 "BuiltInDnsClientEnabled"=dword:00000000
 
-;Tắt quy trình xác thực chủ động
+; Disable proactive authentication with Bing, MSN, and Copilot
+; Tắt xác thực chủ động với Bing, MSN và Copilot
 "ProactiveAuthWorkflowEnabled"=dword:00000000
 
-;Tắt đồng bộ yêu thích Application Guard
+; Disable syncing favorites to the Application Guard container
+; Tắt đồng bộ mục yêu thích sang Application Guard
 "ApplicationGuardFavoritesSyncEnabled"=dword:00000000
 
-;Tắt nhận diện lưu lượng Application Guard
+; Disable extra HTTP header in Application Guard outbound requests
+; Tắt tiêu đề HTTP phụ trong các yêu cầu từ Application Guard
 "ApplicationGuardTrafficIdentificationEnabled"=dword:00000000
 
-;Tắt đăng nhập liền mạch từ web sang trình duyệt
+; Disable seamless web-to-browser sign-in
+; Tắt đăng nhập liền mạch từ web sang trình duyệt
 "SeamlessWebToBrowserSignInEnabled"=dword:00000000
 
-;Tắt tự động điền ML
+; Disable ML technology for predicting and filling forms
+; Tắt công nghệ Máy học (ML) dự đoán và điền biểu mẫu
 "EdgeAutofillMlEnabled"=dword:00000000
 
-;Tắt cài đặt mô hình nền tảng GenAI cục bộ
-"GenAILocalFoundationalModelSettings"=dword:00000001
-
-;Tắt cá nhân hóa trang web hàng đầu trong tùy chỉnh thanh bên
+; Disable personalizing top sites in the customize sidebar
+; Tắt cá nhân hóa các trang web hàng đầu trong thanh bên
 "PersonalizeTopSitesInCustomizeSidebarEnabled"=dword:00000000
 
-;Tắt phát hiện hiệu suất
+; Disable performance detector for tab issues
+; Tắt phát hiện các vấn đề về hiệu suất tab
 "PerformanceDetectorEnabled"=dword:00000000
 
-;Tắt ngữ cảnh trang Copilot Entra
-"EdgeEntraCopilotPageContext"=dword:00000000
-
-;Tắt kiểm tra chính tả
+; Disable the spellcheck feature
+; Tắt tính năng kiểm tra chính tả
 "SpellcheckEnabled"=dword:00000000
 
-;Tắt kết quả tìm kiếm công việc trong thanh địa chỉ
+; Disable relevant workplace suggestions in the address bar
+; Tắt hiển thị đề xuất nơi làm việc trên thanh địa chỉ
 "AddressBarWorkSearchResultsEnabled"=dword:00000000
 
-;Tắt bảo vệ Scareware Blocker
+; Disable Scareware blocker
+; Tắt Trình chặn phần mềm hù dọa (Scareware blocker)
 "ScarewareBlockerProtectionEnabled"=dword:00000000
 
-;Tắt gợi ý xu hướng trong thanh địa chỉ
+; Disable Bing trending suggestions in the address bar
+; Tắt hiển thị đề xuất xu hướng của Bing trên thanh địa chỉ
 "AddressBarTrendingSuggestEnabled"=dword:00000000
 
-; Tắt "Continue running background apps when Chromium is closed"
+; Do not continue running background apps when Edge is closed
+; Không chạy các ứng dụng nền khi Edge đã đóng
 "BackgroundModeEnabled"=dword:00000000
 
-;Tắt tính năng Startup boost
+; Disable processes starting at OS sign-in (Startup boost)
+; Tắt tính năng khởi động nhanh (Startup boost)
 "StartupBoostEnabled"=dword:00000000
 
-; Bật Preload pages
-"NetworkPredictionOptions"=dword:00000000
+; Never predict network actions or prefetch resources
+; Tắt dự đoán hành động mạng và tìm nạp trước tài nguyên
+"NetworkPredictionOptions"=dword:00000002
 
-; Bật Use graphics acceleration when available
+; Use hardware acceleration when available
+; Bật sử dụng tăng tốc phần cứng khi khả dụng
 "HardwareAccelerationModeEnabled"=dword:00000001
 
-; Tắt rò rỉ IP WebRTC bằng cách thiết lập WebRtcLocalhostIpHandling thành disable_non_proxied_udp
+; Never route WebRTC traffic over non-proxied UDP (prevents local IP leak)
+; Không định tuyến WebRTC qua UDP không qua proxy (ngăn rò rỉ IP cục bộ)
 "WebRtcLocalhostIpHandling"="disable_non_proxied_udp"
 
-; Không cho phép các trang web liên quan xem hoạt động của bạn trong nhóm
-"RelatedWebsiteSetsEnabled"=dword:00000000
-
-;Block third-party cookies (Ngăn các trang web sử dụng cookie theo dõi bạn trên web)
+; Block third-party cookies in regular browsing sessions
+; Chặn cookie của bên thứ ba
 "BlockThirdPartyCookies"=dword:00000001
 
-;Never share additional operating system region
+; Never share additional OS region
+; Không bao giờ chia sẻ vùng hệ điều hành bổ sung
 "DefaultShareAdditionalOSRegionSetting"=dword:00000002
 
-;Enhance your security on the web Standard mode (bật bảo mật tiêu chuẩn)
+; Disable Enhance security mode in Edge
+; Tắt chế độ Tăng cường bảo mật trong Edge
 "EnhanceSecurityMode"=dword:00000000
 
-; Change default search Google (dùng duy nhất Google làm tìm kiếm)
+; Configure the default search provider (Google)
+; Đặt Google làm công cụ tìm kiếm mặc định
 "ManagedSearchEngines"="[{\"is_default\":true,\"keyword\":\"google.com\",\"name\":\"Google\",\"search_url\":\"https://www.google.com/search?q={searchTerms}\",\"suggest_url\":\"https://www.google.com/complete/search?output=chrome&q={searchTerms}\"}]"
 
-; Disable the default browser check on startup (tắt kiểm tra trình duyệt mặc định)
+; Do not check whether Edge is the default browser on startup
+; Không kiểm tra xem Edge có phải là trình duyệt mặc định khi khởi động
 "DefaultBrowserSettingEnabled"=dword:00000000
 
-; Performance (các tab sau 15 phút không truy cập sẽ tự đóng)
+; Put idle background tabs to sleep to reduce CPU/battery usage
+; Tự động đưa các tab nền vào chế độ ngủ để tiết kiệm tài nguyên
 "SleepingTabsEnabled"=dword:00000001
-"SleepingTabsTimeout"=dword:00000384	;15 phút
+; Put tabs to sleep after 15 minutes of inactivity
+; Đặt tab vào chế độ ngủ sau 15 phút không hoạt động
+"SleepingTabsTimeout"=dword:00000384
+; Disable Efficiency Mode
+; Tắt Chế độ hiệu quả (Efficiency Mode)
 "EfficiencyModeEnabled"=dword:00000000
+; Disable High Efficiency Mode
+; Tắt Chế độ hiệu suất cao (High Efficiency Mode)
 "HighEfficiencyModeEnabled"=dword:00000000
+; Disable extension performance detector
+; Tắt trình phát hiện hiệu suất của tiện ích mở rộng
 "ExtensionsPerformanceDetectorEnabled"=dword:00000000
 
-; Hiển thị nút tải xuống trên thanh công cụ
+; Always show the Downloads button on the toolbar
+; Luôn hiển thị nút Tải xuống trên thanh công cụ
 "ShowDownloadsToolbarButton"=dword:00000001
 
-; Copilot sẽ không xuất hiện trên thanh công cụ
-"Microsoft365CopilotChatIconEnabled"=dword:00000000
-
-; Chặn tìm kiếm AI trong lịch sử duyệt web
-"EdgeHistoryAISearchEnabled"=dword:00000000
-
-; Cloudflare Gateway DNS ECS (chặn quảng cáo bởi bộ lọc AdGuard và ABPVN)
+; Force DNS over HTTPS (DoH)
+; Bắt buộc sử dụng DNS qua HTTPS (DoH)
 "DnsOverHttpsMode"="secure"
+; Use custom template for DNS over HTTPS - Cloudflare Gateway DNS ECS
+; Sử dụng máy chủ tùy chỉnh cho DNS qua HTTPS - Cloudflare Gateway DNS ECS
 "DnsOverHttpsTemplates"="https://iabucttpma.cloudflare-gateway.com/dns-query{?dns}"
 
-; v148
-"AllowBrowsingWithCopilot"=dword:00000000
-"BuiltInAIAPIsEnabled"=dword:00000000
+; Do not bind encryption keys for local data storage to Edge
+; Không liên kết khóa mã hóa lưu trữ dữ liệu cục bộ với Edge
 "ApplicationBoundEncryptionEnabled"=dword:00000000
 
+; Disable importing browser settings from another browser
+; Tắt tính năng nhập cài đặt từ trình duyệt khác
+"ImportBrowserSettings"=dword:00000000
+
+; Disable explicitly invoking Copilot for a query
+; Tắt việc gọi Copilot thủ công
+"AllowBrowsingWithCopilot"=dword:00000000
+
+; Disable websites from accessing built-in AI APIs
+; Tắt cho phép trang web truy cập vào API AI tích hợp sẵn
+"BuiltInAIAPIsEnabled"=dword:00000000
+
+; Hide the Microsoft 365 Copilot Chat icon
+; Ẩn biểu tượng Trò chuyện Microsoft 365 Copilot
+"Microsoft365CopilotChatIconEnabled"=dword:00000000
+
+; Disable Copilot in the side pane from accessing page content
+; Ngăn Copilot trong ngăn bên truy cập nội dung trang
+"CopilotPageContextEnabled"=dword:00000000
+
+; Disable Copilot from accessing page content for Entra ID profiles
+; Ngăn Copilot truy cập nội dung trang đối với hồ sơ Entra ID
+"EdgeEntraCopilotPageContext"=dword:00000000
+
+; Disable AI-enhanced search in browsing history
+; Tắt tìm kiếm AI nâng cao trong lịch sử duyệt web
+"EdgeHistoryAISearchEnabled"=dword:00000000
+
+; Disable generating browser themes using DALL-E
+; Tắt tự động tạo chủ đề trình duyệt bằng DALL-E
+"AIGenThemesEnabled"=dword:00000000
+
+; Do not download the foundational GenAI model for local inference
+; Không tải xuống mô hình GenAI nền tảng để suy luận cục bộ
+"GenAILocalFoundationalModelSettings"=dword:00000001
+
+; Disable Copilot mode
+; Tắt chế độ Copilot
+"CopilotMode"=dword:00000000
+
+; Disable Copilot multi-tab features
+; Tắt các tính năng Copilot cho nhiều tab
+"CopilotMultitabEnabled"=dword:00000000
+
+; Disable Copilot on new tab page
+; Tắt Copilot trên trang tab mới
+"CopilotNewTabPageEnabled"=dword:00000000
+
+; Disable Copilot page context broadly
+; Ngăn chặn Copilot truy cập ngữ cảnh trang
+"CopilotPageContext"=dword:00000000
+
+; Do not include history in Entra Copilot page context
+; Không bao gồm lịch sử trong ngữ cảnh trang Entra Copilot
+"EdgeEntraCopilotPageContextIncludesHistory"=dword:00000000
+
+; Do not auto-open Copilot for M365 links
+; Không tự động mở Copilot cho các liên kết M365
+"M365LinksAutoOpenCopilotEnabled"=dword:00000000
+
+; Do not share browsing history with Microsoft 365 Copilot Search
+; Không chia sẻ lịch sử duyệt web với Microsoft 365 Copilot Search
+"ShareBrowsingHistoryWithCopilotSearchAllowed"=dword:00000000
+
+; Disable Copilot chat suggestions in the address bar
+; Tắt các đề xuất trò chuyện Copilot trên thanh địa chỉ
+"CopilotAddressBarSuggestionsEnabled"=dword:00000000
+
+; Block the default New Tab
 ; Chặn New Tab mặc định
 [HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\Edge\URLBlocklist]
 "1"="ntp.msn.com"
 
+; Install the Minimal New Tab plugin.
 ; Cài đặt plugin Minimal New Tab
 [HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\Edge\ExtensionInstallForcelist]
 "1"="khdnagehanbomfdogegmpddmcalmdnbg"
