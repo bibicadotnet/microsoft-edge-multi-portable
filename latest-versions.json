@@ -1,12 +1,12 @@
 ﻿{
     "channels":  {
                      "canary":  {
-                                    "version":  "150.0.4076.0",
+                                    "version":  "150.0.4077.0",
                                     "name":  "Microsoft Edge Canary",
-                                    "published_at":  "2026-06-05T16:06:36Z",
+                                    "published_at":  "2026-06-05T20:54:02Z",
                                     "chromePlus":  "1.16.2",
-                                    "download_url":  "https://edge.bibica.net/edge-canary-portable-x64_150.0.4076.0_1.16.2/edge-canary-portable-x64_150.0.4076.0_1.16.2.zip",
-                                    "tag_name":  "edge-canary-portable-x64_150.0.4076.0_1.16.2"
+                                    "download_url":  "https://edge.bibica.net/edge-canary-portable-x64_150.0.4077.0_1.16.2/edge-canary-portable-x64_150.0.4077.0_1.16.2.zip",
+                                    "tag_name":  "edge-canary-portable-x64_150.0.4077.0_1.16.2"
                                 },
                      "beta":  {
                                   "version":  "149.0.4022.52",
@@ -33,5 +33,5 @@
                                     "tag_name":  "edge-stable-portable-x64_149.0.4022.52_1.16.2"
                                 }
                  },
-    "last_updated":  "2026-06-05T20:54:09Z"
+    "last_updated":  "2026-06-08T19:27:14Z"
 }
