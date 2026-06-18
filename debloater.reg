@@ -51,6 +51,8 @@ Windows Registry Editor Version 5.00
 ; Disable the Screenshot (formerly web capture) feature
 ; Tắt tính năng Chụp ảnh màn hình (Screenshot/Web capture)
 "WebCaptureEnabled"=dword:00000000
+"DisableScreenshots"=dword:00000000
+"ScreenCaptureAllowed"=dword:00000000
 
 ; Disable prompting to switch profiles for personal/work links
 ; Tắt nhắc chuyển hồ sơ cho liên kết cá nhân/công việc
@@ -452,9 +454,9 @@ Windows Registry Editor Version 5.00
 ; Tắt chế độ Tăng cường bảo mật trong Edge
 "EnhanceSecurityMode"=dword:00000000
 
-; Configure the default search provider (Google)
-; Đặt Google làm công cụ tìm kiếm mặc định
-"ManagedSearchEngines"="[{\"is_default\":true,\"keyword\":\"google.com\",\"name\":\"Google\",\"search_url\":\"https://www.google.com/search?q={searchTerms}\",\"suggest_url\":\"https://www.google.com/complete/search?output=chrome&q={searchTerms}\"}]"
+; Configure the default search provider (Google Web Only)
+; Đặt Google làm công cụ tìm kiếm mặc định (Chỉ hiển thị kết quả Web - Không AI)
+"ManagedSearchEngines"="[{\"is_default\":true,\"keyword\":\"google.com\",\"name\":\"Google\",\"search_url\":\"https://www.google.com/search?q={searchTerms}&udm=14\",\"suggest_url\":\"https://www.google.com/complete/search?output=chrome&q={searchTerms}\"}]"
 
 ; Do not check whether Edge is the default browser on startup
 ; Không kiểm tra xem Edge có phải là trình duyệt mặc định khi khởi động
@@ -558,6 +560,13 @@ Windows Registry Editor Version 5.00
 ; Disable Copilot chat suggestions in the address bar
 ; Tắt các đề xuất trò chuyện Copilot trên thanh địa chỉ
 "CopilotAddressBarSuggestionsEnabled"=dword:00000000
+
+; 4:14 AM Sunday, June 14, 2026
+"SmartScreenDnsRequestsEnabled"=dword:00000000
+"BrowserNetworkTimeQueriesEnabled"=dword:00000000
+"ClearCachedImagesAndFilesOnExit"=dword:00000001
+"WhatsNewPageForEntraProfilesEnabled"=dword:00000000
+"QuickSearchShowMiniMenu"=dword:00000000
 
 ; Block the default New Tab
 ; Chặn New Tab mặc định
