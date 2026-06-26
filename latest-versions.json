@@ -1,21 +1,21 @@
 ﻿{
     "channels":  {
-                     "beta":  {
-                                  "version":  "150.0.4078.28",
-                                  "name":  "Microsoft Edge Beta",
-                                  "published_at":  "2026-06-22T20:58:01Z",
-                                  "chromePlus":  "1.17.0",
-                                  "download_url":  "https://edge.bibica.net/edge-beta-portable-x64_150.0.4078.28_1.17.0/edge-beta-portable-x64_150.0.4078.28_1.17.0.zip",
-                                  "tag_name":  "edge-beta-portable-x64_150.0.4078.28_1.17.0"
-                              },
-                     "stable":  {
-                                    "version":  "149.0.4022.96",
-                                    "name":  "Microsoft Edge Stable",
-                                    "published_at":  "2026-06-25T22:26:25Z",
+                     "canary":  {
+                                    "version":  "151.0.4118.0",
+                                    "name":  "Microsoft Edge Canary",
+                                    "published_at":  "2026-06-26T15:29:10Z",
                                     "chromePlus":  "1.17.0",
-                                    "download_url":  "https://edge.bibica.net/edge-stable-portable-x64_149.0.4022.96_1.17.0/edge-stable-portable-x64_149.0.4022.96_1.17.0.zip",
-                                    "tag_name":  "edge-stable-portable-x64_149.0.4022.96_1.17.0"
+                                    "download_url":  "https://edge.bibica.net/edge-canary-portable-x64_151.0.4118.0_1.17.0/edge-canary-portable-x64_151.0.4118.0_1.17.0.zip",
+                                    "tag_name":  "edge-canary-portable-x64_151.0.4118.0_1.17.0"
                                 },
+                     "beta":  {
+                                  "version":  "150.0.4078.36",
+                                  "name":  "Microsoft Edge Beta",
+                                  "published_at":  "2026-06-26T17:57:48Z",
+                                  "chromePlus":  "1.17.0",
+                                  "download_url":  "https://edge.bibica.net/edge-beta-portable-x64_150.0.4078.36_1.17.0/edge-beta-portable-x64_150.0.4078.36_1.17.0.zip",
+                                  "tag_name":  "edge-beta-portable-x64_150.0.4078.36_1.17.0"
+                              },
                      "dev":  {
                                  "version":  "151.0.4105.0",
                                  "name":  "Microsoft Edge Developer",
@@ -24,14 +24,14 @@
                                  "download_url":  "https://edge.bibica.net/edge-dev-portable-x64_151.0.4105.0_1.17.0/edge-dev-portable-x64_151.0.4105.0_1.17.0.zip",
                                  "tag_name":  "edge-dev-portable-x64_151.0.4105.0_1.17.0"
                              },
-                     "canary":  {
-                                    "version":  "151.0.4118.0",
-                                    "name":  "Microsoft Edge Canary",
-                                    "published_at":  "2026-06-26T15:29:10Z",
+                     "stable":  {
+                                    "version":  "149.0.4022.96",
+                                    "name":  "Microsoft Edge Stable",
+                                    "published_at":  "2026-06-25T22:26:25Z",
                                     "chromePlus":  "1.17.0",
-                                    "download_url":  "https://edge.bibica.net/edge-canary-portable-x64_151.0.4118.0_1.17.0/edge-canary-portable-x64_151.0.4118.0_1.17.0.zip",
-                                    "tag_name":  "edge-canary-portable-x64_151.0.4118.0_1.17.0"
+                                    "download_url":  "https://edge.bibica.net/edge-stable-portable-x64_149.0.4022.96_1.17.0/edge-stable-portable-x64_149.0.4022.96_1.17.0.zip",
+                                    "tag_name":  "edge-stable-portable-x64_149.0.4022.96_1.17.0"
                                 }
                  },
-    "last_updated":  "2026-06-26T17:57:56Z"
+    "last_updated":  "2026-06-26T22:21:09Z"
 }
